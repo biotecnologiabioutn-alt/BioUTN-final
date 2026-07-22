@@ -26,7 +26,9 @@ namespace BioUTN.API.Controllers
         {
             try
             {
-                var list = await _context.Proyectos.ToListAsync();
+                var list = await _context.Proyectos
+                    .Include(p => p.TipoProyectoRef)
+                    .ToListAsync();
                 return Ok(list); 
             }
             catch (Exception ex)
@@ -43,6 +45,7 @@ namespace BioUTN.API.Controllers
             {
                 var item = await _context.Proyectos
                     .Include(p => p.Tesista)
+                    .Include(p => p.TipoProyectoRef)
                     .FirstOrDefaultAsync(p => p.Id == id);
 
                 if (item == null)

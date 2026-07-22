@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <ItemGroup>
     <ProjectReference Include="..\BioUTN.Modelos\BioUTN.Modelos.csproj" />
@@ -10,6 +10,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>941e5c83-933e-490c-b6d8-a4340fa40c92</UserSecretsId>
   </PropertyGroup>
 
 </Project>
