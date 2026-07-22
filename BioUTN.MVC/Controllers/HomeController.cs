@@ -65,6 +65,27 @@ namespace BioUTN.MVC.Controllers
                 ViewBag.TotalEquipos = 0; ViewBag.ReservasActivas = 0; ViewBag.TotalAnaqueles = 0; ViewBag.TotalDocumentos = 0;
             }
 
+            // Datos para Gráficos
+            try 
+            {
+                var fases = Crud<FaseCultivo>.GetAll() ?? Array.Empty<FaseCultivo>();
+                var lotesGroupFase = lotes.GroupBy(l => l.IdFaseCultivo).ToList();
+                var faseLabels = new List<string>();
+                var faseData = new List<int>();
+                foreach (var g in lotesGroupFase)
+                {
+                    var fase = fases.FirstOrDefault(f => f.Id == g.Key);
+                    faseLabels.Add(fase != null ? fase.NombreFase : "Desconocida");
+                    faseData.Add(g.Count());
+                }
+                ViewBag.LotesPorFaseLabels = JsonConvert.SerializeObject(faseLabels);
+                ViewBag.LotesPorFaseData = JsonConvert.SerializeObject(faseData);
+            } 
+            catch {
+                ViewBag.LotesPorFaseLabels = "[]";
+                ViewBag.LotesPorFaseData = "[]";
+            }
+
             var mockTasks = new Dictionary<string, List<object>>();
 
             // Add reservas
