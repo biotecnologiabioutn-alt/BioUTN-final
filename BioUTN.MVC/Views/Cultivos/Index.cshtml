@@ -239,7 +239,7 @@
                         <i class="bi bi-flower1"></i>
                     </div>
                     <div>
-                        <p class="kpi-value">1,245</p>
+                        <p class="kpi-value">@ViewBag.TotalFrascos</p>
                         <p class="kpi-label">Plantas In Vitro</p>
                     </div>
                 </a>
@@ -250,7 +250,7 @@
                         <i class="bi bi-box"></i>
                     </div>
                     <div>
-                        <p class="kpi-value">24</p>
+                        <p class="kpi-value">@ViewBag.TotalEspecies</p>
                         <p class="kpi-label">Especies</p>
                     </div>
                 </a>
@@ -261,7 +261,7 @@
                         <i class="bi bi-tree"></i>
                     </div>
                     <div>
-                        <p class="kpi-value">18</p>
+                        <p class="kpi-value">@ViewBag.TotalPlantasMadre</p>
                         <p class="kpi-label">Plantas Madre</p>
                     </div>
                 </a>
@@ -272,7 +272,7 @@
                         <i class="bi bi-droplet"></i>
                     </div>
                     <div>
-                        <p class="kpi-value">56</p>
+                        <p class="kpi-value">@ViewBag.TotalLotes</p>
                         <p class="kpi-label">Lotes Activos</p>
                     </div>
                 </a>
@@ -283,17 +283,15 @@
         <div>
             <div class="d-flex justify-content-between text-muted" style="font-size: 12px; margin-bottom: 8px;">
                 <span class="fw-bold" style="color: #111827;">Estado de frascos</span>
-                <span>Eficiencia promedio: <strong style="color: #111827;">92%</strong></span>
+                <span>Eficiencia promedio: <strong style="color: #111827;">@ViewBag.Eficiencia%</strong></span>
             </div>
             <div class="health-bar-container mb-2">
-                <div style="width: 85%; background-color: #34d399;"></div>
-                <div style="width: 10%; background-color: #f87171;"></div>
-                <div style="width: 5%; background-color: #e5e7eb;"></div>
+                <div style="width: @(ViewBag.Eficiencia)%; background-color: #34d399;"></div>
+                <div style="width: @(100 - ViewBag.Eficiencia)%; background-color: #f87171;"></div>
             </div>
             <div class="d-flex gap-3 text-muted" style="font-size: 11px;">
-                <span class="d-flex align-items-center gap-1"><span style="width:8px;height:8px;border-radius:50%;background-color:#34d399;display:inline-block;"></span>85% saludables (1,058)</span>
-                <span class="d-flex align-items-center gap-1"><span style="width:8px;height:8px;border-radius:50%;background-color:#f87171;display:inline-block;"></span>10% contaminados (124)</span>
-                <span class="d-flex align-items-center gap-1"><span style="width:8px;height:8px;border-radius:50%;background-color:#e5e7eb;display:inline-block;"></span>5% otros</span>
+                <span class="d-flex align-items-center gap-1"><span style="width:8px;height:8px;border-radius:50%;background-color:#34d399;display:inline-block;"></span>@(ViewBag.Eficiencia)% saludables (@ViewBag.Saludables)</span>
+                <span class="d-flex align-items-center gap-1"><span style="width:8px;height:8px;border-radius:50%;background-color:#f87171;display:inline-block;"></span>@(100 - ViewBag.Eficiencia)% contaminados (@ViewBag.Contaminados)</span>
             </div>
         </div>
     </div>
@@ -580,7 +578,21 @@
                         <p class="module-title" style="color: #6b21a8;">Árbol de Trazabilidad</p>
                         <i class="bi bi-chevron-right module-arrow" style="color: #6b21a8;"></i>
                     </div>
-                    <p class="module-desc" style="color: #4c1d95;">Visualiza el árbol genealógico interactivo de una Planta Madre, todas sus siembras y resiembras asociadas.</p>
+                        <p class="module-desc" style="color: #4c1d95;">Visualiza el árbol genealógico interactivo de una Planta Madre, todas sus siembras y resiembras asociadas.</p>
+                </div>
+            </a>
+        </div>
+        
+        <!-- Tarjeta de Configuración Biológica agregada aquí -->
+        <div class="col-12 col-md-6 col-lg-4">
+            <a asp-controller="ConfiguracionBiologica" asp-action="Index" class="module-card">
+                <div class="module-icon bg-blue-50 text-blue-600" style="background-color: #e0f2fe; color: #0284c7;"><i class="bi bi-gear-fill"></i></div>
+                <div class="flex-grow-1">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <p class="module-title" style="color: #0369a1;">Configuración Biológica</p>
+                        <i class="bi bi-chevron-right module-arrow" style="color: #0369a1;"></i>
+                    </div>
+                    <p class="module-desc" style="color: #0c4a6e;">Gestiona las listas desplegables: Medios de cultivo, fases de desarrollo, géneros, especies, etc.</p>
                 </div>
             </a>
         </div>

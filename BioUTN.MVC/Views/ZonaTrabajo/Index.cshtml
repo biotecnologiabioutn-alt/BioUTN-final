@@ -242,7 +242,7 @@
                         <i class="bi bi-pc-display-horizontal"></i>
                     </div>
                     <div>
-                        <p class="kpi-value">24</p>
+                        <p class="kpi-value">@ViewBag.TotalEquipos</p>
                         <p class="kpi-label">Equipos Totales</p>
                     </div>
                 </a>
@@ -253,29 +253,29 @@
                         <i class="bi bi-clock-history"></i>
                     </div>
                     <div>
-                        <p class="kpi-value">3</p>
+                        <p class="kpi-value">@ViewBag.ReservasActivas</p>
                         <p class="kpi-label">Tus Reservas Activas</p>
                     </div>
                 </a>
             </div>
             <div class="col-6 col-md-3">
-                <a asp-controller="ZonaTrabajo" asp-action="Mapa" class="kpi-card">
+                <a asp-controller="UbicacionFisicas" asp-action="Index" class="kpi-card">
                     <div class="kpi-icon-box bg-rose-50 text-rose-600">
                         <i class="bi bi-geo-alt"></i>
                     </div>
                     <div>
-                        <p class="kpi-value">8</p>
+                        <p class="kpi-value">@ViewBag.TotalAnaqueles</p>
                         <p class="kpi-label">Anaqueles</p>
                     </div>
                 </a>
             </div>
             <div class="col-6 col-md-3">
                 <a asp-controller="Biblioteca" asp-action="Index" class="kpi-card">
-                    <div class="kpi-icon-box bg-violet-50 text-violet-600">
+                    <div class="kpi-icon-box bg-purple-50 text-purple-600">
                         <i class="bi bi-book"></i>
                     </div>
                     <div>
-                        <p class="kpi-value">145</p>
+                        <p class="kpi-value">@ViewBag.TotalDocumentos</p>
                         <p class="kpi-label">Documentos</p>
                     </div>
                 </a>

@@ -86,29 +86,31 @@ namespace BioUTN.MVC.Controllers
             {
                 try
                 {
-                    // 1. Guardar archivo en Azure Blob Storage
+                    // 1. Guardar archivo localmente en wwwroot/biblioteca
+                    string folder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "biblioteca");
+                    if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
                     string uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(ArchivoPdf.FileName);
+                    string filePath = Path.Combine(folder, uniqueFileName);
                     
-                    // Subir al contenedor "biblioteca"
-                    string fileUrl;
-                    using (var stream = ArchivoPdf.OpenReadStream())
+                    using (var stream = new FileStream(filePath, FileMode.Create))
                     {
-                        fileUrl = await _blobStorageService.UploadFileAsync(stream, ArchivoPdf.ContentType, "biblioteca", uniqueFileName);
+                        await ArchivoPdf.CopyToAsync(stream);
                     }
 
                     // 2. Llenar modelo y guardar en DB
-                    item.UrlArchivo = fileUrl;
+                    item.UrlArchivo = "/biblioteca/" + uniqueFileName;
                     item.FechaSubida = DateTime.UtcNow;
 
                     // Asignar IdUsuario del usuario logueado
-                    var claimId = User.FindFirst(ClaimTypes.NameIdentifier);
-                    if (claimId != null && int.TryParse(claimId.Value, out int idUsuario))
+                    var loggedUserEmail = User.Identity?.Name;
+                    var loggedUser = Crud<Usuario>.GetAll().FirstOrDefault(u => u.Email == loggedUserEmail);
+                    if (loggedUser != null)
                     {
-                        item.IdUsuario = idUsuario;
+                        item.IdUsuario = loggedUser.Id;
                     }
-                    else
+                    else 
                     {
-                        item.IdUsuario = 1; // Fallback
+                        item.IdUsuario = 1; // Fallback temporal
                     }
 
                     Crud<Documento>.Create(item);

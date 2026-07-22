@@ -1,3 +1,4 @@
+using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,6 +9,24 @@ namespace BioUTN.MVC.Controllers
     {
         public IActionResult Index()
         {
+            try
+            {
+                ViewBag.TotalEquipos = BioUTN.ApiConsumer.Crud<BioUTN.Modelos.Equipo>.GetAll()?.Count() ?? 0;
+                
+                var reservas = BioUTN.ApiConsumer.Crud<BioUTN.Modelos.ReservaEquipo>.GetAll();
+                ViewBag.ReservasActivas = reservas?.Count(r => r.FechaFin >= System.DateTime.Now) ?? 0;
+
+                ViewBag.TotalAnaqueles = BioUTN.ApiConsumer.Crud<BioUTN.Modelos.UbicacionFisica>.GetAll()?.Count() ?? 0;
+                ViewBag.TotalDocumentos = BioUTN.ApiConsumer.Crud<BioUTN.Modelos.Documento>.GetAll()?.Count() ?? 0;
+            }
+            catch (System.Exception)
+            {
+                ViewBag.TotalEquipos = 0;
+                ViewBag.ReservasActivas = 0;
+                ViewBag.TotalAnaqueles = 0;
+                ViewBag.TotalDocumentos = 0;
+            }
+
             return View();
         }
 

@@ -121,14 +121,18 @@ namespace BioUTN.API.Controllers
                 _context.Usuarios.Add(item);
                 await _context.SaveChangesAsync();
 
-                try 
+                // Enviar el correo en segundo plano para no bloquear la respuesta
+                _ = Task.Run(async () =>
                 {
-                    await _emailService.EnviarCorreoRegistro(item.Email, $"{item.Nombres} {item.Apellidos}");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Error enviando correo: " + ex.Message);
-                }
+                    try
+                    {
+                        await _emailService.EnviarCorreoRegistro(item.Email, $"{item.Nombres} {item.Apellidos}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Error enviando correo: " + ex.Message);
+                    }
+                });
 
                 return CreatedAtAction(nameof(GetUsuario), new { id = item.Id }, item);
             }
@@ -238,14 +242,17 @@ namespace BioUTN.API.Controllers
             // This should ideally come from appsettings
             string resetUrl = $"https://localhost:7142/Account/ResetPassword?token={usuario.ResetToken}&email={usuario.Email}";
             
-            try 
+            _ = Task.Run(async () => 
             {
-                await _emailService.EnviarCorreoRecuperacion(usuario.Email, resetUrl);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error enviando correo de recuperación: " + ex.Message);
-            }
+                try 
+                {
+                    await _emailService.EnviarCorreoRecuperacion(usuario.Email, resetUrl);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error enviando correo de recuperación: " + ex.Message);
+                }
+            });
 
             return Ok(new { message = "Si el correo existe, se enviará un enlace de recuperación." });
         }
