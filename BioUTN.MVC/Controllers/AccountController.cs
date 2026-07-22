@@ -78,8 +78,21 @@ namespace BioUTN.MVC.Controllers
                     return RedirectToAction("Index", "Home");
                 }
             }
-            
+            if (response.StatusCode == System.Net.HttpStatusCode.BadGateway || 
+                response.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable || 
+                response.StatusCode == System.Net.HttpStatusCode.GatewayTimeout)
+            {
+                ViewBag.Error = "El servidor de la API se está iniciando o no está disponible temporalmente. Por favor, intenta de nuevo en unos segundos.";
+                return View();
+            }
+
             var errorContent = await response.Content.ReadAsStringAsync();
+            if (errorContent.TrimStart().StartsWith("<"))
+            {
+                // Si la respuesta es HTML (ej. un error de proxy no capturado por el status code), no la mostramos.
+                errorContent = "Ocurrió un error inesperado de red.";
+            }
+
             ViewBag.Error = string.IsNullOrEmpty(errorContent) ? "Credenciales incorrectas o cuenta bloqueada." : errorContent;
             return View();
         }
@@ -143,9 +156,20 @@ namespace BioUTN.MVC.Controllers
                 TempData["Success"] = "Contraseña restablecida exitosamente. Ahora puedes iniciar sesión.";
                 return RedirectToAction("Login");
             }
+            if (response.StatusCode == System.Net.HttpStatusCode.BadGateway || 
+                response.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable || 
+                response.StatusCode == System.Net.HttpStatusCode.GatewayTimeout)
+            {
+                ViewBag.Error = "El servidor de la API se está iniciando o no está disponible temporalmente. Por favor, intenta de nuevo en unos segundos.";
+                return View();
+            }
             
             var errorMsg = await response.Content.ReadAsStringAsync();
-            ViewBag.Error = string.IsNullOrEmpty(errorMsg) ? "Error al restablecer la contraseña." : errorMsg;
+            if (errorMsg.TrimStart().StartsWith("<"))
+            {
+                errorMsg = "Ocurrió un error inesperado de red.";
+            }
+            ViewBag.Error = string.IsNullOrEmpty(errorMsg) ? "Error al restablecer la contraseña. El enlace puede haber expirado." : errorMsg;
             return View();
         }
 
