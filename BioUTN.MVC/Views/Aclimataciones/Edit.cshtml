@@ -1,0 +1,92 @@
+@model BioUTN.Modelos.Aclimatacion
+
+@{
+    ViewData["Title"] = "Evaluar Aclimatación";
+}
+
+@section Styles {
+<style>
+    .figma-container { font-family: 'Inter', -apple-system, sans-serif; background-color: #f9fafb; padding: 20px; border-radius: 12px; }
+    .figma-card { background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 0.75rem; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); padding: 2rem; }
+    .form-label { font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 0.5rem; }
+    .form-control, .form-select { border: 1px solid #d1d5db; border-radius: 0.5rem; padding: 0.625rem 0.875rem; font-size: 14px; transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out; }
+    .form-control:focus, .form-select:focus { border-color: #10b981; box-shadow: 0 0 0 0.25rem rgba(16, 185, 129, 0.25); }
+    .figma-btn-primary { background-color: #10b981; color: white; border: none; padding: 0.625rem 1.25rem; border-radius: 0.5rem; font-size: 14px; font-weight: 500; transition: background-color 0.2s; }
+    .figma-btn-primary:hover { background-color: #059669; color: white; }
+    .figma-btn-secondary { background-color: white; color: #374151; border: 1px solid #d1d5db; padding: 0.625rem 1.25rem; border-radius: 0.5rem; font-size: 14px; font-weight: 500; transition: all 0.2s; text-decoration: none; display: inline-block; }
+    .figma-btn-secondary:hover { background-color: #f3f4f6; color: #111827; }
+</style>
+}
+
+<div class="figma-container">
+    <div class="mb-4">
+        <h3 style="font-weight: 700; color: #111827; font-size: 20px;">Evaluación de Supervivencia (Cierre del Ciclo)</h3>
+        <p class="text-muted" style="font-size: 13px;">Registra el éxito de la aclimatación de este lote ex-vitro.</p>
+    </div>
+
+    <div class="figma-card">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="IdLoteEnraizado" />
+            <input type="hidden" asp-for="IdUsuarioResponsable" />
+            <input type="hidden" asp-for="FechaTraspaso" />
+            <input type="hidden" asp-for="SustratoUtilizado" />
+            <input type="hidden" asp-for="LavadoRaices" />
+            <input type="hidden" asp-for="CoberturaPlastica" />
+            <input type="hidden" asp-for="IdUbicacionFisica" />
+            <input type="hidden" asp-for="IdDocumentoProtocolo" />
+            <input type="hidden" asp-for="HumedadInicial" />
+            <input type="hidden" asp-for="TemperaturaControlada" />
+
+            <div class="row g-4">
+                <div class="col-md-12">
+                    <h5 style="font-size: 16px; font-weight: 600; color: #111827; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #e5e7eb;">Resultados de Aclimatación</h5>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="FechaEvaluacionFinal" class="form-label">Fecha de Evaluación Final *</label>
+                    <input asp-for="FechaEvaluacionFinal" class="form-control" type="date" value="@(Model.FechaEvaluacionFinal?.ToString("yyyy-MM-dd") ?? DateTime.Now.ToString("yyyy-MM-dd"))" required />
+                    <span asp-validation-for="FechaEvaluacionFinal" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="PlantasSobrevivientes" class="form-label">Número de Plantas Sobrevivientes *</label>
+                    <input asp-for="PlantasSobrevivientes" class="form-control" type="number" min="0" required />
+                    <span asp-validation-for="PlantasSobrevivientes" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="PlantasMuertas" class="form-label">Número de Plantas Muertas</label>
+                    <input asp-for="PlantasMuertas" class="form-control" type="number" min="0" />
+                    <span asp-validation-for="PlantasMuertas" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-12">
+                    <label asp-for="Observaciones" class="form-label">Observaciones Finales</label>
+                    <textarea asp-for="Observaciones" class="form-control" rows="3" placeholder="Comentarios sobre hongos, clima, etc."></textarea>
+                    <span asp-validation-for="Observaciones" class="text-danger small"></span>
+                </div>
+                
+                <div class="col-md-6">
+                    <label asp-for="Activo" class="form-label">Estado de la Aclimatación</label>
+                    <select asp-for="Activo" class="form-select">
+                        <option value="true">En Aclimatación (Abierto)</option>
+                        <option value="false">Completado (Ciclo Cerrado)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="mt-5 pt-4 border-top d-flex justify-content-end gap-3">
+                <a asp-action="Index" class="figma-btn-secondary">Cancelar</a>
+                <button type="submit" class="figma-btn-primary">
+                    <i class="bi bi-save me-1"></i> Guardar Evaluación
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

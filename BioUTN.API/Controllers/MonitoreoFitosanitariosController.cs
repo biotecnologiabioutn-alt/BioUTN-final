@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -103,6 +103,28 @@ namespace BioUTN.API.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, "Error al guardar: " + ex.Message);
+            }
+        }
+
+        // POST: api/MonitoreoFitosanitarios/batch
+        [HttpPost("batch")]
+        public async Task<IActionResult> PostMonitoreoFitosanitarioBatch(List<MonitoreoFitosanitario> items)
+        {
+            try
+            {
+                if (items == null || !items.Any())
+                {
+                    return BadRequest("La lista de monitoreos está vacía.");
+                }
+
+                _context.MonitoreosFitosanitarios.AddRange(items);
+                await _context.SaveChangesAsync();
+
+                return Ok(new { message = $"{items.Count} monitoreos guardados correctamente." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Error al guardar en lote: " + ex.Message);
             }
         }
 

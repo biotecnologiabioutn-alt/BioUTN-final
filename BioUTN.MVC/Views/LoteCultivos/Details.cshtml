@@ -27,12 +27,21 @@
         </div>
         <div class="gap-2 d-flex">
             <a asp-action="Index" class="figma-btn-secondary">Volver al listado</a>
+            <a asp-controller="MonitoreoFitosanitarios" asp-action="FichaSeguimiento" asp-route-loteId="@Model.Id" class="figma-btn-primary" style="background-color: #f59e0b;">
+                <i class="bi bi-clipboard2-pulse me-1"></i> Ficha Seguimiento
+            </a>
             @if (Model.NumeroRepique < 10)
             {
                 <a asp-action="Resiembra" asp-route-id="@Model.Id" class="figma-btn-secondary" style="color: #0d6efd;">
                     <i class="bi bi-diagram-3-fill me-1"></i> Resiembra
                 </a>
             }
+            <a asp-action="Enraizamiento" asp-route-id="@Model.Id" class="figma-btn-secondary" style="color: #10b981;">
+                <i class="bi bi-tree me-1"></i> Enraizamiento
+            </a>
+            <a asp-action="Aclimatacion" asp-route-id="@Model.Id" class="figma-btn-secondary" style="color: #8b5cf6;">
+                <i class="bi bi-sun me-1"></i> Aclimatación
+            </a>
             <a asp-action="Edit" asp-route-id="@Model.Id" class="figma-btn-primary">
                 <i class="bi bi-pencil-square me-1"></i> Editar Lote
             </a>

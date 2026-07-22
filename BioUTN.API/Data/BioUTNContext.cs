@@ -34,6 +34,8 @@ namespace BioUTN.API.Data
         public DbSet<UbicacionFisica> UbicacionesFisicas { get; set; }
         public DbSet<LoteCultivo> LotesCultivo { get; set; }
         public DbSet<UnidadFrasco> UnidadesFrasco { get; set; }
+        public DbSet<Enraizamiento> Enraizamientos { get; set; }
+        public DbSet<Aclimatacion> Aclimataciones { get; set; }
 
         // 5. MONITOREO Y EVIDENCIA CIENTÍFICA
         public DbSet<MonitoreoFitosanitario> MonitoreosFitosanitarios { get; set; }

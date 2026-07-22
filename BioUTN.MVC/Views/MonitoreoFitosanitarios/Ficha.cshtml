@@ -1,0 +1,103 @@
+@model BioUTN.MVC.Models.FichaSeguimientoViewModel
+
+@{
+    ViewData["Title"] = "Ficha de Seguimiento";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid py-4">
+    <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-header bg-primary text-white rounded-top-4 py-3">
+            <h4 class="mb-0 fw-bold"><i class="bi bi-card-checklist me-2"></i>FICHA DE SEGUIMIENTO</h4>
+        </div>
+        <div class="card-body p-4 p-md-5">
+            <form asp-action="FichaSeguimiento" method="post">
+                <input type="hidden" asp-for="IdLoteCultivo" />
+                <input type="hidden" asp-for="FechaSiembra" />
+
+                <!-- Datos Generales -->
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-2"><strong>Lote:</strong> @Model.LoteCodigo</div>
+                    <div class="col-md-6 mb-2"><strong>Fecha de siembra:</strong> @Model.FechaSiembra.ToString("dd/MM/yyyy")</div>
+                    
+                    <div class="col-md-6 mb-2">
+                        <label class="fw-bold">Fecha de revisión:</label>
+                        <input type="date" asp-for="FechaRevision" class="form-control form-control-sm w-50 d-inline-block ms-2" />
+                    </div>
+                    <div class="col-md-6 mb-2"><strong>Tiempo en días:</strong> @Model.TiempoEnDias días</div>
+                    
+                    <div class="col-md-6 mb-2"><strong>Explante:</strong> @Model.Explante</div>
+                    <div class="col-md-6 mb-2"><strong>Unidades revisadas:</strong> @Model.TotalUnidades</div>
+                    
+                    <div class="col-md-12 mb-2"><strong>Responsable:</strong> @Model.Responsables</div>
+                </div>
+
+                <!-- Tabla de Evaluación -->
+                <div class="table-responsive mb-4">
+                    <table class="table table-bordered table-hover align-middle text-center">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Unidad (Frasco)</th>
+                                <th>Contaminación bacteriana</th>
+                                <th>Contaminación fúngica</th>
+                                <th>Oxidación / fenolización</th>
+                                <th>Muerte</th>
+                                <th>Respuesta</th>
+                                <th>Observación</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < Model.Filas.Count; i++)
+                            {
+                                <tr>
+                                    <td class="text-start">
+                                        <input type="hidden" asp-for="Filas[i].IdUnidadFrasco" />
+                                        <input type="hidden" asp-for="Filas[i].CodigoUnidad" />
+                                        @Model.Filas[i].CodigoUnidad
+                                    </td>
+                                    <td>
+                                        <input type="checkbox" asp-for="Filas[i].Bacterias" class="form-check-input" />
+                                    </td>
+                                    <td>
+                                        <input type="checkbox" asp-for="Filas[i].Hongos" class="form-check-input" />
+                                    </td>
+                                    <td>
+                                        <input type="checkbox" asp-for="Filas[i].Oxidacion" class="form-check-input" />
+                                    </td>
+                                    <td>
+                                        <input type="checkbox" asp-for="Filas[i].Muerte" class="form-check-input" />
+                                    </td>
+                                    <td>
+                                        <input type="text" asp-for="Filas[i].Respuesta" class="form-control form-control-sm" />
+                                    </td>
+                                    <td>
+                                        <input type="text" asp-for="Filas[i].Observacion" class="form-control form-control-sm" />
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Acciones -->
+                <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                    <a asp-controller="LoteCultivos" asp-action="Details" asp-route-id="@Model.IdLoteCultivo" class="btn btn-light rounded-pill px-4">Cancelar</a>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4">
+                        <i class="bi bi-save me-1"></i> Guardar Ficha
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        // Actualiza el "Tiempo en días" dinámicamente si cambian la fecha de revisión
+        document.getElementById('FechaRevision').addEventListener('change', function() {
+            var fechaSiembraStr = document.getElementById('FechaSiembra').value; // Formato dependiente de cultura
+            // Por simplicidad, recargar o calcular via JS (opcional).
+        });
+    </script>
+}

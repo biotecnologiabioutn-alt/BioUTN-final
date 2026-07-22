@@ -26,6 +26,28 @@ namespace BioUTN.MVC.Controllers
             }
         }
 
+        // GET: MonitoreoFitosanitarios/Details/5
+        public IActionResult Details(int id)
+        {
+            try
+            {
+                var item = Crud<MonitoreoFitosanitario>.GetById(id);
+                if (item == null) return NotFound();
+                
+                if (item.IdUnidadFrasco > 0)
+                    item.UnidadFrasco = Crud<UnidadFrasco>.GetById(item.IdUnidadFrasco);
+                if (item.IdUsuario > 0)
+                    item.Usuario = Crud<Usuario>.GetById(item.IdUsuario);
+
+                return View(item);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Error al cargar los detalles: " + ex.Message;
+                return RedirectToAction(nameof(Index));
+            }
+        }
+
         // GET: MonitoreoFitosanitarios/Create
         public IActionResult Create()
         {
@@ -133,6 +155,89 @@ namespace BioUTN.MVC.Controllers
             {
                 TempData["Error"] = "No se puede eliminar (posiblemente en uso): " + ex.Message;
                 return RedirectToAction(nameof(Index));
+            }
+        }
+        // GET: MonitoreoFitosanitarios/FichaSeguimiento/5
+        public IActionResult FichaSeguimiento(int loteId)
+        {
+            try
+            {
+                var lote = Crud<LoteCultivo>.GetById(loteId);
+                if (lote == null) return NotFound("Lote no encontrado.");
+
+                var todasUnidades = Crud<UnidadFrasco>.GetAll();
+                var unidadesLote = todasUnidades.Where(u => u.IdLoteCultivo == loteId && u.Activo).ToList();
+
+                var vm = new BioUTN.MVC.Models.FichaSeguimientoViewModel
+                {
+                    IdLoteCultivo = loteId,
+                    LoteCodigo = lote.CodigoTrazabilidad,
+                    FechaSiembra = lote.FechaSiembra,
+                    TotalUnidades = lote.TotalUnidades,
+                    Explante = lote.TipoExplante,
+                    Responsables = lote.ResponsablesSiembraNombres ?? ""
+                };
+
+                foreach (var u in unidadesLote)
+                {
+                    vm.Filas.Add(new BioUTN.MVC.Models.FichaFilaViewModel
+                    {
+                        IdUnidadFrasco = u.Id,
+                        CodigoUnidad = u.CodigoUnidad,
+                        Respuesta = "Crecimiento del explante" // default from PDF
+                    });
+                }
+
+                return View("Ficha", vm);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Error al cargar la ficha: " + ex.Message;
+                return RedirectToAction("Index", "LoteCultivos");
+            }
+        }
+
+        // POST: MonitoreoFitosanitarios/FichaSeguimiento
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult FichaSeguimiento(BioUTN.MVC.Models.FichaSeguimientoViewModel vm)
+        {
+            try
+            {
+                var loggedUserId = Crud<Usuario>.GetAll().FirstOrDefault(u => u.Email == User.Identity?.Name)?.Id ?? 1;
+
+                var monitoreos = new List<MonitoreoFitosanitario>();
+                foreach (var f in vm.Filas)
+                {
+                    var m = new MonitoreoFitosanitario
+                    {
+                        IdUnidadFrasco = f.IdUnidadFrasco,
+                        IdUsuario = loggedUserId,
+                        FechaEvaluacion = vm.FechaRevision.ToUniversalTime(),
+                        UnidadesRevisadas = 1,
+                        Bacterias = f.Bacterias,
+                        Hongos = f.Hongos,
+                        Muerte = f.Muerte,
+                        NivelFenolizacion = f.Oxidacion ? "Alto" : "Ninguno",
+                        NivelContaminacion = (f.Bacterias || f.Hongos) ? "Alto" : "Ninguno",
+                        Respuesta = f.Respuesta ?? "",
+                        Observaciones = f.Observacion ?? ""
+                    };
+                    monitoreos.Add(m);
+                }
+
+                if (monitoreos.Any())
+                {
+                    Crud<MonitoreoFitosanitario>.CreateBatch(monitoreos.ToArray());
+                    TempData["Success"] = "Ficha de seguimiento guardada correctamente.";
+                }
+
+                return RedirectToAction("Details", "LoteCultivos", new { id = vm.IdLoteCultivo });
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Error al guardar la ficha: " + ex.Message;
+                return View("Ficha", vm);
             }
         }
     }

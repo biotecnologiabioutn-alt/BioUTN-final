@@ -1,0 +1,92 @@
+@model BioUTN.Modelos.MonitoreoFitosanitario
+
+@{
+    ViewData["Title"] = "Detalles del Monitoreo";
+}
+
+@section Styles {
+    <style>
+        .figma-container { font-family: 'Inter', -apple-system, sans-serif; background-color: #f9fafb; padding: 20px; border-radius: 12px; }
+        .figma-card { background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 0.75rem; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); padding: 1.5rem; }
+        .figma-title { font-size: 1.125rem; font-weight: 700; color: #111827; margin-bottom: 1rem; border-bottom: 1px solid #f3f4f6; padding-bottom: 0.5rem; }
+        .detail-label { font-size: 13px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.025em; margin-bottom: 0.25rem; }
+        .detail-value { font-size: 14px; font-weight: 500; color: #111827; margin-bottom: 1.25rem; }
+        .figma-btn-secondary { background-color: white; color: #374151; border: 1px solid #e5e7eb; padding: 0.5rem 1rem; border-radius: 0.5rem; font-size: 14px; font-weight: 500; transition: all 0.2s; text-decoration: none; display: inline-block; }
+        .figma-btn-secondary:hover { background-color: #f9fafb; color: #111827; }
+    </style>
+}
+
+<div class="figma-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 style="font-weight: 700; color: #111827; font-size: 20px; margin-bottom: 0;">Detalles de Monitoreo Individual</h3>
+        </div>
+        <div class="gap-2 d-flex">
+            <a asp-action="Index" class="figma-btn-secondary">Volver al Historial</a>
+            <a asp-action="Edit" asp-route-id="@Model?.Id" class="figma-btn-secondary" style="color: #059669;">
+                <i class="bi bi-pencil me-1"></i> Editar
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="figma-card h-100">
+                <h4 class="figma-title">Información del Frasco</h4>
+                
+                <div class="row">
+                    <div class="col-12">
+                        <div class="detail-label">Unidad / Frasco Evaluado</div>
+                        <div class="detail-value" style="font-weight: 700; color: #111827;">@(Model?.UnidadFrasco?.CodigoUnidad ?? "N/A")</div>
+                    </div>
+                </div>
+
+                <div class="row mt-2">
+                    <div class="col-6">
+                        <div class="detail-label">Fecha del Monitoreo</div>
+                        <div class="detail-value">@(Model?.FechaEvaluacion.ToString("dd/MM/yyyy HH:mm") ?? "N/A")</div>
+                    </div>
+                    <div class="col-6">
+                        <div class="detail-label">Técnico Responsable</div>
+                        <div class="detail-value">@(Model?.Usuario?.Nombres ?? "N/A")</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="figma-card h-100">
+                <h4 class="figma-title">Resultados de Evaluación</h4>
+                
+                <div class="row">
+                    <div class="col-12">
+                        <div class="detail-label">Estado Fitosanitario Reportado</div>
+                        <div class="detail-value">
+                            @if (Model?.Muerte == true)
+                            {
+                                <span class="badge bg-dark bg-opacity-25 text-dark" style="font-size: 14px;">Planta Muerta</span>
+                            }
+                            else if (Model?.Bacterias == true || Model?.Hongos == true)
+                            {
+                                <span class="badge bg-danger bg-opacity-25 text-danger" style="font-size: 14px;">Contaminado</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-success bg-opacity-25 text-success" style="font-size: 14px;">@Model?.Respuesta</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-2">
+                    <div class="col-12">
+                        <div class="detail-label">Observaciones / Detalles</div>
+                        <div class="detail-value" style="background: #f9fafb; padding: 10px; border-radius: 6px; border: 1px solid #e5e7eb;">
+                            @(string.IsNullOrEmpty(Model?.Observaciones) ? "Sin observaciones adicionales registradas." : Model.Observaciones)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

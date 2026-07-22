@@ -44,19 +44,33 @@ namespace BioUTN.MVC.Controllers
         // GET: Proyectos/Create
         public IActionResult Create(string tipo = "Investigacion")
         {
-            var todosUsuarios = Crud<Usuario>.GetAll().Where(u => u.Activo).ToList();
-            var usuarios = todosUsuarios.Where(u => u.Rol?.NombreRol == "Estudiante" || u.Rol?.NombreRol == "Tecnico").ToList();
-            var directores = todosUsuarios.Where(u => u.Rol?.NombreRol == "Docente").ToList();
-            var tesistas = todosUsuarios.Where(u => u.Rol?.NombreRol == "Estudiante").ToList();
-            
-            ViewBag.Usuarios = new SelectList(usuarios, "Id", "NombreCompletoConRol");
-            ViewBag.Directores = new SelectList(directores, "Id", "NombreCompletoConRol");
-            ViewBag.Tesistas = new SelectList(tesistas, "Id", "NombreCompletoConRol");
-            ViewBag.Especies = new SelectList(Crud<Especie>.GetAll(), "Id", "NombreCientifico");
-            ViewBag.TiposProyecto = new SelectList(Crud<TipoProyecto>.GetAll(), "Id", "Nombre");
-            var tipoId = Crud<TipoProyecto>.GetAll().FirstOrDefault(t => t.Nombre.Contains(tipo, StringComparison.OrdinalIgnoreCase))?.Id;
-            ViewBag.IdTipoProyectoSeleccionado = tipoId;
-            return View();
+            try
+            {
+                var tipoSeguro = string.IsNullOrEmpty(tipo) ? "Investigacion" : tipo;
+                
+                var todosUsuarios = Crud<Usuario>.GetAll().Where(u => u.Activo).ToList();
+                var usuarios = todosUsuarios.Where(u => u.Rol != null && (u.Rol.NombreRol == "Estudiante" || u.Rol.NombreRol == "Tecnico")).ToList();
+                var directores = todosUsuarios.Where(u => u.Rol != null && u.Rol.NombreRol == "Docente").ToList();
+                var tesistas = todosUsuarios.Where(u => u.Rol != null && u.Rol.NombreRol == "Estudiante").ToList();
+                
+                ViewBag.Usuarios = new SelectList(usuarios, "Id", "NombreCompletoConRol");
+                ViewBag.Directores = new SelectList(directores, "Id", "NombreCompletoConRol");
+                ViewBag.Tesistas = new SelectList(tesistas, "Id", "NombreCompletoConRol");
+                ViewBag.Especies = new SelectList(Crud<Especie>.GetAll(), "Id", "NombreCientifico");
+                
+                var todosTipos = Crud<TipoProyecto>.GetAll() ?? Array.Empty<TipoProyecto>();
+                ViewBag.TiposProyecto = new SelectList(todosTipos, "Id", "Nombre");
+                
+                var tipoId = todosTipos.FirstOrDefault(t => t.Nombre != null && t.Nombre.Contains(tipoSeguro, StringComparison.OrdinalIgnoreCase))?.Id;
+                ViewBag.IdTipoProyectoSeleccionado = tipoId;
+                
+                return View();
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Error al cargar el formulario de creación: " + ex.Message;
+                return RedirectToAction(nameof(Index));
+            }
         }
 
         // POST: Proyectos/Create

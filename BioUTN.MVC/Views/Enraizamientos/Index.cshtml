@@ -1,0 +1,112 @@
+@model IEnumerable<BioUTN.Modelos.Enraizamiento>
+
+@{
+    ViewData["Title"] = "Gestión de Enraizamientos";
+}
+
+@section Styles {
+    <style>
+        .figma-container { font-family: 'Inter', -apple-system, sans-serif; background-color: #f9fafb; padding: 20px; border-radius: 12px; }
+        .figma-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .figma-title { font-size: 24px; font-weight: 700; color: #111827; }
+        .figma-btn-primary { background-color: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 500; font-size: 14px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: background-color 0.2s; }
+        .figma-btn-primary:hover { background-color: #059669; color: white; }
+        .figma-table-container { background: white; border-radius: 12px; border: 1px solid #e5e7eb; overflow: hidden; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1); }
+        .figma-table { width: 100%; border-collapse: collapse; }
+        .figma-table th { background-color: #f9fafb; padding: 12px 24px; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #e5e7eb; }
+        .figma-table td { padding: 16px 24px; border-bottom: 1px solid #e5e7eb; font-size: 14px; color: #374151; vertical-align: middle; }
+        .figma-table tbody tr:hover { background-color: #f9fafb; }
+        .figma-table tbody tr:last-child td { border-bottom: none; }
+        .figma-actions { display: flex; gap: 8px; }
+        .figma-btn-icon { background: none; border: none; padding: 6px; border-radius: 6px; cursor: pointer; transition: all 0.2s; color: #6b7280; display: inline-flex; align-items: center; justify-content: center; }
+        .figma-btn-icon:hover { background-color: #f3f4f6; color: #111827; }
+        .badge-status { padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: 500; }
+        .badge-active { background-color: #d1fae5; color: #065f46; }
+        .badge-inactive { background-color: #fee2e2; color: #991b1b; }
+    </style>
+}
+
+<div class="figma-container">
+    <div class="figma-header">
+        <h2 class="figma-title">Gestión de Enraizamientos (Fase Final In-Vitro)</h2>
+        <a asp-action="Create" class="figma-btn-primary">
+            <i class="bi bi-plus-circle"></i> Nuevo Registro de Enraizamiento
+        </a>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="figma-table-container">
+        <table class="figma-table">
+            <thead>
+                <tr>
+                    <th>Lote Origen</th>
+                    <th>Fecha Inicio</th>
+                    <th>Nº Plantas</th>
+                    <th>Semanas Est.</th>
+                    <th>Responsable</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            <div style="font-weight: 500; color: #111827;">@(item.LoteOrigen?.CodigoTrazabilidad ?? $"ID: {item.IdLoteOrigen}")</div>
+                        </td>
+                        <td>@item.FechaInicio.ToString("dd/MM/yyyy")</td>
+                        <td>@item.NumeroPlantas</td>
+                        <td>@item.SemanasEstimadas semanas</td>
+                        <td>
+                            @(item.UsuarioResponsable?.Nombres ?? $"ID: {item.IdUsuarioResponsable}")
+                        </td>
+                        <td>
+                            @if (item.Activo)
+                            {
+                                <span class="badge-status badge-active">En Proceso</span>
+                            }
+                            else
+                            {
+                                <span class="badge-status badge-inactive">Finalizado</span>
+                            }
+                        </td>
+                        <td>
+                            <div class="figma-actions">
+                                <a asp-action="Details" asp-route-id="@item.Id" class="figma-btn-icon" title="Ver Detalles">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a asp-controller="Aclimataciones" asp-action="Create" asp-route-idLoteOrigen="@item.IdLoteOrigen" class="figma-btn-icon" style="color: #8b5cf6;" title="Pasar a Aclimatación">
+                                    <i class="bi bi-sun"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="7" class="text-center py-5 text-muted">
+                            <i class="bi bi-tree" style="font-size: 2rem; display: block; margin-bottom: 10px;"></i>
+                            No hay lotes en enraizamiento registrados
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

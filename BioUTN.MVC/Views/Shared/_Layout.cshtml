@@ -46,10 +46,22 @@
                 </a>
                 
                 <a asp-controller="Cultivos" asp-action="Index" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Cultivos" ? "active" : "")">
-                    <i class="fa-solid fa-seedling"></i> Gestión de Cultivos
+                    <i class="fa-solid fa-seedling"></i> Panel de Cultivos
                 </a>
 
-                <a asp-controller="Inventarios" asp-action="Index" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Inventarios" ? "active" : "")">
+                <div style="padding-left: 20px; font-size: 0.9em;">
+                    <a asp-controller="LoteCultivos" asp-action="Index" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "LoteCultivos" ? "active" : "")">
+                        <i class="bi bi-grid text-muted"></i> Lotes y Siembras
+                    </a>
+                    <a asp-controller="Resiembras" asp-action="Index" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Resiembras" ? "active" : "")">
+                        <i class="bi bi-diagram-2 text-muted"></i> Resiembras
+                    </a>
+                    <a asp-controller="MonitoreoFitosanitarios" asp-action="Index" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "MonitoreoFitosanitarios" ? "active" : "")">
+                        <i class="bi bi-activity text-muted"></i> Monitoreo / Fichas
+                    </a>
+                </div>
+
+                <a asp-controller="Inventarios" asp-action="Index" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Inventarios" ? "active" : "") mt-2">
                     <i class="fa-solid fa-boxes-stacked"></i> Gestión de Inventario
                 </a>
 

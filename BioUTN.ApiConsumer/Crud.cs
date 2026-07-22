@@ -37,6 +37,15 @@ namespace BioUTN.ApiConsumer
             return response.IsSuccessStatusCode;
         }
 
+        public static bool CreateBatch(T[] data)
+        {
+            using var client = new HttpClient();
+            var json = JsonSerializer.Serialize(data);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var response = client.PostAsync($"{EndPoint}/batch", content).Result;
+            return response.IsSuccessStatusCode;
+        }
+
         public static bool Update(int id, T data)
         {
             using var client = new HttpClient();

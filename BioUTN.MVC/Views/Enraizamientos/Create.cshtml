@@ -1,0 +1,107 @@
+@model BioUTN.Modelos.Enraizamiento
+
+@{
+    ViewData["Title"] = "Nuevo Enraizamiento";
+}
+
+@section Styles {
+<style>
+    .figma-container { font-family: 'Inter', -apple-system, sans-serif; background-color: #f9fafb; padding: 20px; border-radius: 12px; }
+    .figma-card { background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 0.75rem; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); padding: 2rem; }
+    .form-label { font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 0.5rem; }
+    .form-control, .form-select { border: 1px solid #d1d5db; border-radius: 0.5rem; padding: 0.625rem 0.875rem; font-size: 14px; transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out; }
+    .form-control:focus, .form-select:focus { border-color: #10b981; box-shadow: 0 0 0 0.25rem rgba(16, 185, 129, 0.25); }
+    .figma-btn-primary { background-color: #10b981; color: white; border: none; padding: 0.625rem 1.25rem; border-radius: 0.5rem; font-size: 14px; font-weight: 500; transition: background-color 0.2s; }
+    .figma-btn-primary:hover { background-color: #059669; color: white; }
+    .figma-btn-secondary { background-color: white; color: #374151; border: 1px solid #d1d5db; padding: 0.625rem 1.25rem; border-radius: 0.5rem; font-size: 14px; font-weight: 500; transition: all 0.2s; text-decoration: none; display: inline-block; }
+    .figma-btn-secondary:hover { background-color: #f3f4f6; color: #111827; }
+</style>
+}
+
+<div class="figma-container">
+    <div class="mb-4">
+        <h3 style="font-weight: 700; color: #111827; font-size: 20px;">Fase 7: Enraizamiento (In-Vitro Final)</h3>
+        <p class="text-muted" style="font-size: 13px;">Proceso de inducción de raíces previo a la salida del laboratorio.</p>
+    </div>
+
+    <div class="figma-card">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="row g-4">
+                <div class="col-md-12">
+                    <h5 style="font-size: 16px; font-weight: 600; color: #111827; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #e5e7eb;">Identificación y Relaciones</h5>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="IdLoteOrigen" class="form-label">Lote In-Vitro de Origen *</label>
+                    <select asp-for="IdLoteOrigen" class="form-select" asp-items="ViewBag.LotesOrigen" required>
+                        <option value="">-- Seleccionar Lote --</option>
+                    </select>
+                    <span asp-validation-for="IdLoteOrigen" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="IdUsuarioResponsable" class="form-label">Técnico / Responsable *</label>
+                    <select asp-for="IdUsuarioResponsable" class="form-select" asp-items="ViewBag.Usuarios" required>
+                        <option value="">-- Seleccionar Técnico --</option>
+                    </select>
+                    <span asp-validation-for="IdUsuarioResponsable" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="IdProyecto" class="form-label">Proyecto Asociado *</label>
+                    <select asp-for="IdProyecto" class="form-select" asp-items="ViewBag.Proyectos" required>
+                        <option value="">-- Seleccionar Proyecto --</option>
+                    </select>
+                    <span asp-validation-for="IdProyecto" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-12 mt-4">
+                    <h5 style="font-size: 16px; font-weight: 600; color: #111827; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #e5e7eb;">Tiempos y Cuantificación</h5>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="FechaInicio" class="form-label">Fecha de Inicio *</label>
+                    <input asp-for="FechaInicio" class="form-control" type="date" value="@Model.FechaInicio.ToString("yyyy-MM-dd")" required />
+                    <span asp-validation-for="FechaInicio" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="NumeroPlantas" class="form-label">Número de Plantas a Enraizar *</label>
+                    <input asp-for="NumeroPlantas" class="form-control" type="number" min="1" required />
+                    <span asp-validation-for="NumeroPlantas" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="SemanasEstimadas" class="form-label">Semanas Estimadas</label>
+                    <input asp-for="SemanasEstimadas" class="form-control" type="number" min="1" placeholder="Ej: 4" />
+                    <span asp-validation-for="SemanasEstimadas" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-12 mt-4">
+                    <h5 style="font-size: 16px; font-weight: 600; color: #111827; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #e5e7eb;">Documentación Técnica</h5>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="IdDocumentoProtocolo" class="form-label">Protocolo de Enraizamiento (Biblioteca)</label>
+                    <select asp-for="IdDocumentoProtocolo" class="form-select" asp-items="ViewBag.Protocolos">
+                        <option value="">-- Sin protocolo --</option>
+                    </select>
+                    <span asp-validation-for="IdDocumentoProtocolo" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <div class="mt-5 pt-4 border-top d-flex justify-content-end gap-3">
+                <a asp-controller="LoteCultivos" asp-action="Index" class="figma-btn-secondary">Cancelar</a>
+                <button type="submit" class="figma-btn-primary">
+                    <i class="bi bi-save me-1"></i> Guardar Enraizamiento
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

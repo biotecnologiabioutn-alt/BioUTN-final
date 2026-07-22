@@ -1,0 +1,155 @@
+@model BioUTN.Modelos.LoteCultivo
+
+@{
+    ViewData["Title"] = "Registrar Resiembra";
+}
+
+@section Styles {
+<style>
+    .figma-container { font-family: 'Inter', -apple-system, sans-serif; background-color: #f9fafb; padding: 20px; border-radius: 12px; }
+    .figma-card { background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 0.75rem; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); padding: 2rem; }
+    .form-label { font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 0.5rem; }
+    .form-control, .form-select { border: 1px solid #d1d5db; border-radius: 0.5rem; padding: 0.625rem 0.875rem; font-size: 14px; transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out; }
+    .form-control:focus, .form-select:focus { border-color: #10b981; box-shadow: 0 0 0 0.25rem rgba(16, 185, 129, 0.25); }
+    .figma-btn-primary { background-color: #10b981; color: white; border: none; padding: 0.625rem 1.25rem; border-radius: 0.5rem; font-size: 14px; font-weight: 500; transition: background-color 0.2s; }
+    .figma-btn-primary:hover { background-color: #059669; color: white; }
+    .figma-btn-secondary { background-color: white; color: #374151; border: 1px solid #d1d5db; padding: 0.625rem 1.25rem; border-radius: 0.5rem; font-size: 14px; font-weight: 500; transition: all 0.2s; text-decoration: none; display: inline-block; }
+    .figma-btn-secondary:hover { background-color: #f3f4f6; color: #111827; }
+    
+    .section-label { font-size: 16px; font-weight: 600; color: #111827; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #e5e7eb; }
+</style>
+}
+
+<div class="figma-container">
+    <div class="mb-4">
+        <h3 style="font-weight: 700; color: #111827; font-size: 20px;">Registrar Resiembra (Multiplicación)</h3>
+        <p class="text-muted" style="font-size: 13px;">Ingrese los datos para la creación de nuevos clones a partir de un frasco existente.</p>
+    </div>
+
+    <div class="figma-card">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="row g-4">
+                <div class="col-md-12">
+                    <h5 class="section-label">Identificación y Origen</h5>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="IdLotePadre" class="form-label">Lote de Origen *</label>
+                    <select asp-for="IdLotePadre" id="selLotePadre" class="form-select" asp-items="ViewBag.LotesOrigen" required>
+                        <option value="">-- Seleccionar Lote Padre --</option>
+                    </select>
+                    <span asp-validation-for="IdLotePadre" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="IdUnidadFrascoOrigen" class="form-label">Frasco / Unidad de Origen *</label>
+                    <select asp-for="IdUnidadFrascoOrigen" id="selFrasco" class="form-select" asp-items="ViewBag.FrascosOrigen" required>
+                        <option value="">-- Saber de qué frasco exacto salió el brote --</option>
+                    </select>
+                    <span asp-validation-for="IdUnidadFrascoOrigen" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Nuevo Código de Lote *</label>
+                    <input type="text" class="form-control" value="Se autogenerará al guardar" disabled />
+                    <!-- Se maneja internamente -->
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="IdUsuario" class="form-label">Técnico/Responsable de Resiembra *</label>
+                    <select asp-for="IdUsuario" class="form-select" asp-items="ViewBag.Usuarios" required>
+                        <option value="">-- Seleccionar Responsable --</option>
+                    </select>
+                    <span asp-validation-for="IdUsuario" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-12 mt-4">
+                    <h5 class="section-label">Tiempos y Cuantificación</h5>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="FechaSiembra" class="form-label">Fecha de Resiembra *</label>
+                    <input asp-for="FechaSiembra" type="date" class="form-control" value="@Model.FechaSiembra.ToString("yyyy-MM-dd")" required />
+                    <span asp-validation-for="FechaSiembra" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="TotalUnidades" class="form-label">Número de Nuevas Unidades (Frascos generados) *</label>
+                    <input asp-for="TotalUnidades" type="number" min="1" class="form-control" required />
+                    <span asp-validation-for="TotalUnidades" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="ExplantesPorUnidad" class="form-label">Número de Explantes por Unidad *</label>
+                    <input asp-for="ExplantesPorUnidad" type="number" min="1" class="form-control" placeholder="Cuántos pedacitos por frasco" required />
+                    <span asp-validation-for="ExplantesPorUnidad" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-12 mt-4">
+                    <h5 class="section-label">Parámetros Bio-Químicos</h5>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="IdFaseCultivo" class="form-label">Fase de Desarrollo *</label>
+                    <select asp-for="IdFaseCultivo" class="form-select" asp-items="ViewBag.FasesCultivo" required>
+                        <option value="">-- Seleccionar Fase --</option>
+                    </select>
+                    <span asp-validation-for="IdFaseCultivo" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="IdMedioCultivo" class="form-label">Medio de Cultivo *</label>
+                    <select asp-for="IdMedioCultivo" class="form-select" asp-items="ViewBag.MediosCultivo" required>
+                        <option value="">-- Seleccionar Medio --</option>
+                    </select>
+                    <span asp-validation-for="IdMedioCultivo" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="IdUbicacionFisica" class="form-label">Anaquel / Ubicación *</label>
+                    <select asp-for="IdUbicacionFisica" class="form-select" asp-items="ViewBag.UbicacionesFisicas" required>
+                        <option value="">-- Seleccionar Anaquel --</option>
+                    </select>
+                    <span asp-validation-for="IdUbicacionFisica" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-12 mt-4">
+                    <h5 class="section-label">Documentación Técnica</h5>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="IdDocumentoProtocolo" class="form-label">Protocolo de Resiembra Aplicado</label>
+                    <select asp-for="IdDocumentoProtocolo" class="form-select" asp-items="ViewBag.Protocolos">
+                        <option value="">-- Seleccionar PDF de biblioteca --</option>
+                    </select>
+                    <span asp-validation-for="IdDocumentoProtocolo" class="text-danger small"></span>
+                </div>
+
+            </div>
+            
+            <input type="hidden" asp-for="IdPlantaMadre" />
+            <input type="hidden" asp-for="IdProyecto" />
+            <input type="hidden" asp-for="NumeroRepique" />
+
+            <div class="mt-5 pt-4 border-top d-flex justify-content-end gap-3">
+                <a asp-action="Index" class="figma-btn-secondary">Cancelar</a>
+                <button type="submit" class="figma-btn-primary">
+                    <i class="bi bi-save me-1"></i> Generar Resiembra
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        $(document).ready(function() {
+            // Un pequeño script para actualizar los frascos al cambiar el lote padre (opcional, si se implementa AJAX. Si no, se recarga o se envían todos, pero por ahora está en ViewBag estático o dependiente)
+            // Se asume funcionalidad básica
+        });
+    </script>
+}

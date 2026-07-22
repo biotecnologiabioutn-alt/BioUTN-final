@@ -161,39 +161,61 @@ namespace BioUTN.MVC.Controllers
         // GET: LoteCultivos/Resiembra/5
         public IActionResult Resiembra(int id)
         {
+            return RedirectToAction("Create", "Resiembras", new { idLoteOrigen = id });
+        }
+
+        // GET: LoteCultivos/Enraizamiento/5
+        public IActionResult Enraizamiento(int id)
+        {
+            return RedirectToAction("Create", "Enraizamientos", new { idLoteOrigen = id });
+        }
+
+        // GET: LoteCultivos/Aclimatacion/5
+        public IActionResult Aclimatacion(int id)
+        {
+            return RedirectToAction("Create", "Aclimataciones", new { idLoteOrigen = id });
+        }
+
+        private IActionResult PrepararFaseSubsecuente(int lotePadreId, string faseNombre)
+        {
             try
             {
-                var padre = Crud<LoteCultivo>.GetById(id);
+                var padre = Crud<LoteCultivo>.GetById(lotePadreId);
                 if (padre == null) return NotFound("El lote de origen no existe.");
+
+                var fases = Crud<FaseCultivo>.GetAll();
+                var idFase = fases.FirstOrDefault(f => f.NombreFase.Contains(faseNombre, StringComparison.OrdinalIgnoreCase))?.Id ?? 0;
 
                 var nuevoLote = new LoteCultivo
                 {
                     IdLotePadre = padre.Id,
                     IdPlantaMadre = padre.IdPlantaMadre,
                     IdProyecto = padre.IdProyecto,
+                    IdFaseCultivo = idFase,
                     NumeroRepique = padre.NumeroRepique + 1,
                     FechaSiembra = DateTime.Now
                 };
 
                 ViewBag.PlantaMadres = new SelectList(Crud<PlantaMadre>.GetAll(), "Id", "CodigoAsignado", nuevoLote.IdPlantaMadre);
-                ViewBag.FasesCultivo = new SelectList(Crud<FaseCultivo>.GetAll(), "Id", "NombreFase");
+                ViewBag.FasesCultivo = new SelectList(fases, "Id", "NombreFase", nuevoLote.IdFaseCultivo);
                 ViewBag.MediosCultivo = new SelectList(Crud<MedioCultivo>.GetAll(), "Id", "Nombre");
                 ViewBag.Proyectos = new SelectList(Crud<Proyecto>.GetAll(), "Id", "NombreProyecto", nuevoLote.IdProyecto);
                 ViewBag.UbicacionesFisicas = new SelectList(Crud<UbicacionFisica>.GetAll(), "Id", "CodigoAnaquel");
                 ViewBag.Usuarios = new SelectList(Crud<Usuario>.GetAll(), "Id", "Nombres");
                 ViewBag.Documentos = new SelectList(Crud<Documento>.GetAll(), "Id", "Titulo");
                 
-                var frascosLote = Crud<UnidadFrasco>.GetAll().Where(f => f.IdLoteCultivo == padre.Id).ToList();
+                var frascosLote = Crud<UnidadFrasco>.GetAll().Where(f => f.IdLoteCultivo == padre.Id && f.Activo).ToList();
                 ViewBag.FrascosOrigen = new SelectList(frascosLote, "Id", "CodigoUnidad");
                 
                 ViewBag.LotePadreInfo = padre.CodigoTrazabilidad; // Para pasarlo a la vista
+                ViewBag.FaseNombre = faseNombre;
                 
                 // Usamos la misma vista Create, pero le pasamos el modelo pre-cargado
                 return View("Create", nuevoLote);
             }
             catch (Exception ex)
             {
-                TempData["Error"] = "Error al preparar resiembra: " + ex.Message;
+                TempData["Error"] = "Error al preparar fase: " + ex.Message;
                 return RedirectToAction(nameof(Index));
             }
         }

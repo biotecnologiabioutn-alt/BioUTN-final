@@ -1,0 +1,89 @@
+@model BioUTN.Modelos.Enraizamiento
+
+@{
+    ViewData["Title"] = "Detalles del Enraizamiento";
+}
+
+@section Styles {
+<style>
+    .figma-container { font-family: 'Inter', -apple-system, sans-serif; background-color: #f9fafb; padding: 20px; border-radius: 12px; }
+    .figma-card { background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 0.75rem; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); padding: 1.5rem; }
+    .figma-title { font-size: 1.125rem; font-weight: 700; color: #111827; margin-bottom: 1rem; border-bottom: 1px solid #f3f4f6; padding-bottom: 0.5rem; }
+    .detail-label { font-size: 13px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.025em; margin-bottom: 0.25rem; }
+    .detail-value { font-size: 14px; font-weight: 500; color: #111827; margin-bottom: 1.25rem; }
+    .figma-btn-secondary { background-color: white; color: #374151; border: 1px solid #e5e7eb; padding: 0.5rem 1rem; border-radius: 0.5rem; font-size: 14px; font-weight: 500; transition: all 0.2s; text-decoration: none; display: inline-block; }
+    .figma-btn-secondary:hover { background-color: #f9fafb; color: #111827; }
+</style>
+}
+
+<div class="figma-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 style="font-weight: 700; color: #111827; font-size: 20px; margin-bottom: 0;">Detalles de Enraizamiento</h3>
+        </div>
+        <div class="gap-2 d-flex">
+            <a asp-action="Index" class="figma-btn-secondary">Volver al listado</a>
+            <a asp-controller="Aclimataciones" asp-action="Create" asp-route-idLoteOrigen="@Model.IdLoteOrigen" class="figma-btn-secondary" style="color: #8b5cf6;">
+                <i class="bi bi-sun me-1"></i> Pasar a Aclimatación
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="figma-card h-100">
+                <h4 class="figma-title">Información Principal</h4>
+                
+                <div class="row">
+                    <div class="col-6">
+                        <div class="detail-label">Lote In-Vitro Origen</div>
+                        <div class="detail-value">@(Model.LoteOrigen?.CodigoTrazabilidad ?? "N/A")</div>
+                    </div>
+                    <div class="col-6">
+                        <div class="detail-label">Estado</div>
+                        <div class="detail-value">@(Model.Activo ? "En Proceso" : "Finalizado")</div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-6">
+                        <div class="detail-label">Técnico Responsable</div>
+                        <div class="detail-value">@(Model.UsuarioResponsable?.Nombres ?? "N/A")</div>
+                    </div>
+                    <div class="col-6">
+                        <div class="detail-label">Proyecto</div>
+                        <div class="detail-value">@(Model.Proyecto?.NombreProyecto ?? "N/A")</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="figma-card h-100">
+                <h4 class="figma-title">Fechas y Cantidades</h4>
+                
+                <div class="row">
+                    <div class="col-6">
+                        <div class="detail-label">Fecha de Inicio</div>
+                        <div class="detail-value">@Model.FechaInicio.ToString("dd/MM/yyyy")</div>
+                    </div>
+                    <div class="col-6">
+                        <div class="detail-label">Número de Plantas</div>
+                        <div class="detail-value">@Model.NumeroPlantas</div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-6">
+                        <div class="detail-label">Semanas Estimadas</div>
+                        <div class="detail-value">@Model.SemanasEstimadas semanas</div>
+                    </div>
+                    <div class="col-6">
+                        <div class="detail-label">Protocolo Utilizado</div>
+                        <div class="detail-value">@(Model.Protocolo?.Titulo ?? "Sin protocolo")</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
