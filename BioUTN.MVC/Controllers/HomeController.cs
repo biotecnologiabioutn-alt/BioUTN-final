@@ -38,6 +38,33 @@ namespace BioUTN.MVC.Controllers
 
             var equipos = (Crud<Equipo>.GetAll() ?? Array.Empty<Equipo>()).ToList();
 
+            // Variables para los Resúmenes del Dashboard
+            try
+            {
+                var frascos = Crud<UnidadFrasco>.GetAll();
+                ViewBag.TotalFrascos = frascos?.Count() ?? 0;
+                var contaminados = frascos?.Count(f => f.Estado != null && f.Estado.Contains("Contaminad")) ?? 0;
+                ViewBag.Contaminados = contaminados;
+                var saludables = (ViewBag.TotalFrascos - contaminados);
+                ViewBag.Saludables = saludables;
+                ViewBag.Eficiencia = ViewBag.TotalFrascos > 0 ? (int)Math.Round((double)saludables / ViewBag.TotalFrascos * 100) : 100;
+
+                ViewBag.TotalEspecies = Crud<Especie>.GetAll()?.Count() ?? 0;
+                ViewBag.TotalPlantasMadre = Crud<PlantaMadre>.GetAll()?.Count() ?? 0;
+                ViewBag.TotalLotes = lotes.Count;
+
+                ViewBag.TotalEquipos = equipos.Count;
+                ViewBag.ReservasActivas = reservas.Count(r => r.FechaReserva >= DateTime.Today);
+                ViewBag.TotalAnaqueles = Crud<UbicacionFisica>.GetAll()?.Count() ?? 0;
+                ViewBag.TotalDocumentos = Crud<Documento>.GetAll()?.Count() ?? 0;
+            }
+            catch (Exception)
+            {
+                ViewBag.TotalFrascos = 0; ViewBag.Contaminados = 0; ViewBag.Saludables = 0; ViewBag.Eficiencia = 100;
+                ViewBag.TotalEspecies = 0; ViewBag.TotalPlantasMadre = 0; ViewBag.TotalLotes = 0;
+                ViewBag.TotalEquipos = 0; ViewBag.ReservasActivas = 0; ViewBag.TotalAnaqueles = 0; ViewBag.TotalDocumentos = 0;
+            }
+
             var mockTasks = new Dictionary<string, List<object>>();
 
             // Add reservas

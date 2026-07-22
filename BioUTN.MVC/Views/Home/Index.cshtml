@@ -83,6 +83,81 @@
         margin: 1.5rem 0;
     }
 
+    /* KPI Cards Styles */
+    .figma-card {
+        background-color: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.75rem;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        padding: 1.25rem;
+        transition: all 0.2s;
+    }
+    .figma-section-title {
+        font-size: 11px;
+        font-weight: 600;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        margin-bottom: 1.25rem;
+    }
+    .kpi-card {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+        padding: 0.75rem;
+        border-radius: 0.75rem;
+        border: 1px solid #e5e7eb;
+        background-color: #f9fafb;
+        transition: all 0.2s;
+        text-decoration: none;
+    }
+    .kpi-card:hover {
+        border-color: rgba(16, 185, 129, 0.3);
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    }
+    .kpi-icon-box {
+        width: 32px;
+        height: 32px;
+        border-radius: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .kpi-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #111827;
+        line-height: 1;
+        margin: 0;
+    }
+    .kpi-label {
+        font-size: 11px;
+        color: #6b7280;
+        margin: 0;
+    }
+    .health-bar-container {
+        display: flex;
+        height: 12px;
+        border-radius: 9999px;
+        overflow: hidden;
+        gap: 2px;
+    }
+    .bg-emerald-50 { background-color: #ecfdf5; }
+    .text-emerald-600 { color: #059669; }
+    .bg-purple-50 { background-color: #faf5ff; }
+    .text-purple-600 { color: #9333ea; }
+    .bg-teal-50 { background-color: #f0fdfa; }
+    .text-teal-600 { color: #0d9488; }
+    .bg-blue-50 { background-color: #eff6ff; }
+    .text-blue-600 { color: #2563eb; }
+    .bg-violet-50 { background-color: #f5f3ff; }
+    .text-violet-600 { color: #7c3aed; }
+    .bg-orange-50 { background-color: #fff7ed; }
+    .text-orange-600 { color: #ea580c; }
+    .bg-pink-50 { background-color: #fdf2f8; }
+    .text-pink-600 { color: #db2777; }
+
     /* Tareas Pendientes */
     .pending-header {
         display: flex;
@@ -140,8 +215,119 @@
     .text-success { color: #2ecc71; }
 </style>
 
-<div class="container-fluid mt-4 pb-5">
-    
+<div class="container-fluid py-4">
+    <div class="row g-4">
+        <div class="col-12">
+            <!-- Stats Panel: Cultivos -->
+            <div class="figma-card mb-4">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <p class="figma-section-title mb-0">Resumen de Cultivos</p>
+                </div>
+                <div class="row g-3 mb-4">
+                    <div class="col-6 col-md-3">
+                        <a asp-controller="LoteCultivos" asp-action="Index" class="kpi-card">
+                            <div class="kpi-icon-box bg-emerald-50 text-emerald-600"><i class="bi bi-flower1"></i></div>
+                            <div>
+                                <p class="kpi-value">@ViewBag.TotalFrascos</p>
+                                <p class="kpi-label">Plantas In Vitro</p>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a asp-controller="Especies" asp-action="Index" class="kpi-card">
+                            <div class="kpi-icon-box bg-purple-50 text-purple-600"><i class="bi bi-box"></i></div>
+                            <div>
+                                <p class="kpi-value">@ViewBag.TotalEspecies</p>
+                                <p class="kpi-label">Especies</p>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a asp-controller="PlantaMadres" asp-action="Index" class="kpi-card">
+                            <div class="kpi-icon-box bg-teal-50 text-teal-600"><i class="bi bi-tree"></i></div>
+                            <div>
+                                <p class="kpi-value">@ViewBag.TotalPlantasMadre</p>
+                                <p class="kpi-label">Plantas Madre</p>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a asp-controller="LoteCultivos" asp-action="Index" class="kpi-card">
+                            <div class="kpi-icon-box bg-blue-50 text-blue-600"><i class="bi bi-droplet"></i></div>
+                            <div>
+                                <p class="kpi-value">@ViewBag.TotalLotes</p>
+                                <p class="kpi-label">Lotes Activos</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <div class="mb-1 d-flex justify-content-between align-items-end">
+                    <span style="font-size: 11px; font-weight: 600; color: #111827;">Estado de frascos</span>
+                    <span style="font-size: 10px; color: #6b7280;">Eficiencia promedio: <strong>@ViewBag.Eficiencia%</strong></span>
+                </div>
+                <div class="health-bar-container mb-2">
+                    <div style="width: @ViewBag.Eficiencia%; background-color: #2ecc71;"></div>
+                    <div style="width: @(100 - (int)ViewBag.Eficiencia)%; background-color: #ef4444;"></div>
+                </div>
+                <div class="d-flex gap-3" style="font-size: 10px; color: #6b7280;">
+                    <div class="d-flex align-items-center gap-1">
+                        <div style="width:6px;height:6px;border-radius:50%;background-color:#2ecc71;"></div>
+                        @ViewBag.Eficiencia% saludables (@ViewBag.Saludables)
+                    </div>
+                    <div class="d-flex align-items-center gap-1">
+                        <div style="width:6px;height:6px;border-radius:50%;background-color:#ef4444;"></div>
+                        @(100 - (int)ViewBag.Eficiencia)% contaminados (@ViewBag.Contaminados)
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Panel: Zona de Trabajo -->
+            <div class="figma-card mb-4">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <p class="figma-section-title mb-0">Resumen de Zona</p>
+                </div>
+                <div class="row g-3">
+                    <div class="col-6 col-md-3">
+                        <a asp-controller="Equipos" asp-action="Index" class="kpi-card">
+                            <div class="kpi-icon-box bg-teal-50 text-teal-600"><i class="bi bi-display"></i></div>
+                            <div>
+                                <p class="kpi-value">@ViewBag.TotalEquipos</p>
+                                <p class="kpi-label">Equipos Totales</p>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a asp-controller="ReservaEquipos" asp-action="Index" class="kpi-card">
+                            <div class="kpi-icon-box bg-orange-50 text-orange-600"><i class="bi bi-clock"></i></div>
+                            <div>
+                                <p class="kpi-value">@ViewBag.ReservasActivas</p>
+                                <p class="kpi-label">Reservas Activas</p>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a asp-controller="UbicacionFisicas" asp-action="Index" class="kpi-card">
+                            <div class="kpi-icon-box bg-pink-50 text-pink-600"><i class="bi bi-geo-alt"></i></div>
+                            <div>
+                                <p class="kpi-value">@ViewBag.TotalAnaqueles</p>
+                                <p class="kpi-label">Anaqueles</p>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a asp-controller="Biblioteca" asp-action="Index" class="kpi-card">
+                            <div class="kpi-icon-box bg-violet-50 text-violet-600"><i class="bi bi-book"></i></div>
+                            <div>
+                                <p class="kpi-value">@ViewBag.TotalDocumentos</p>
+                                <p class="kpi-label">Documentos</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row justify-content-center">
         <!-- Calendario de Notificaciones Centralizado -->
         <div class="col-lg-8 col-xl-6">

@@ -229,61 +229,6 @@
         <p class="text-muted" style="font-size: 14px;">Reserva y gestión de equipos del laboratorio, acceso a anaqueles y biblioteca</p>
     </div>
 
-    <!-- Stats Panel -->
-    <div class="figma-card mb-4">
-        <div class="d-flex align-items-center justify-content-between mb-3">
-            <p class="figma-section-title mb-0">Resumen de Zona</p>
-        </div>
-
-        <div class="row g-3">
-            <div class="col-6 col-md-3">
-                <a asp-controller="Equipos" asp-action="Index" class="kpi-card">
-                    <div class="kpi-icon-box bg-teal-50 text-teal-600">
-                        <i class="bi bi-pc-display-horizontal"></i>
-                    </div>
-                    <div>
-                        <p class="kpi-value">@ViewBag.TotalEquipos</p>
-                        <p class="kpi-label">Equipos Totales</p>
-                    </div>
-                </a>
-            </div>
-            <div class="col-6 col-md-3">
-                <a asp-controller="ReservaEquipos" asp-action="Index" class="kpi-card">
-                    <div class="kpi-icon-box bg-orange-50 text-orange-600">
-                        <i class="bi bi-clock-history"></i>
-                    </div>
-                    <div>
-                        <p class="kpi-value">@ViewBag.ReservasActivas</p>
-                        <p class="kpi-label">Tus Reservas Activas</p>
-                    </div>
-                </a>
-            </div>
-            <div class="col-6 col-md-3">
-                <a asp-controller="UbicacionFisicas" asp-action="Index" class="kpi-card">
-                    <div class="kpi-icon-box bg-rose-50 text-rose-600">
-                        <i class="bi bi-geo-alt"></i>
-                    </div>
-                    <div>
-                        <p class="kpi-value">@ViewBag.TotalAnaqueles</p>
-                        <p class="kpi-label">Anaqueles</p>
-                    </div>
-                </a>
-            </div>
-            <div class="col-6 col-md-3">
-                <a asp-controller="Biblioteca" asp-action="Index" class="kpi-card">
-                    <div class="kpi-icon-box bg-purple-50 text-purple-600">
-                        <i class="bi bi-book"></i>
-                    </div>
-                    <div>
-                        <p class="kpi-value">@ViewBag.TotalDocumentos</p>
-                        <p class="kpi-label">Documentos</p>
-                    </div>
-                </a>
-            </div>
-        </div>
-    </div>
-
-
     <!-- Modulos / Pasos del Proceso (Grid) -->
     <div class="row g-3 mb-4">
         <div class="col-12 col-md-6 col-lg-4">
