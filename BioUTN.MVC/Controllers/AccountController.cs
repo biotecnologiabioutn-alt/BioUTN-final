@@ -39,7 +39,16 @@ namespace BioUTN.MVC.Controllers
             var request = new { Email = email, Password = password };
             var content = new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PostAsync("Usuarios/Login", content);
+            HttpResponseMessage response;
+            try
+            {
+                response = await _httpClient.PostAsync("Usuarios/Login", content);
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Error = $"Error de conexión con la API: {ex.Message}";
+                return View();
+            }
 
             if (response.IsSuccessStatusCode)
             {
