@@ -103,3 +103,13 @@
 }
 .nav-item-sidebar[aria-expanded="true"] .bi-chevron-down { transform: rotate(180deg); }
 .nav-item-sidebar .bi-chevron-down { transition: transform 0.3s ease; }
+/* REGLAS GLOBALES SOLICITADAS */
+/* 1. Ocultar todos los botones de eliminar (basurero) porque se usa SoftDelete */
+.form-delete, form[asp-action="Delete"], a[asp-action="Delete"], button.delete { display: none !important; }
+
+/* 2. Botones de editar de color naranja en todo el sistema */
+a.figma-action-btn[title="Editar"] { color: #f97316 !important; background-color: transparent !important; }
+a.figma-action-btn[title="Editar"]:hover { color: #ea580c !important; background-color: #fff7ed !important; }
+a[asp-action="Edit"].figma-btn-primary, a[href*="/Edit/"].figma-btn-primary { background-color: #f97316 !important; border-color: #f97316 !important; color: white !important; }
+a[asp-action="Edit"].figma-btn-primary:hover, a[href*="/Edit/"].figma-btn-primary:hover { background-color: #ea580c !important; }
+

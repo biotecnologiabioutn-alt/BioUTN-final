@@ -57,10 +57,6 @@
                 {
                     <div class="nav-category">ADMINISTRACIÓN</div>
                     
-                    <a asp-controller="Especies" asp-action="Index" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Especies" ? "active" : "")">
-                        <i class="fa-solid fa-dna"></i> Configuración Biológica
-                    </a>
-                    
                     <a asp-controller="TalentoHumano" asp-action="Index" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "TalentoHumano" ? "active" : "")">
                         <i class="fa-solid fa-users"></i> Talento Humano
                     </a>
