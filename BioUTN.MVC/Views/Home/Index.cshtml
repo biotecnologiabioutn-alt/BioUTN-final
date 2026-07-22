@@ -187,10 +187,10 @@
 
 @section Scripts {
     <script>
-        // Sin datos quemados, en espera de conexión a BD
-        const mockTasks = {};
+        // Cargar datos dinámicos desde el backend
+        const mockTasks = @Html.Raw(ViewBag.MockTasksJson ?? "{}");
 
-        let currentDate = new Date(2026, 6, 1); // Empezamos en Julio 2026
+        let currentDate = new Date(); // Fecha actual
         const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
 
         function renderCalendar() {
@@ -221,6 +221,8 @@
             }
 
             let htmlString = "";
+            let today = new Date();
+
             for (let i = 1; i <= daysInMonth; i++) {
                 const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
                 let dotsHtml = '';
@@ -240,9 +242,11 @@
                     dotsHtml = `<div class="cal-dots">${dots}</div>`;
                 }
 
-                // Día seleccionado por defecto
+                // Día seleccionado por defecto (hoy)
                 let activeClass = '';
-                if (year === 2026 && month === 6 && i === 4) activeClass = 'active'; 
+                if (year === today.getFullYear() && month === today.getMonth() && i === today.getDate()) {
+                    activeClass = 'active'; 
+                }
 
                 htmlString += `
                     <div class="cal-day ${activeClass}" onclick="selectDay(this, ${i}, ${month+1}, ${year})">
@@ -260,7 +264,6 @@
             renderTasksForMonth();
         }
 
-        // Simulación básica de avance
         function nextMonth() {
             currentDate.setMonth(currentDate.getMonth() + 1);
             renderCalendar();
@@ -307,12 +310,13 @@
                 <div class="task-card">
                     <div class="task-info">
                         <h6>${t.title}</h6>
-                        <p>Especie: ${t.species} | Lote: ${t.lote}</p>
-                        <p>Fecha Límite: ${t.deadline}</p>
+                        <p>${t.subtitle1}</p>
+                        <p>${t.subtitle2}</p>
+                        <p style="font-size: 0.8rem; margin-top: 5px; color: #64748B;"><i class="bi bi-calendar"></i> Fecha: ${t.deadline}</p>
                     </div>
-                    <div class="task-status">
-                        <div class="status-icon ${t.type}"><i class="fas ${t.icon}"></i></div>
-                        <div class="status-text ${colorClass}">${t.status}</div>
+                    <div class="task-status" style="text-align: center; min-width: 80px;">
+                        <div class="status-icon ${t.type}" style="font-size: 1.5rem; margin-bottom: 5px;"><i class="fas ${t.icon}"></i></div>
+                        <div class="status-text ${colorClass}" style="font-size: 0.75rem;">${t.status}</div>
                     </div>
                 </div>`;
                 container.innerHTML += cardHtml;
@@ -321,7 +325,8 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             renderCalendar();
-            renderTasks(4, 7, 2026); // Inicializar con 4 de Julio de 2026
+            const today = new Date();
+            renderTasks(today.getDate(), today.getMonth() + 1, today.getFullYear()); 
         });
     </script>
 }

@@ -230,13 +230,17 @@ namespace BioUTN.MVC.Controllers
 
                 ViewBag.PlantaMadres = new SelectList(Crud<PlantaMadre>.GetAll(), "Id", "CodigoAsignado", item.IdPlantaMadre);
                 ViewBag.FasesCultivo = new SelectList(Crud<FaseCultivo>.GetAll(), "Id", "NombreFase", item.IdFaseCultivo);
-                ViewBag.MediosCultivo = new SelectList(Crud<MedioCultivo>.GetAll(), "Id", "Nombre", item.IdMedioCultivo);
+                ViewBag.MediosCultivo = new SelectList(Crud<MedioCultivo>.GetAll(), "Id", "Descripcion", item.IdMedioCultivo);
                 ViewBag.Proyectos = new SelectList(Crud<Proyecto>.GetAll(), "Id", "NombreProyecto", item.IdProyecto);
                 ViewBag.UbicacionesFisicas = new SelectList(Crud<UbicacionFisica>.GetAll(), "Id", "CodigoAnaquel", item.IdUbicacionFisica);
                 ViewBag.Usuarios = new SelectList(Crud<Usuario>.GetAll(), "Id", "Nombres", item.IdUsuario);
                 ViewBag.Documentos = new SelectList(Crud<Documento>.GetAll(), "Id", "Titulo", item.IdDocumentoProtocolo);
-                var frascosLote = item.IdLotePadre.HasValue ? Crud<UnidadFrasco>.GetAll().Where(f => f.IdLoteCultivo == item.IdLotePadre).ToList() : new List<UnidadFrasco>();
-                ViewBag.FrascosOrigen = new SelectList(frascosLote, "Id", "CodigoUnidad", item.IdUnidadFrascoOrigen);
+                
+                var frascos = item.IdLotePadre.HasValue ? 
+                    Crud<UnidadFrasco>.GetAll().Where(f => f.IdLoteCultivo == item.IdLotePadre.Value).ToList() : 
+                    new List<UnidadFrasco>();
+                ViewBag.FrascosOrigen = new SelectList(frascos, "Id", "CodigoUnidad", item.IdUnidadFrascoOrigen);
+
                 return View(item);
             }
             catch (Exception ex)
@@ -257,24 +261,30 @@ namespace BioUTN.MVC.Controllers
             {
                 try
                 {
+                    item.FechaSiembra = item.FechaSiembra.ToUniversalTime();
                     Crud<LoteCultivo>.Update(id, item);
                     TempData["Success"] = "Elemento actualizado correctamente.";
                     return RedirectToAction(nameof(Index));
                 }
                 catch (Exception ex)
                 {
-                     TempData["Error"] = "Error al actualizar: " + ex.Message;
+                    ModelState.AddModelError("", "Error: " + ex.Message);
                 }
             }
+
             ViewBag.PlantaMadres = new SelectList(Crud<PlantaMadre>.GetAll(), "Id", "CodigoAsignado", item.IdPlantaMadre);
             ViewBag.FasesCultivo = new SelectList(Crud<FaseCultivo>.GetAll(), "Id", "NombreFase", item.IdFaseCultivo);
-            ViewBag.MediosCultivo = new SelectList(Crud<MedioCultivo>.GetAll(), "Id", "Nombre", item.IdMedioCultivo);
+            ViewBag.MediosCultivo = new SelectList(Crud<MedioCultivo>.GetAll(), "Id", "Descripcion", item.IdMedioCultivo);
             ViewBag.Proyectos = new SelectList(Crud<Proyecto>.GetAll(), "Id", "NombreProyecto", item.IdProyecto);
             ViewBag.UbicacionesFisicas = new SelectList(Crud<UbicacionFisica>.GetAll(), "Id", "CodigoAnaquel", item.IdUbicacionFisica);
             ViewBag.Usuarios = new SelectList(Crud<Usuario>.GetAll(), "Id", "Nombres", item.IdUsuario);
             ViewBag.Documentos = new SelectList(Crud<Documento>.GetAll(), "Id", "Titulo", item.IdDocumentoProtocolo);
-            var frascosLote = item.IdLotePadre.HasValue ? Crud<UnidadFrasco>.GetAll().Where(f => f.IdLoteCultivo == item.IdLotePadre).ToList() : new List<UnidadFrasco>();
-            ViewBag.FrascosOrigen = new SelectList(frascosLote, "Id", "CodigoUnidad", item.IdUnidadFrascoOrigen);
+            
+            var frascos = item.IdLotePadre.HasValue ? 
+                Crud<UnidadFrasco>.GetAll().Where(f => f.IdLoteCultivo == item.IdLotePadre.Value).ToList() : 
+                new List<UnidadFrasco>();
+            ViewBag.FrascosOrigen = new SelectList(frascos, "Id", "CodigoUnidad", item.IdUnidadFrascoOrigen);
+            
             return View(item);
         }
 
@@ -312,7 +322,53 @@ namespace BioUTN.MVC.Controllers
                 return RedirectToAction(nameof(Index));
             }
         }
+
+        [HttpPost]
+        public IActionResult CrearMedioAjax(string nombre)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(nombre)) return Json(new { success = false, message = "El nombre es requerido." });
+
+                var nuevoMedio = new MedioCultivo { Descripcion = nombre, Siglas = nombre.Length > 10 ? nombre.Substring(0, 10) : nombre, Componentes = "No definidos" };
+                bool isSuccess = Crud<MedioCultivo>.Create(nuevoMedio);
+
+                if (isSuccess)
+                {
+                    var todos = Crud<MedioCultivo>.GetAll().OrderBy(m => m.Id).ToList();
+                    var ultimos = todos.Select(m => new { id = m.Id, nombre = m.Descripcion }).ToList();
+                    return Json(new { success = true, data = ultimos });
+                }
+                return Json(new { success = false, message = "Error al guardar en la base de datos." });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public IActionResult CrearFaseAjax(string nombre)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(nombre)) return Json(new { success = false, message = "El nombre es requerido." });
+
+                var nuevaFase = new FaseCultivo { NombreFase = nombre };
+                bool isSuccess = Crud<FaseCultivo>.Create(nuevaFase);
+
+                if (isSuccess)
+                {
+                    var todos = Crud<FaseCultivo>.GetAll().OrderBy(f => f.Id).ToList();
+                    var ultimos = todos.Select(f => new { id = f.Id, nombre = f.NombreFase }).ToList();
+                    return Json(new { success = true, data = ultimos });
+                }
+                return Json(new { success = false, message = "Error al guardar en la base de datos." });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
     }
 }
-
-

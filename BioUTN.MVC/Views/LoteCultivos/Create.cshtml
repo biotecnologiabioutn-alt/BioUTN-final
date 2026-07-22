@@ -164,7 +164,12 @@
                     
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label asp-for="IdMedioCultivo" class="figma-label">Medio de Cultivo *</label>
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label asp-for="IdMedioCultivo" class="figma-label mb-0">Medio de Cultivo *</label>
+                                <button type="button" id="btnNuevoMedio" class="btn btn-sm btn-link text-decoration-none p-0" style="font-size: 12px; color: #10b981;">
+                                    <i class="bi bi-plus-circle me-1"></i>Nuevo
+                                </button>
+                            </div>
                             <select asp-for="IdMedioCultivo" id="selMedio" class="figma-input form-select" required onchange="updateCode()">
                                 <option value="">-- Seleccionar Medio --</option>
                                 @if (ViewBag.MediosCultivo != null) {
@@ -204,7 +209,12 @@
                             <span asp-validation-for="TotalUnidades" class="text-danger small mt-1 d-block"></span>
                         </div>
                         <div class="col-md-6">
-                            <label asp-for="IdFaseCultivo" class="figma-label">Fase de Desarrollo *</label>
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label asp-for="IdFaseCultivo" class="figma-label mb-0">Fase de Desarrollo *</label>
+                                <button type="button" id="btnNuevaFase" class="btn btn-sm btn-link text-decoration-none p-0" style="font-size: 12px; color: #10b981;">
+                                    <i class="bi bi-plus-circle me-1"></i>Nuevo
+                                </button>
+                            </div>
                             <select asp-for="IdFaseCultivo" class="figma-input form-select" asp-items="ViewBag.FasesCultivo" required>
                                 <option value="">-- Seleccionar Fase --</option>
                             </select>
@@ -355,5 +365,91 @@
     // Inicializar con fecha de hoy
     document.querySelector('[name="FechaSiembra"]').valueAsDate = new Date();
     updateCode();
+
+    document.getElementById('btnNuevoMedio').addEventListener('click', function() {
+        Swal.fire({
+            title: 'Nuevo Medio de Cultivo',
+            input: 'text',
+            inputPlaceholder: 'Ej. Medio MS Básico',
+            showCancelButton: true,
+            confirmButtonText: 'Crear',
+            cancelButtonText: 'Cancelar',
+            inputValidator: (value) => {
+                if (!value) return '¡Necesitas escribir un nombre!'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch('/LoteCultivos/CrearMedioAjax', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'nombre=' + encodeURIComponent(result.value)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        var select = document.getElementById('selMedio');
+                        select.innerHTML = '<option value="">-- Seleccionar Medio --</option>';
+                        var lastId = '';
+                        data.data.forEach(item => {
+                            var option = document.createElement('option');
+                            option.value = item.id;
+                            option.text = item.nombre;
+                            option.dataset.cod = 'MS' + item.id;
+                            select.appendChild(option);
+                            lastId = item.id; 
+                        });
+                        select.value = lastId;
+                        Swal.fire('Creado!', 'El Medio de Cultivo ha sido agregado.', 'success');
+                        updateCode();
+                    } else {
+                        Swal.fire('Error', 'No se pudo crear.', 'error');
+                    }
+                })
+                .catch(error => Swal.fire('Error', 'Ocurrió un problema de red.', 'error'));
+            }
+        });
+    });
+
+    document.getElementById('btnNuevaFase').addEventListener('click', function() {
+        Swal.fire({
+            title: 'Nueva Fase de Desarrollo',
+            input: 'text',
+            inputPlaceholder: 'Ej. Enraizamiento',
+            showCancelButton: true,
+            confirmButtonText: 'Crear',
+            cancelButtonText: 'Cancelar',
+            inputValidator: (value) => {
+                if (!value) return '¡Necesitas escribir un nombre!'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch('/LoteCultivos/CrearFaseAjax', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'nombre=' + encodeURIComponent(result.value)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        var select = document.getElementById('IdFaseCultivo');
+                        select.innerHTML = '<option value="">-- Seleccionar Fase --</option>';
+                        var lastId = '';
+                        data.data.forEach(item => {
+                            var option = document.createElement('option');
+                            option.value = item.id;
+                            option.text = item.nombre;
+                            select.appendChild(option);
+                            lastId = item.id; 
+                        });
+                        select.value = lastId;
+                        Swal.fire('Creado!', 'La Fase de Desarrollo ha sido agregada.', 'success');
+                    } else {
+                        Swal.fire('Error', 'No se pudo crear.', 'error');
+                    }
+                })
+                .catch(error => Swal.fire('Error', 'Ocurrió un problema de red.', 'error'));
+            }
+        });
+    });
 </script>
 }
