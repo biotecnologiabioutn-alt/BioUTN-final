@@ -16,7 +16,8 @@ if (!string.IsNullOrEmpty(databaseUrl))
 {
     var databaseUri = new Uri(databaseUrl);
     var userInfo = databaseUri.UserInfo.Split(':');
-    connString = $"Host={databaseUri.Host};Port={databaseUri.Port};Database={databaseUri.LocalPath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};Ssl Mode=Require;Trust Server Certificate=true;";
+    var port = databaseUri.Port > 0 ? databaseUri.Port : 5432;
+    connString = $"Host={databaseUri.Host};Port={port};Database={databaseUri.LocalPath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};Ssl Mode=Require;Trust Server Certificate=true;";
 }
 
 builder.Services.AddDbContext<BioUTNContext>(options =>
