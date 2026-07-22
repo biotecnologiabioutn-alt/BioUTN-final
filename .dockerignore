@@ -1,0 +1,10 @@
+**/.vs/
+**/.vscode/
+**/bin/
+**/obj/
+**/.git/
+**/.DS_Store
+*.suo
+*.user
+*.userosscache
+*.sln.docstates

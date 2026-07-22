@@ -1,0 +1,21 @@
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+WORKDIR /src
+
+# Copiar csproj y restaurar como capas distintas
+COPY ["BioUTN.API/BioUTN.API.csproj", "BioUTN.API/"]
+COPY ["BioUTN.Modelos/BioUTN.Modelos.csproj", "BioUTN.Modelos/"]
+COPY ["BioUTN.Servicios/BioUTN.Servicios.csproj", "BioUTN.Servicios/"]
+RUN dotnet restore "BioUTN.API/BioUTN.API.csproj"
+
+# Copiar todo y construir
+COPY . .
+WORKDIR "/src/BioUTN.API"
+RUN dotnet build "BioUTN.API.csproj" -c Release -o /app/build
+
+FROM build AS publish
+RUN dotnet publish "BioUTN.API.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "BioUTN.API.dll"]

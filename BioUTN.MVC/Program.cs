@@ -8,7 +8,7 @@ namespace BioUTN.MVC
     {
         public static void Main(string[] args)
         {
-            var apiBaseUrl = "https://localhost:7024/api";
+            var apiBaseUrl = Environment.GetEnvironmentVariable("API_BASE_URL") ?? "https://localhost:7024/api";
             
             var builder = WebApplication.CreateBuilder(args);
 

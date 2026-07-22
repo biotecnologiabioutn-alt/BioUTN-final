@@ -10,12 +10,27 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 });
 builder.Services.AddOpenApi();
 
+var connString = builder.Configuration.GetConnectionString("DefaultConnection");
+var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+if (!string.IsNullOrEmpty(databaseUrl))
+{
+    var databaseUri = new Uri(databaseUrl);
+    var userInfo = databaseUri.UserInfo.Split(':');
+    connString = $"Host={databaseUri.Host};Port={databaseUri.Port};Database={databaseUri.LocalPath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};Ssl Mode=Require;Trust Server Certificate=true;";
+}
+
 builder.Services.AddDbContext<BioUTNContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(connString));
 
 builder.Services.AddScoped<BioUTN.Servicios.IEmailService, BioUTN.Servicios.EmailService>();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<BioUTNContext>();
+    db.Database.Migrate();
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
