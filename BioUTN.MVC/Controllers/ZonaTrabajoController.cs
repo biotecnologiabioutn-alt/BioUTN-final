@@ -14,7 +14,7 @@ namespace BioUTN.MVC.Controllers
                 ViewBag.TotalEquipos = BioUTN.ApiConsumer.Crud<BioUTN.Modelos.Equipo>.GetAll()?.Count() ?? 0;
                 
                 var reservas = BioUTN.ApiConsumer.Crud<BioUTN.Modelos.ReservaEquipo>.GetAll();
-                ViewBag.ReservasActivas = reservas?.Count(r => r.FechaFin >= System.DateTime.Now) ?? 0;
+                ViewBag.ReservasActivas = reservas?.Count(r => r.FechaReserva >= System.DateTime.Today) ?? 0;
 
                 ViewBag.TotalAnaqueles = BioUTN.ApiConsumer.Crud<BioUTN.Modelos.UbicacionFisica>.GetAll()?.Count() ?? 0;
                 ViewBag.TotalDocumentos = BioUTN.ApiConsumer.Crud<BioUTN.Modelos.Documento>.GetAll()?.Count() ?? 0;

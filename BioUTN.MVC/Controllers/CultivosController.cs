@@ -15,7 +15,7 @@ namespace BioUTN.MVC.Controllers
                 var frascos = BioUTN.ApiConsumer.Crud<BioUTN.Modelos.UnidadFrasco>.GetAll();
                 ViewBag.TotalFrascos = frascos?.Count() ?? 0;
                 
-                var contaminados = frascos?.Count(f => f.EstadoContaminacion == true) ?? 0;
+                var contaminados = frascos?.Count(f => f.Estado != null && f.Estado.Contains("Contaminad")) ?? 0;
                 ViewBag.Contaminados = contaminados;
                 
                 var saludables = (ViewBag.TotalFrascos - contaminados);
