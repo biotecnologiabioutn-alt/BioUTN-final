@@ -19,50 +19,45 @@ namespace BioUTN.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<ApiResult<List<TipoProyecto>>>> Get()
+        public async Task<ActionResult<IEnumerable<TipoProyecto>>> Get()
         {
             var data = await _context.TiposProyecto.ToListAsync();
-            var res = new ApiResult<List<TipoProyecto>> { Success = true, Data = data, Message = "Éxito" };
-            return Ok(res);
+            return Ok(data);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<ApiResult<TipoProyecto>>> Get(int id)
+        public async Task<ActionResult<TipoProyecto>> Get(int id)
         {
             var data = await _context.TiposProyecto.FindAsync(id);
-            if (data == null) return NotFound(new ApiResult<TipoProyecto> { Success = false, Message = "No encontrado" });
-            var res = new ApiResult<TipoProyecto> { Success = true, Data = data, Message = "Éxito" };
-            return Ok(res);
+            if (data == null) return NotFound();
+            return Ok(data);
         }
 
         [HttpPost]
-        public async Task<ActionResult<ApiResult<TipoProyecto>>> Post(TipoProyecto entity)
+        public async Task<ActionResult<TipoProyecto>> Post(TipoProyecto entity)
         {
             _context.TiposProyecto.Add(entity);
             await _context.SaveChangesAsync();
-            var res = new ApiResult<TipoProyecto> { Success = true, Data = entity, Message = "Creado exitosamente" };
-            return Ok(res);
+            return Ok(entity);
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<ApiResult<TipoProyecto>>> Put(int id, TipoProyecto entity)
+        public async Task<ActionResult<TipoProyecto>> Put(int id, TipoProyecto entity)
         {
-            if (id != entity.Id) return BadRequest(new ApiResult<TipoProyecto> { Success = false, Message = "ID no coincide" });
+            if (id != entity.Id) return BadRequest();
             _context.Entry(entity).State = EntityState.Modified;
             await _context.SaveChangesAsync();
-            var res = new ApiResult<TipoProyecto> { Success = true, Data = entity, Message = "Actualizado exitosamente" };
-            return Ok(res);
+            return Ok(entity);
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<ApiResult<TipoProyecto>>> Delete(int id)
+        public async Task<ActionResult<TipoProyecto>> Delete(int id)
         {
             var entity = await _context.TiposProyecto.FindAsync(id);
-            if (entity == null) return NotFound(new ApiResult<TipoProyecto> { Success = false, Message = "No encontrado" });
+            if (entity == null) return NotFound();
             _context.TiposProyecto.Remove(entity);
             await _context.SaveChangesAsync();
-            var res = new ApiResult<TipoProyecto> { Success = true, Data = entity, Message = "Eliminado exitosamente" };
-            return Ok(res);
+            return Ok(entity);
         }
     }
 }

@@ -1,0 +1,64 @@
+@model BioUTN.MVC.Models.TrazabilidadLoteNode
+
+<li>
+    <a href="@Url.Action("Details", "LoteCultivos", new { id = Model.Id })" class="border-lote">
+        <span class="node-type type-lote">Lote @(Model.Repique > 0 ? $"(R{Model.Repique})" : "")</span>
+        <span class="node-title">@Model.CodigoTrazabilidad</span>
+        <span class="node-subtitle">@Model.Fase</span>
+        <span class="node-subtitle">@Model.FechaSiembra.ToString("dd/MMM/yy")</span>
+        
+        @if (Model.Frascos.Any() || Model.LotesHijos.Any())
+        {
+            <div class="toggle-btn" onclick="toggleNode(this)"><i class="bi bi-dash"></i></div>
+        }
+    </a>
+    
+    @if (Model.Frascos.Any() || Model.LotesHijos.Any())
+    {
+        <ul>
+            @* Renderizar Resiembras (Lotes Hijos) *@
+            @foreach (var hijo in Model.LotesHijos)
+            {
+                @await Html.PartialAsync("_LoteNode", hijo)
+            }
+
+            @* Renderizar Frascos *@
+            @foreach (var frasco in Model.Frascos)
+            {
+                <li>
+                    <a href="#" class="border-frasco">
+                        <span class="badge-status status-@frasco.EstadoFitosanitario">
+                            @if(frasco.EstadoFitosanitario == "Saludable") { <i class="bi bi-check"></i> }
+                            else if(frasco.EstadoFitosanitario == "Contaminado") { <i class="bi bi-bug"></i> }
+                            else if(frasco.EstadoFitosanitario == "Muerta") { <i class="bi bi-x-circle"></i> }
+                        </span>
+                        
+                        <span class="node-type type-frasco">Frasco</span>
+                        <span class="node-title">@frasco.CodigoUnidad</span>
+                        
+                        @if (frasco.Monitoreos.Any())
+                        {
+                            <div class="toggle-btn" onclick="toggleNode(this)"><i class="bi bi-dash"></i></div>
+                        }
+                    </a>
+
+                    @if (frasco.Monitoreos.Any())
+                    {
+                        <ul>
+                            @foreach (var m in frasco.Monitoreos)
+                            {
+                                <li>
+                                    <a href="#" class="border-monitoreo" style="min-width: 100px;">
+                                        <span class="node-type type-monitoreo">Monitoreo</span>
+                                        <span class="node-title">@m.Estado</span>
+                                        <span class="node-subtitle">@m.Fecha.ToString("dd/MMM")</span>
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    }
+                </li>
+            }
+        </ul>
+    }
+</li>

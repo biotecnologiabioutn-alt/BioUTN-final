@@ -280,6 +280,130 @@ namespace BioUTN.MVC.Controllers
                 return RedirectToAction(nameof(Details), new { id });
             }
         }
+        // GET: Proyectos/Trazabilidad/5
+        public IActionResult Trazabilidad(int id)
+        {
+            try
+            {
+                var proyecto = Crud<Proyecto>.GetById(id);
+                if (proyecto == null) return NotFound();
+
+                var vm = new BioUTN.MVC.Models.TrazabilidadProyectoViewModel
+                {
+                    ProyectoId = proyecto.Id,
+                    NombreProyecto = proyecto.NombreProyecto,
+                    Director = proyecto.DirectoresNombres ?? "No asignado",
+                    PlantasMadres = new List<BioUTN.MVC.Models.TrazabilidadPlantaMadreNode>()
+                };
+
+                // Query API
+                var todasPlantas = Crud<PlantaMadre>.GetAll();
+                var todasEspecies = Crud<Especie>.GetAll();
+                var todosLotes = Crud<LoteCultivo>.GetAll();
+                var todosFrascos = Crud<UnidadFrasco>.GetAll();
+                var todosMonitoreos = Crud<MonitoreoFitosanitario>.GetAll();
+                var todasFases = Crud<FaseCultivo>.GetAll();
+
+                var plantasDelProyecto = todasPlantas.Where(p => p.IdProyecto == id).ToList();
+
+                foreach (var pm in plantasDelProyecto)
+                {
+                    var especieStr = todasEspecies.FirstOrDefault(e => e.Id == pm.IdEspecie)?.NombreCientifico ?? "";
+                    var nodoPlanta = new BioUTN.MVC.Models.TrazabilidadPlantaMadreNode
+                    {
+                        Id = pm.Id,
+                        CodigoAsignado = pm.CodigoAsignado,
+                        Especie = especieStr,
+                        EstadoFitosanitario = pm.EstadoFitosanitario,
+                        Lotes = new List<BioUTN.MVC.Models.TrazabilidadLoteNode>()
+                    };
+
+                    // Lotes introducidos desde la PM (Nivel 1)
+                    var lotesRaiz = todosLotes.Where(l => l.IdPlantaMadre == pm.Id && l.IdLotePadre == null).ToList();
+
+                    foreach (var lote in lotesRaiz)
+                    {
+                        var nodoLote = ConstruirArbolLotes(lote, todosLotes, todosFrascos, todosMonitoreos, todasFases);
+                        nodoPlanta.Lotes.Add(nodoLote);
+                    }
+
+                    vm.PlantasMadres.Add(nodoPlanta);
+                }
+
+                return View(vm);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Error al cargar árbol de trazabilidad: " + ex.Message;
+                return RedirectToAction(nameof(Details), new { id });
+            }
+        }
+
+        private BioUTN.MVC.Models.TrazabilidadLoteNode ConstruirArbolLotes(
+            LoteCultivo loteActual, 
+            IEnumerable<LoteCultivo> todosLotes, 
+            IEnumerable<UnidadFrasco> todosFrascos, 
+            IEnumerable<MonitoreoFitosanitario> todosMonitoreos,
+            IEnumerable<FaseCultivo> todasFases)
+        {
+            var faseStr = todasFases.FirstOrDefault(f => f.Id == loteActual.IdFaseCultivo)?.NombreFase ?? "";
+            
+            var nodo = new BioUTN.MVC.Models.TrazabilidadLoteNode
+            {
+                Id = loteActual.Id,
+                CodigoTrazabilidad = loteActual.CodigoTrazabilidad,
+                TipoExplante = loteActual.TipoExplante,
+                FechaSiembra = loteActual.FechaSiembra,
+                Fase = faseStr,
+                Repique = loteActual.NumeroRepique,
+                Frascos = new List<BioUTN.MVC.Models.TrazabilidadFrascoNode>(),
+                LotesHijos = new List<BioUTN.MVC.Models.TrazabilidadLoteNode>()
+            };
+
+            // Buscar frascos de este lote
+            var frascosDelLote = todosFrascos.Where(f => f.IdLoteCultivo == loteActual.Id).ToList();
+            foreach (var frasco in frascosDelLote)
+            {
+                var monitoreosFrasco = todosMonitoreos
+                    .Where(m => m.IdUnidadFrasco == frasco.Id)
+                    .OrderByDescending(m => m.FechaEvaluacion)
+                    .ToList();
+
+                var estadoActual = "Saludable";
+                if (monitoreosFrasco.Any())
+                {
+                    var ultimo = monitoreosFrasco.First();
+                    if (ultimo.Muerte) estadoActual = "Planta Muerta";
+                    else if (ultimo.Bacterias || ultimo.Hongos) estadoActual = "Contaminado";
+                    else estadoActual = ultimo.Respuesta;
+                }
+
+                var nodoFrasco = new BioUTN.MVC.Models.TrazabilidadFrascoNode
+                {
+                    Id = frasco.Id,
+                    CodigoUnidad = frasco.CodigoUnidad,
+                    FechaCreacion = loteActual.FechaSiembra,
+                    EstadoFitosanitario = estadoActual,
+                    Monitoreos = monitoreosFrasco.Select(m => new BioUTN.MVC.Models.TrazabilidadMonitoreoNode
+                    {
+                        Id = m.Id,
+                        Fecha = m.FechaEvaluacion,
+                        Estado = m.Muerte ? "Muerta" : (m.Bacterias || m.Hongos ? "Contaminado" : m.Respuesta),
+                        Observaciones = m.Observaciones
+                    }).ToList()
+                };
+                nodo.Frascos.Add(nodoFrasco);
+            }
+
+            // Recursión para Resiembras (Lotes Hijos)
+            var lotesHijos = todosLotes.Where(l => l.IdLotePadre == loteActual.Id).ToList();
+            foreach (var hijo in lotesHijos)
+            {
+                nodo.LotesHijos.Add(ConstruirArbolLotes(hijo, todosLotes, todosFrascos, todosMonitoreos, todasFases));
+            }
+
+            return nodo;
+        }
     }
 }
 

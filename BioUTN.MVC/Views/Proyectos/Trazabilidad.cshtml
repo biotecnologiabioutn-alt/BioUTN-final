@@ -1,0 +1,281 @@
+@model BioUTN.MVC.Models.TrazabilidadProyectoViewModel
+
+@{
+    ViewData["Title"] = "Árbol Genealógico - " + Model.NombreProyecto;
+}
+
+@section Styles {
+    <style>
+        .trazabilidad-container {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background-color: #f9fafb;
+            padding: 2rem;
+            border-radius: 12px;
+            overflow-x: auto;
+        }
+
+        /* Base tree styles */
+        .tree {
+            width: max-content;
+        }
+
+        .tree ul {
+            padding-top: 20px;
+            position: relative;
+            transition: all 0.5s;
+            -webkit-transition: all 0.5s;
+            -moz-transition: all 0.5s;
+            display: flex;
+            padding-left: 0;
+            list-style-type: none;
+        }
+
+        .tree li {
+            float: left;
+            text-align: center;
+            list-style-type: none;
+            position: relative;
+            padding: 20px 5px 0 5px;
+            transition: all 0.5s;
+            -webkit-transition: all 0.5s;
+            -moz-transition: all 0.5s;
+        }
+
+        /* We will use ::before and ::after to draw the connectors */
+        .tree li::before, .tree li::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 50%;
+            border-top: 2px solid #cbd5e1;
+            width: 50%;
+            height: 20px;
+        }
+
+        .tree li::after {
+            right: auto;
+            left: 50%;
+            border-left: 2px solid #cbd5e1;
+        }
+
+        /* We need to remove left-right connectors from elements without any siblings */
+        .tree li:only-child::after, .tree li:only-child::before {
+            display: none;
+        }
+
+        /* Remove space from the top of single children */
+        .tree li:only-child {
+            padding-top: 0;
+        }
+
+        /* Remove left connector from first child and right connector from last child */
+        .tree li:first-child::before, .tree li:last-child::after {
+            border: 0 none;
+        }
+
+        /* Adding back the vertical connector to the last nodes */
+        .tree li:last-child::before {
+            border-right: 2px solid #cbd5e1;
+            border-radius: 0 5px 0 0;
+            -webkit-border-radius: 0 5px 0 0;
+            -moz-border-radius: 0 5px 0 0;
+        }
+
+        .tree li:first-child::after {
+            border-radius: 5px 0 0 0;
+            -webkit-border-radius: 5px 0 0 0;
+            -moz-border-radius: 5px 0 0 0;
+        }
+
+        /* Time to add downward connectors from parents */
+        .tree ul ul::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            border-left: 2px solid #cbd5e1;
+            width: 0;
+            height: 20px;
+        }
+
+        .tree li a {
+            border: 1px solid #e2e8f0;
+            padding: 10px 15px;
+            text-decoration: none;
+            color: #1e293b;
+            font-size: 12px;
+            display: inline-block;
+            border-radius: 8px;
+            background-color: white;
+            transition: all 0.2s;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            min-width: 140px;
+            position: relative;
+        }
+
+        .tree li a:hover {
+            background-color: #f8fafc;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .node-type {
+            font-size: 10px;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .node-title {
+            font-weight: 600;
+            font-size: 14px;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .node-subtitle {
+            font-size: 11px;
+            color: #64748b;
+            display: block;
+        }
+
+        /* Color classes */
+        .type-proyecto { color: #f59e0b; }
+        .border-proyecto { border-top: 3px solid #f59e0b !important; }
+        
+        .type-pm { color: #10b981; }
+        .border-pm { border-top: 3px solid #10b981 !important; }
+        
+        .type-lote { color: #3b82f6; }
+        .border-lote { border-top: 3px solid #3b82f6 !important; }
+        
+        .type-frasco { color: #8b5cf6; }
+        .border-frasco { border-top: 3px solid #8b5cf6 !important; }
+
+        .type-monitoreo { color: #ec4899; }
+        .border-monitoreo { border-top: 3px solid #ec4899 !important; }
+
+        .badge-status {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ef4444;
+            color: white;
+            border-radius: 9999px;
+            padding: 2px 8px;
+            font-size: 10px;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status-Saludable { background: #10b981; }
+        .status-Contaminado { background: #ef4444; }
+        .status-Muerta { background: #1f2937; }
+
+        /* Collapse feature */
+        .toggle-btn {
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            border: 1px solid #cbd5e1;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            cursor: pointer;
+            z-height: 10;
+            color: #64748b;
+        }
+        .toggle-btn:hover {
+            background: #f1f5f9;
+        }
+        .collapsed-ul {
+            display: none !important;
+        }
+    </style>
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 style="font-weight: 700; color: #1e293b;">Árbol Genealógico del Proyecto</h2>
+        <p class="text-muted">Trazabilidad completa: Desde la planta madre hasta el monitoreo.</p>
+    </div>
+    <a asp-controller="Proyectos" asp-action="Details" asp-route-id="@Model.ProyectoId" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i> Volver al Proyecto
+    </a>
+</div>
+
+<div class="trazabilidad-container">
+    <div class="tree">
+        <ul>
+            <li>
+                <a href="#" class="border-proyecto">
+                    <span class="node-type type-proyecto">Proyecto</span>
+                    <span class="node-title">@Model.NombreProyecto</span>
+                    <span class="node-subtitle">Director: @Model.Director</span>
+                    @if (Model.PlantasMadres.Any())
+                    {
+                        <div class="toggle-btn" onclick="toggleNode(this)"><i class="bi bi-dash"></i></div>
+                    }
+                </a>
+                
+                @if (Model.PlantasMadres.Any())
+                {
+                    <ul>
+                        @foreach (var pm in Model.PlantasMadres)
+                        {
+                            <li>
+                                <a href="@Url.Action("Details", "PlantaMadres", new { id = pm.Id })" class="border-pm">
+                                    <span class="node-type type-pm">Planta Madre</span>
+                                    <span class="node-title">@pm.CodigoAsignado</span>
+                                    <span class="node-subtitle">@pm.Especie</span>
+                                    @if (pm.Lotes.Any())
+                                    {
+                                        <div class="toggle-btn" onclick="toggleNode(this)"><i class="bi bi-dash"></i></div>
+                                    }
+                                </a>
+                                
+                                @if (pm.Lotes.Any())
+                                {
+                                    <ul>
+                                        @foreach (var lote in pm.Lotes)
+                                        {
+                                            @await Html.PartialAsync("_LoteNode", lote)
+                                        }
+                                    </ul>
+                                }
+                            </li>
+                        }
+                    </ul>
+                }
+            </li>
+        </ul>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function toggleNode(btn) {
+            event.preventDefault();
+            event.stopPropagation();
+            var aTag = btn.parentElement;
+            var ulTag = aTag.nextElementSibling;
+            
+            if (ulTag && ulTag.tagName === 'UL') {
+                if (ulTag.classList.contains('collapsed-ul')) {
+                    ulTag.classList.remove('collapsed-ul');
+                    btn.innerHTML = '<i class="bi bi-dash"></i>';
+                } else {
+                    ulTag.classList.add('collapsed-ul');
+                    btn.innerHTML = '<i class="bi bi-plus"></i>';
+                }
+            }
+        }
+    </script>
+}
