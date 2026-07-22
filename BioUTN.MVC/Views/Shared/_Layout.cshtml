@@ -53,11 +53,13 @@
                     <i class="fa-solid fa-boxes-stacked"></i> Gestión de Inventario
                 </a>
 
-                @if (User?.Identity?.IsAuthenticated == true && (User.IsInRole("Coordinador") || User.IsInRole("Tecnico")))
+                @if (User?.Identity?.IsAuthenticated == true && (User.IsInRole("Coordinador") || User.IsInRole("Tecnico") || User.IsInRole("Tecnico de laboratorio")))
                 {
                     <div class="nav-category">ADMINISTRACIÓN</div>
                     
-                    <!-- Enlace Configuración Biológica removido por solicitud -->
+                    <a asp-controller="Especies" asp-action="Index" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Especies" ? "active" : "")">
+                        <i class="fa-solid fa-dna"></i> Configuración Biológica
+                    </a>
                     
                     <a asp-controller="TalentoHumano" asp-action="Index" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "TalentoHumano" ? "active" : "")">
                         <i class="fa-solid fa-users"></i> Talento Humano
