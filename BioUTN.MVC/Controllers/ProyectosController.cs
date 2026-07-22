@@ -53,7 +53,9 @@ namespace BioUTN.MVC.Controllers
             ViewBag.Directores = new SelectList(directores, "Id", "NombreCompletoConRol");
             ViewBag.Tesistas = new SelectList(tesistas, "Id", "NombreCompletoConRol");
             ViewBag.Especies = new SelectList(Crud<Especie>.GetAll(), "Id", "NombreCientifico");
-            ViewBag.TipoProyecto = tipo;
+            ViewBag.TiposProyecto = new SelectList(Crud<TipoProyecto>.GetAll(), "Id", "Nombre");
+            var tipoId = Crud<TipoProyecto>.GetAll().FirstOrDefault(t => t.Nombre.Contains(tipo, StringComparison.OrdinalIgnoreCase))?.Id;
+            ViewBag.IdTipoProyectoSeleccionado = tipoId;
             return View();
         }
 
@@ -87,6 +89,7 @@ namespace BioUTN.MVC.Controllers
             ViewBag.Directores = new SelectList(directores, "Id", "NombreCompletoConRol", item.IdDirector);
             ViewBag.Tesistas = new SelectList(tesistas, "Id", "NombreCompletoConRol", item.IdTesista);
             ViewBag.Especies = new SelectList(Crud<Especie>.GetAll(), "Id", "NombreCientifico", item.IdEspecie);
+            ViewBag.TiposProyecto = new SelectList(Crud<TipoProyecto>.GetAll(), "Id", "Nombre", item.IdTipoProyecto);
             return View(item);
         }
 
@@ -107,6 +110,8 @@ namespace BioUTN.MVC.Controllers
                 ViewBag.Directores = new SelectList(directores, "Id", "NombreCompletoConRol", item.IdDirector);
                 ViewBag.Tesistas = new SelectList(tesistas, "Id", "NombreCompletoConRol", item.IdTesista);
                 ViewBag.Especies = new SelectList(Crud<Especie>.GetAll(), "Id", "NombreCientifico", item.IdEspecie);
+            ViewBag.TiposProyecto = new SelectList(Crud<TipoProyecto>.GetAll(), "Id", "Nombre", item.IdTipoProyecto);
+                ViewBag.TiposProyecto = new SelectList(Crud<TipoProyecto>.GetAll(), "Id", "Nombre", item.IdTipoProyecto);
 
                 return View(item);
             }
@@ -149,6 +154,7 @@ namespace BioUTN.MVC.Controllers
             ViewBag.Directores = new SelectList(directores, "Id", "NombreCompletoConRol", item.IdDirector);
             ViewBag.Tesistas = new SelectList(tesistas, "Id", "NombreCompletoConRol", item.IdTesista);
             ViewBag.Especies = new SelectList(Crud<Especie>.GetAll(), "Id", "NombreCientifico", item.IdEspecie);
+            ViewBag.TiposProyecto = new SelectList(Crud<TipoProyecto>.GetAll(), "Id", "Nombre", item.IdTipoProyecto);
             return View(item);
         }
 
@@ -262,5 +268,6 @@ namespace BioUTN.MVC.Controllers
         }
     }
 }
+
 
 

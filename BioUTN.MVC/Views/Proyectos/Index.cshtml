@@ -32,7 +32,7 @@
     <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
         @foreach (var item in Model)
         {
-            var isTesis = item.TipoProyecto == "Tesis";
+            var isTesis = item.TipoProyectoRef != null && item.TipoProyectoRef.Nombre == "Tesis";
             var cardBorderClass = isTesis ? "border-success" : "border-primary";
             var textClass = isTesis ? "text-success" : "text-primary";
             var iconClass = isTesis ? "bi-folder-fill" : "bi-folder-symlink-fill";
@@ -46,7 +46,7 @@
                             <i class="bi @iconClass @textClass fs-1 me-3"></i>
                             <div>
                                 <h5 class="card-title fw-bold mb-1">@item.NombreProyecto</h5>
-                                <span class="badge @bgClass bg-opacity-10 @textClass rounded-pill">@item.TipoProyecto</span>
+                                <span class="badge @bgClass bg-opacity-10 @textClass rounded-pill">@(item.TipoProyectoRef?.Nombre ?? "No definido")</span>
                             </div>
                         </div>
 
@@ -114,3 +114,4 @@
         box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
     }
 </style>
+

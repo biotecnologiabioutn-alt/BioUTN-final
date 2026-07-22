@@ -3,7 +3,7 @@
 @{
     ViewData["Title"] = "Ficha Planta Madre";
     Layout = null; // No layout for printing
-    bool isGreen = Model.Proyecto?.TipoProyecto == "Tesis";
+    bool isGreen = Model.Proyecto?.TipoProyectoRef?.Nombre == "Tesis";
     string themeColor = isGreen ? "#3c763d" : "#0d6efd"; // Dark green or primary blue
     string borderColor = isGreen ? "#5cb85c" : "#89c2d9";
     string bgColor = isGreen ? "#dff0d8" : "#e0f2fe";
@@ -392,3 +392,5 @@
 
 </body>
 </html>
+
+

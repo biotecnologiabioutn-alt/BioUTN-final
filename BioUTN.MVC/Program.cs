@@ -66,6 +66,7 @@ namespace BioUTN.MVC
             Crud<UnidadFrasco>.EndPoint = $"{apiBaseUrl}/UnidadFrascos";
             Crud<Usuario>.EndPoint = $"{apiBaseUrl}/Usuarios";
             Crud<UnidadMedida>.EndPoint = $"{apiBaseUrl}/UnidadesMedida";
+            Crud<TipoProyecto>.EndPoint = $"{apiBaseUrl}/TiposProyecto";
             Crud<SolicitudLab>.EndPoint = $"{apiBaseUrl}/SolicitudesLab";
             Crud<SolicitudDetalleMaterial>.EndPoint = $"{apiBaseUrl}/SolicitudesDetalleMaterial";
 

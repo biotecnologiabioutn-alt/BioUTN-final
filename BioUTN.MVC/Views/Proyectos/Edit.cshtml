@@ -28,10 +28,10 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label asp-for="TipoProyecto" class="form-label fw-bold">Tipo de Proyecto</label>
-                                <input type="hidden" asp-for="TipoProyecto" />
-                                <input type="text" class="form-control" value="@Model.TipoProyecto" readonly />
-                                <span asp-validation-for="TipoProyecto" class="text-danger small"></span>
+                                <label asp-for="IdTipoProyecto" class="form-label fw-bold">Tipo de Proyecto</label>
+                                <input type="hidden" asp-for="IdTipoProyecto" />
+                                <input type="text" class="form-control" value="@Model.TipoProyectoRef?.Nombre" readonly />
+                                <span asp-validation-for="IdTipoProyecto" class="text-danger small"></span>
                             </div>
 
                             <div class="col-md-6 mb-3">
@@ -54,7 +54,7 @@
 
                             <!-- CAMPOS DINÁMICOS PARA FICHAS -->
                             <div class="col-md-6 mb-3" id="div-director">
-                                <label asp-for="DirectoresNombres" class="form-label fw-bold">@(Model.TipoProyecto == "Tesis" ? "Director(es)" : "Docente(s)")</label>
+                                <label asp-for="DirectoresNombres" class="form-label fw-bold">@(Model.TipoProyectoRef?.Nombre == "Tesis" ? "Director(es)" : "Docente(s)")</label>
                                 <input type="hidden" asp-for="DirectoresNombres" id="DirectoresNombresHidden" />
                                 <select id="directores_select" class="form-select select2-multiple" multiple="multiple" asp-items="ViewBag.Directores" style="width: 100%;">
                                 </select>
@@ -180,7 +180,7 @@
             preselectSelect2('EstudiantesNombresHidden', 'estudiantes_select');
             preselectSelect2('DirectoresNombresHidden', 'directores_select');
 
-            var tipoSelectValue = '@Model.TipoProyecto';
+            var tipoSelectValue = '@Model.TipoProyectoRef?.Nombre';
             var divTesista = document.getElementById('div-tesista');
             var divUso = document.getElementById('div-uso');
             var divEstudiantes = document.getElementById('div-estudiantes');
@@ -203,3 +203,5 @@
         });
     </script>
 }
+
+

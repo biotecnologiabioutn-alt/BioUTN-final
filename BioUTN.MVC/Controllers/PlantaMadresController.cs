@@ -399,7 +399,7 @@ namespace BioUTN.MVC.Controllers
                 var nuevo = new Proyecto { 
                     NombreProyecto = nombre.Trim(),
                     Descripcion = "Proyecto creado automáticamente desde el registro de Planta Madre.",
-                    TipoProyecto = "Investigación",
+                    IdTipoProyecto = Crud<TipoProyecto>.GetAll().FirstOrDefault(t => t.Nombre.Contains("Investiga"))?.Id,
                     Estado = "Activo",
                     FechaInicio = DateTime.Now,
                     IdUsuarioResponsable = idUsuario
@@ -421,5 +421,7 @@ namespace BioUTN.MVC.Controllers
         }
     }
 }
+
+
 
 

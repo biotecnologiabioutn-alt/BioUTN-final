@@ -19,9 +19,9 @@ namespace BioUTN.Modelos
         [Required]
         public string Descripcion { get; set; } = string.Empty;
 
-        [Required]
-        [MaxLength(50)]
-        public string TipoProyecto { get; set; } = string.Empty;
+        [ForeignKey(nameof(TipoProyectoRef))]
+        public int? IdTipoProyecto { get; set; }
+        public virtual TipoProyecto? TipoProyectoRef { get; set; }
 
         [Required]
         [MaxLength(20)]

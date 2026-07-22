@@ -22,6 +22,7 @@ namespace BioUTN.API.Data
         public DbSet<Especie> Especies { get; set; }
 
         // 3. PROYECTOS Y GESTIÓN OPERATIVA
+        public DbSet<TipoProyecto> TiposProyecto { get; set; }
         public DbSet<Proyecto> Proyectos { get; set; }
         public DbSet<TareaOperativa> TareasOperativas { get; set; }
 

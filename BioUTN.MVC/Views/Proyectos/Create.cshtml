@@ -3,7 +3,8 @@
 @{
     ViewData["Title"] = "Crear Proyecto";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    string tipo = ViewBag.TipoProyecto as string ?? "Investigacion";
+    string tipo = ViewContext.HttpContext.Request.Query["tipo"].ToString() ?? "Investigacion";
+    int? tipoId = ViewBag.IdTipoProyectoSeleccionado as int?;
 }
 
 <div class="container-fluid py-4">
@@ -28,10 +29,11 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label asp-for="TipoProyecto" class="form-label fw-bold">Tipo de Proyecto</label>
-                                <input type="hidden" asp-for="TipoProyecto" value="@tipo" />
+                                <label asp-for="IdTipoProyecto" class="form-label fw-bold">Tipo de Proyecto</label>
+                                <input type="hidden" asp-for="IdTipoProyecto" value="@tipoId" />
+                                <input type="hidden" id="TipoProyectoNombre" value="@tipo" />
                                 <input type="text" class="form-control" value="@tipo" readonly />
-                                <span asp-validation-for="TipoProyecto" class="text-danger small"></span>
+                                <span asp-validation-for="IdTipoProyecto" class="text-danger small"></span>
                             </div>
 
                             <div class="col-md-6 mb-3">
@@ -156,13 +158,13 @@
                 $('#DirectoresNombresHidden').val(names.join(', '));
             });
 
-            var tipoSelect = document.getElementById('TipoProyecto');
+            var tipoNombre = document.getElementById('TipoProyectoNombre').value;
             var divTesista = document.getElementById('div-tesista');
             var divUso = document.getElementById('div-uso');
             var divEstudiantes = document.getElementById('div-estudiantes');
 
             function toggleCampos() {
-                if (tipoSelect.value === 'Tesis') {
+                if (tipoNombre === 'Tesis') {
                     // Carpeta Verde
                     divTesista.style.display = 'block';
                     divUso.style.display = 'none';
@@ -180,3 +182,4 @@
         });
     </script>
 }
+
