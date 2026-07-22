@@ -1,0 +1,241 @@
+@{
+    ViewData["Title"] = "Registrar Introducción";
+    ViewData["HeaderTitle"] = "Registrar Introducción";
+    ViewData["ShowBackButton"] = true;
+}
+
+<div class="container mt-4 pb-5 mb-5">
+    
+    <div class="alert alert-info small py-2 mb-3">
+        <i class="fas fa-info-circle"></i> Complete la información taxonómica y el origen del nuevo material vegetal.
+    </div>
+
+    <form id="formNuevaIntroduccion" onsubmit="handleCreatePlantaMadre(event)">
+      
+        <div class="accordion" id="accordionEspecie">
+            
+            <!-- 1. Información Taxonómica -->
+            <div class="accordion-item border-0 mb-3 shadow-sm rounded">
+                <h2 class="accordion-header" id="headingTax">
+                    <button class="accordion-button fw-bold text-dark rounded" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTax" aria-expanded="true">
+                        <i class="fas fa-leaf text-success me-2"></i> 1. Información Taxonómica
+                    </button>
+                </h2>
+                <div id="collapseTax" class="accordion-collapse collapse show" data-bs-parent="#accordionEspecie">
+                    <div class="accordion-body bg-light">
+                        <div class="row">
+                            <div class="col-12 col-md-8">
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold">Código Interno (Estricto)</label>
+                                    <input type="text" class="form-control" id="inpCodigo" placeholder="Ej. C-NUB" maxlength="5" style="text-transform:uppercase" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold text-success fst-italic">Nombre Científico</label>
+                                    <input type="text" class="form-control fst-italic" id="inpCientifico" placeholder="Ej. Chrysanthemum morifolium" required>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4 mb-3 text-center">
+                                <label class="form-label small fw-bold d-block text-start">Fotografía de la Especie</label>
+                                <div class="border rounded bg-white p-2 mb-2 d-flex align-items-center justify-content-center" style="height: 120px; border-style: dashed !important;">
+                                    <img id="imgPreview" src="" alt="Previsualización" class="img-fluid d-none" style="max-height: 100px;">
+                                    <span id="imgPlaceholder" class="text-muted small"><i class="fas fa-image fa-2x mb-1 d-block"></i> Sin foto</span>
+                                </div>
+                                <input type="file" class="form-control form-control-sm" id="inpFoto" accept="image/png, image/jpeg" onchange="previewImage(this)">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label class="form-label small fw-bold">Familia</label>
+                                <input type="text" class="form-control" placeholder="Ej. Asteraceae">
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label small fw-bold">Nombre Común</label>
+                                <input type="text" class="form-control" placeholder="Ej. Crisantemo">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Ecotipo</label>
+                            <input type="text" class="form-control" placeholder="Ej. Madre 1, Columbia 0">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Información Biológica -->
+            <div class="accordion-item border-0 mb-3 shadow-sm rounded">
+                <h2 class="accordion-header" id="headingBio">
+                    <button class="accordion-button collapsed fw-bold text-dark rounded" type="button" data-bs-toggle="collapse" data-bs-target="#collapseBio">
+                        <i class="fas fa-dna text-primary me-2"></i> 2. Información Biológica
+                    </button>
+                </h2>
+                <div id="collapseBio" class="accordion-collapse collapse" data-bs-parent="#accordionEspecie">
+                    <div class="accordion-body bg-light">
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label class="form-label small fw-bold">Tipo de Planta</label>
+                                <select class="form-select border-0 shadow-sm">
+                                    <option>Herbácea</option>
+                                    <option>Epífita</option>
+                                    <option>Arbustiva</option>
+                                    <option>Arbórea</option>
+                                </select>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label small fw-bold">Ciclo de Vida</label>
+                                <input type="text" class="form-control border-0 shadow-sm" placeholder="Ej. Perenne">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Estado de Conservación (UICN)</label>
+                            <select id="selIucn" class="form-select border-0 shadow-sm" onchange="checkSoftStop()">
+                                <option value="NE">NE (No Evaluada)</option>
+                                <option value="LC">LC (Preocupación Menor)</option>
+                                <option value="VU">VU (Vulnerable)</option>
+                                <option value="EN">EN (En Peligro)</option>
+                                <option value="CR">CR (Peligro Crítico)</option>
+                            </select>
+                        </div>
+                        
+                        <div id="softStopAlert" class="alert alert-warning d-none small py-2 mt-2">
+                            <i class="fas fa-exclamation-triangle"></i> Especie bajo amenaza. El Permiso Ambiental es <strong>obligatorio</strong>.
+                        </div>
+
+                        <div class="row mb-3 mt-3">
+                            <div class="col-6">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="nativa">
+                                    <label class="form-check-label small fw-bold" for="nativa">Es Nativa</label>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="endemica">
+                                    <label class="form-check-label small fw-bold" for="endemica">Es Endémica</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Origen y Explante -->
+            <div class="accordion-item border-0 mb-3 shadow-sm rounded">
+                <h2 class="accordion-header" id="headingOrigen">
+                    <button class="accordion-button collapsed fw-bold text-dark rounded" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOrigen">
+                        <i class="fas fa-map-marker-alt text-danger me-2"></i> 3. Origen y Explante
+                    </button>
+                </h2>
+                <div id="collapseOrigen" class="accordion-collapse collapse" data-bs-parent="#accordionEspecie">
+                    <div class="accordion-body bg-light">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Procedencia</label>
+                            <input type="text" class="form-control border-0 shadow-sm" placeholder="Ej. Laboratorio UTN">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Permiso Ambiental / Respaldo (PDF)</label>
+                            <input type="file" id="fileInput" class="form-control border-0 shadow-sm" accept=".pdf, .jpg, .png" onchange="checkFileSize()">
+                            <div id="fileSizeError" class="text-danger small mt-1 d-none">El archivo excede el tamaño máximo (15 MB).</div>
+                            <small class="text-muted" style="font-size: 0.7rem;">Obligatorio para especies CR/EN/VU. Máx 15MB.</small>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label class="form-label small fw-bold">Tipo de Explante</label>
+                                <select class="form-select border-0 shadow-sm">
+                                    <option>Semilla</option>
+                                    <option>Meristemo</option>
+                                    <option>Somático</option>
+                                    <option>Segmento Nodal</option>
+                                </select>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label small fw-bold">Cantidad</label>
+                                <input type="number" class="form-control border-0 shadow-sm" placeholder="Ej. 5" min="1" value="1">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Fecha de Introducción</label>
+                            <input type="date" id="fechaRecepcion" class="form-control border-0 shadow-sm" required>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div> 
+        
+        <div class="d-grid mt-4">
+            <button type="submit" class="btn btn-primary-utn btn-lg shadow">
+                <i class="fas fa-save me-2"></i> Guardar Registro de Introducción
+            </button>
+        </div>
+
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const dateInput = document.getElementById('fechaRecepcion');
+            const today = new Date().toISOString().split('T')[0];
+            dateInput.setAttribute('max', today);
+            dateInput.value = today;
+        });
+
+        // Regla Soft-Stop (Permiso ambiental)
+        function checkSoftStop() {
+            const val = document.getElementById('selIucn').value;
+            const alertDiv = document.getElementById('softStopAlert');
+            
+            if(['CR', 'EN', 'VU'].includes(val)) {
+                alertDiv.classList.remove('d-none');
+            } else {
+                alertDiv.classList.add('d-none');
+            }
+        }
+
+        // Validación de tamaño (Max 15MB)
+        function checkFileSize() {
+            const fileInput = document.getElementById('fileInput');
+            const errorDiv = document.getElementById('fileSizeError');
+            
+            if(fileInput.files.length > 0) {
+                const fileSize = fileInput.files[0].size / 1024 / 1024; // MB
+                if(fileSize > 15) {
+                    errorDiv.classList.remove('d-none');
+                    fileInput.value = ""; // Limpiar
+                } else {
+                    errorDiv.classList.add('d-none');
+                }
+            }
+        }
+
+        // Previsualización de Imagen (Fotografía de Especie)
+        function previewImage(input) {
+            const preview = document.getElementById('imgPreview');
+            const placeholder = document.getElementById('imgPlaceholder');
+            
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.classList.remove('d-none');
+                    placeholder.classList.add('d-none');
+                }
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                preview.src = "";
+                preview.classList.add('d-none');
+                placeholder.classList.remove('d-none');
+            }
+        }
+
+        function handleCreatePlantaMadre(e) {
+            e.preventDefault();
+            const codigo = document.getElementById('inpCodigo').value;
+            const especie = document.getElementById('inpCientifico').value;
+            
+            alert(`Registro de introducción "${codigo}" (${especie}) guardado exitosamente. Se ha vinculado a la Planta Madre inicial.`);
+            window.location.href = '/Especie/Index';
+        }
+    </script>
+}

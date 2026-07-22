@@ -1,0 +1,379 @@
+@{
+    ViewData["Title"] = "Panel de Control";
+    Layout = "_DashboardLayout";
+}
+
+<style>
+    /* Estilos para el Calendario */
+    .calendar-container {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-top: 1.5rem;
+    }
+
+    .calendar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .calendar-header h4 {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin: 0;
+    }
+
+    .nav-btn {
+        background: var(--bg-color);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: var(--text-dark);
+        transition: all 0.2s;
+    }
+    
+    .nav-btn:hover { background: var(--border-color); }
+
+    .calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 8px;
+        text-align: center;
+    }
+
+    .day-name {
+        font-size: 0.8rem;
+        color: var(--text-dark);
+        font-weight: 500;
+        padding-bottom: 0.5rem;
+        text-transform: capitalize;
+    }
+
+    .day-cell {
+        aspect-ratio: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.95rem;
+        font-weight: 500;
+        border-radius: 50%;
+        cursor: pointer;
+        position: relative;
+        transition: all 0.2s;
+        width: 40px;
+        height: 40px;
+        margin: 0 auto;
+    }
+    
+    .day-cell:not(.empty):hover {
+        background: var(--bg-color);
+    }
+
+    .day-cell.selected {
+        background: var(--primary-color);
+        
+    }
+
+    .dots-container {
+        display: flex;
+        gap: 3px;
+        position: absolute;
+        bottom: 2px;
+    }
+
+    .dot {
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+    }
+
+    .dot.red { background: var(--danger); }
+    .dot.yellow { background: var(--warning); }
+    .dot.green { background: var(--success); }
+
+    /* Alertas del día seleccionado */
+    .alerts-section {
+        margin-top: 1.5rem;
+    }
+
+    .alerts-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        justify-content: center;
+    }
+
+    .alert-count {
+        background: var(--danger);
+        
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        font-weight: 700;
+    }
+
+    .alert-card {
+        background: var(--bg-color);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.8rem;
+    }
+
+    .alert-info h5 {
+        margin: 0 0 0.25rem 0;
+        font-size: 1rem;
+        color: var(--text-dark);
+    }
+
+    .alert-info p {
+        margin: 0;
+        font-size: 0.85rem;
+        color: var(--text-dark);
+    }
+
+    .alert-status {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.3rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .status-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        
+    }
+</style>
+
+<div class="card panel-control" style="max-width: 800px; margin: 0 auto;">
+    <h3 class="card-title"><i class="fa-solid fa-chart-pie"></i> Panel de Control Integrado</h3>
+    
+    <!-- Estadísticas (KPIs) -->
+    <div class="kpi-row">
+        <div class="kpi-box">
+            <div style="font-size: 0.9rem; color: var(--text-dark);">Lotes Activos</div>
+            <div class="kpi-value">345</div>
+            <div style="font-size: 0.85rem; color: var(--success);"><i class="fa-solid fa-arrow-up"></i> +12% vs Anterior</div>
+        </div>
+        <div class="kpi-box">
+            <div style="font-size: 0.9rem; color: var(--text-dark);">% Éxito Global</div>
+            <div class="kpi-value">88%</div>
+            <div style="font-size: 0.85rem; color: var(--success);"><i class="fa-solid fa-thumbs-up"></i> Sano</div>
+        </div>
+    </div>
+
+    <!-- Calendario de Alertas -->
+    <div class="calendar-container">
+        <!-- Calendario Dinámico -->
+        <div class="calendar-header">
+            <button class="nav-btn" onclick="changeMonth(-1)"><i class="fa-solid fa-chevron-left"></i></button>
+            <div style="text-align: center;">
+                <h4 id="calendar-month-name">Mes</h4>
+                <div id="calendar-year" style="font-size: 0.85rem; color: var(--text-dark);">Año</div>
+            </div>
+            <button class="nav-btn" onclick="changeMonth(1)"><i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+
+        <div class="calendar-grid" id="calendar-grid">
+            <!-- Días de la semana -->
+            <div class="day-name">lun</div>
+            <div class="day-name">mar</div>
+            <div class="day-name">mié</div>
+            <div class="day-name">jue</div>
+            <div class="day-name">vie</div>
+            <div class="day-name">sáb</div>
+            <div class="day-name">dom</div>
+            
+            <!-- Los días se renderizan aquí dinámicamente -->
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 1.5rem 0;">
+
+        <!-- Alertas del Día -->
+        <div class="alerts-section" id="alerts-container">
+            <!-- Las alertas se renderizan aquí dinámicamente -->
+        </div>
+    </div>
+</div>
+
+<script>
+    // Datos simulados de eventos/alertas
+    const mockEvents = {
+        '2026-07-04': [
+            { id: 'C-NUB-01', title: 'Resiembra Urgente', desc: 'Especie: C. Nubigenum | Lote PM1-F20-R0', time: '23:59', type: 'danger', typeName: 'Sin procesar', icon: 'fa-xmark' },
+            { id: 'C-SPE-04', title: 'Control de Contaminación', desc: 'Especie: C. Nubigenum | Lote PM2-F21-R0', time: '12:00', type: 'warning', typeName: 'En riesgo', icon: 'fa-triangle-exclamation' }
+        ],
+        '2026-07-01': [
+            { id: 'C-NUB-02', title: 'Revisión de rutina', desc: 'Especie: C. Nubigenum | Lote PM1-F20-R0', time: '10:00', type: 'success', typeName: 'Completado', icon: 'fa-check' }
+        ],
+        '2026-07-15': [
+            { id: 'C-NUB-05', title: 'Preparación de medios', desc: 'MS Medium + Kinetin', time: '09:00', type: 'warning', typeName: 'Pendiente', icon: 'fa-clock' }
+        ]
+    };
+
+    const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+    
+    let currentDate = new Date(2026, 6, 4); // Empezamos en Julio 2026 para coincidir con la captura
+    let selectedDateStr = '2026-07-04';
+
+    function changeMonth(offset) {
+        currentDate.setMonth(currentDate.getMonth() + offset);
+        renderCalendar();
+    }
+
+    function formatDateKey(year, month, day) {
+        return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    }
+
+    function renderCalendar() {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+
+        document.getElementById('calendar-month-name').textContent = monthNames[month];
+        document.getElementById('calendar-year').textContent = year;
+
+        const firstDay = new Date(year, month, 1).getDay(); // 0 = Domingo, 1 = Lunes
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        // Ajustar primer día para que la semana empiece en Lunes
+        let startDay = firstDay === 0 ? 6 : firstDay - 1;
+
+        const grid = document.getElementById('calendar-grid');
+        // Mantener solo los nombres de los días
+        grid.innerHTML = `
+            <div class="day-name">lun</div>
+            <div class="day-name">mar</div>
+            <div class="day-name">mié</div>
+            <div class="day-name">jue</div>
+            <div class="day-name">vie</div>
+            <div class="day-name">sáb</div>
+            <div class="day-name">dom</div>
+        `;
+
+        // Días vacíos iniciales
+        for (let i = 0; i < startDay; i++) {
+            const emptyCell = document.createElement('div');
+            emptyCell.className = 'day-cell empty';
+            grid.appendChild(emptyCell);
+        }
+
+        // Días del mes
+        for (let i = 1; i <= daysInMonth; i++) {
+            const dateKey = formatDateKey(year, month, i);
+            const events = mockEvents[dateKey] || [];
+            
+            const cell = document.createElement('div');
+            cell.className = 'day-cell';
+            if (dateKey === selectedDateStr) cell.classList.add('selected');
+            
+            cell.innerHTML = `${i}`;
+            
+            // Renderizar puntos si hay eventos
+            if (events.length > 0) {
+                const dotsContainer = document.createElement('div');
+                dotsContainer.className = 'dots-container';
+                
+                // Mostrar un punto por cada tipo de evento presente (max 3 para diseño)
+                let hasDanger = events.some(e => e.type === 'danger');
+                let hasWarning = events.some(e => e.type === 'warning');
+                let hasSuccess = events.some(e => e.type === 'success');
+
+                if (hasDanger) dotsContainer.innerHTML += `<div class="dot red"></div>`;
+                if (hasWarning) dotsContainer.innerHTML += `<div class="dot yellow"></div>`;
+                if (hasSuccess) dotsContainer.innerHTML += `<div class="dot green"></div>`;
+                
+                cell.appendChild(dotsContainer);
+            }
+
+            cell.addEventListener('click', () => {
+                selectedDateStr = dateKey;
+                renderCalendar(); // Re-render to update selected class
+                renderAlerts(dateKey, i, month);
+            });
+
+            grid.appendChild(cell);
+        }
+        
+        // Render alerts para el día seleccionado (si está en el mes actual)
+        const [selYear, selMonth, selDay] = selectedDateStr.split('-').map(Number);
+        if (selYear === year && (selMonth - 1) === month) {
+            renderAlerts(selectedDateStr, selDay, month);
+        } else {
+             document.getElementById('alerts-container').innerHTML = `
+                <div style="text-align: center; color: var(--text-dark); padding: 2rem;">
+                    Seleccione un día para ver las alertas.
+                </div>
+            `;
+        }
+    }
+
+    function renderAlerts(dateKey, dayNumber, monthIndex) {
+        const events = mockEvents[dateKey] || [];
+        const container = document.getElementById('alerts-container');
+
+        if (events.length > 0) {
+            let html = `
+                <div class="alerts-header">
+                    <div class="alert-count">${events.length}</div>
+                    <div style="font-weight: 500; font-size: 0.95rem; color: var(--text-dark);">Pendientes (${dayNumber} de ${monthNames[monthIndex]})</div>
+                </div>
+            `;
+
+            events.forEach(ev => {
+                html += `
+                <div class="alert-card">
+                    <div class="alert-info">
+                        <h5>${ev.id ? 'Muestra ' + ev.id + ': ' : ''}${ev.title}</h5>
+                        <p>${ev.desc}</p>
+                        <p>Fecha Límite: ${dayNumber}/${String(monthIndex + 1).padStart(2, '0')}/${currentDate.getFullYear()} ${ev.time}</p>
+                    </div>
+                    <div class="alert-status" style="color: var(--${ev.type});">
+                        <div class="status-icon" style="background: var(--${ev.type});"><i class="fa-solid ${ev.icon}"></i></div>
+                        ${ev.typeName}
+                    </div>
+                </div>
+                `;
+            });
+            container.innerHTML = html;
+        } else {
+            container.innerHTML = `
+                <div class="alerts-header">
+                    <div class="alert-count" style="background: var(--success);"><i class="fa-solid fa-check"></i></div>
+                    <div style="font-weight: 500; font-size: 0.95rem; color: var(--text-dark);">Sin tareas (${dayNumber} de ${monthNames[monthIndex]})</div>
+                </div>
+                <div style="text-align: center; color: var(--text-dark); padding: 2rem;">
+                    No hay alertas ni tareas pendientes para este día.
+                </div>
+            `;
+        }
+    }
+
+    // Inicializar el calendario
+    document.addEventListener("DOMContentLoaded", renderCalendar);
+</script>

@@ -1,0 +1,86 @@
+@{
+    ViewData["Title"] = "Gestión de Talento Humano";
+}
+
+@section Styles {
+<style>
+    body { background-color: #f9fafb; font-family: 'Inter', -apple-system, sans-serif; }
+    .figma-container { padding: 40px 20px; max-width: 1000px; margin: 0 auto; }
+    .figma-header { margin-bottom: 2rem; }
+    .figma-title { font-size: 24px; font-weight: 700; color: #111827; margin-bottom: 0.25rem; }
+    .figma-subtitle { font-size: 14px; color: #6b7280; }
+    
+    .figma-card { background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 16px; padding: 1.5rem; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: flex-start; gap: 1rem; text-decoration: none; color: inherit; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+    .figma-card:hover { border-color: rgba(139, 92, 246, 0.3); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1); transform: translateY(-2px); text-decoration: none; color: inherit;}
+    
+    .figma-icon-wrapper { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .bg-cyan-50 { background-color: #ecfeff; }
+    .text-cyan-600 { color: #0891b2; }
+    .bg-violet-50 { background-color: #f5f3ff; }
+    .text-violet-600 { color: #7c3aed; }
+    .bg-indigo-50 { background-color: #eef2ff; }
+    .text-indigo-600 { color: #4f46e5; }
+    .bg-emerald-50 { background-color: #ecfdf5; }
+    .text-emerald-600 { color: #059669; }
+    
+    .figma-card-content { flex: 1; }
+    .figma-card-title { font-size: 15px; font-weight: 600; color: #111827; margin-bottom: 0.25rem; }
+    .figma-card-desc { font-size: 13px; color: #6b7280; line-height: 1.4; margin-bottom: 0; }
+    
+    .figma-tag { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 9999px; font-size: 10px; font-weight: 600; margin-top: 8px; }
+    .tag-cyan { background-color: #ecfeff; color: #0e7490; }
+    .tag-violet { background-color: #f5f3ff; color: #6d28d9; }
+    .tag-emerald { background-color: #ecfdf5; color: #047857; }
+</style>
+}
+
+<div class="figma-container">
+    <div class="figma-header">
+        <h1 class="figma-title">Gestión de Talento Humano</h1>
+        <p class="figma-subtitle">Administración de usuarios y roles del laboratorio</p>
+    </div>
+
+    <div class="row g-4">
+        <!-- Tarjeta de Usuarios -->
+        <div class="col-md-6">
+            <a asp-controller="Usuarios" asp-action="Index" class="figma-card">
+                <div class="figma-icon-wrapper bg-cyan-50 text-cyan-600">
+                    <i class="bi bi-people-fill fs-4"></i>
+                </div>
+                <div class="figma-card-content">
+                    <h3 class="figma-card-title">Directorio de Usuarios</h3>
+                    <p class="figma-card-desc">Administrar los datos, contraseñas y accesos de estudiantes, investigadores y técnicos del laboratorio.</p>
+                    <span class="figma-tag tag-cyan">Gestión principal</span>
+                </div>
+            </a>
+        </div>
+
+        <!-- Tarjeta de Roles -->
+        <div class="col-md-6">
+            <a asp-controller="Rols" asp-action="Index" class="figma-card">
+                <div class="figma-icon-wrapper bg-violet-50 text-violet-600">
+                    <i class="bi bi-shield-lock-fill fs-4"></i>
+                </div>
+                <div class="figma-card-content">
+                    <h3 class="figma-card-title">Roles y Permisos</h3>
+                    <p class="figma-card-desc">Administrar los niveles de seguridad y definir los roles de los usuarios del sistema.</p>
+                    <span class="figma-tag tag-violet">Configuración</span>
+                </div>
+            </a>
+        </div>
+
+        <!-- Tarjeta de Tipos de Identificación -->
+        <div class="col-md-6">
+            <a asp-controller="TipoIdentificacions" asp-action="Index" class="figma-card">
+                <div class="figma-icon-wrapper bg-emerald-50 text-emerald-600">
+                    <i class="bi bi-card-heading fs-4"></i>
+                </div>
+                <div class="figma-card-content">
+                    <h3 class="figma-card-title">Tipos de Identificación</h3>
+                    <p class="figma-card-desc">Gestionar los distintos documentos de identidad (Ej: Cédula, Pasaporte, RUC).</p>
+                    <span class="figma-tag tag-emerald">Catálogo</span>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>

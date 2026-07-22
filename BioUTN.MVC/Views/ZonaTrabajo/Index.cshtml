@@ -1,0 +1,506 @@
+@{
+    ViewData["Title"] = "Zona de Trabajo";
+}
+
+<style>
+    /* Custom Figma-like styles */
+    .figma-container {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background-color: #f9fafb; /* bg-gray-50 */
+        padding: 20px;
+        border-radius: 12px;
+    }
+    .figma-card {
+        background-color: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.75rem; /* rounded-xl */
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        padding: 1.25rem;
+        transition: all 0.2s;
+    }
+    .figma-section-title {
+        font-size: 11px;
+        font-weight: 600;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        margin-bottom: 1.25rem;
+    }
+    .kpi-card {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+        padding: 0.75rem;
+        border-radius: 0.75rem;
+        border: 1px solid #e5e7eb;
+        background-color: #f9fafb;
+        transition: all 0.2s;
+        text-decoration: none;
+    }
+    .kpi-card:hover {
+        border-color: rgba(16, 185, 129, 0.3);
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    }
+    .kpi-icon-box {
+        width: 32px;
+        height: 32px;
+        border-radius: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .kpi-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #111827;
+        line-height: 1;
+        margin: 0;
+    }
+    .kpi-label {
+        font-size: 11px;
+        color: #6b7280;
+        margin: 0;
+    }
+
+    /* Process Flow */
+    .process-flow {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0;
+        align-items: flex-start;
+    }
+    .process-step {
+        display: flex;
+        align-items: flex-start;
+    }
+    .process-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        width: 120px;
+        background: none;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        text-decoration: none;
+    }
+    .process-icon-box {
+        position: relative;
+        width: 48px;
+        height: 48px;
+        border-radius: 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.2s;
+        font-size: 1.25rem;
+    }
+    .process-btn:hover .process-icon-box {
+        transform: scale(1.05);
+    }
+    .process-badge {
+        position: absolute;
+        top: -8px;
+        left: -8px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background-color: #2d7d32;
+        color: white;
+        font-size: 10px;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
+    }
+    .process-title {
+        font-size: 12px;
+        font-weight: 600;
+        color: #111827;
+        line-height: 1.2;
+        transition: color 0.2s;
+        margin: 0;
+    }
+    .process-btn:hover .process-title {
+        color: #10b981;
+    }
+    .process-subtitle {
+        font-size: 10px;
+        color: #6b7280;
+        margin-top: 2px;
+        margin-bottom: 0;
+    }
+    .process-arrow {
+        display: flex;
+        align-items: center;
+        margin-top: 20px;
+        padding: 0 2px;
+        color: rgba(107, 114, 128, 0.3);
+    }
+
+    /* Modules */
+    .module-card {
+        background-color: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.75rem;
+        padding: 1rem;
+        display: flex;
+        gap: 0.75rem;
+        align-items: flex-start;
+        text-align: left;
+        box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
+        transition: all 0.2s;
+        cursor: pointer;
+        text-decoration: none;
+        color: inherit;
+        height: 100%;
+    }
+    .module-card:hover {
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        border-color: rgba(16, 185, 129, 0.2);
+    }
+    .module-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 1.1rem;
+    }
+    .module-title {
+        font-size: 13px;
+        font-weight: 600;
+        color: #111827;
+        margin: 0;
+        transition: color 0.2s;
+        line-height: 1.4;
+    }
+    .module-card:hover .module-title {
+        color: #10b981;
+    }
+    .module-desc {
+        font-size: 11px;
+        color: #6b7280;
+        margin-top: 4px;
+        line-height: 1.5;
+        margin-bottom: 0.5rem;
+    }
+    .module-arrow {
+        color: rgba(107,114,128,0.35);
+        transition: color 0.2s;
+        margin-top: 2px;
+    }
+    .module-card:hover .module-arrow {
+        color: #10b981;
+    }
+    .module-badge {
+        font-size: 10px;
+        font-weight: 600;
+        padding: 2px 6px;
+        border-radius: 4px;
+        display: inline-block;
+    }
+
+    /* Colors */
+    .bg-emerald-50 { background-color: #ecfdf5; }
+    .text-emerald-600 { color: #059669; }
+    .bg-purple-50 { background-color: #faf5ff; }
+    .text-purple-600 { color: #9333ea; }
+    .bg-teal-50 { background-color: #f0fdfa; }
+    .text-teal-600 { color: #0d9488; }
+    .bg-blue-50 { background-color: #eff6ff; }
+    .text-blue-600 { color: #2563eb; }
+    .bg-violet-50 { background-color: #f5f3ff; }
+    .text-violet-600 { color: #7c3aed; }
+    .bg-orange-50 { background-color: #fff7ed; }
+    .text-orange-600 { color: #ea580c; }
+    .bg-rose-50 { background-color: #fff1f2; }
+    .text-rose-600 { color: #e11d48; }
+</style>
+
+<div class="container-fluid py-4 figma-container">
+    <div class="mb-4">
+        <h1 class="h3 mb-1" style="font-weight: 700; color: #111827;">Zona de Trabajo</h1>
+        <p class="text-muted" style="font-size: 14px;">Reserva y gestión de equipos del laboratorio, acceso a anaqueles y biblioteca</p>
+    </div>
+
+    <!-- Stats Panel -->
+    <div class="figma-card mb-4">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <p class="figma-section-title mb-0">Resumen de Zona</p>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-6 col-md-3">
+                <a asp-controller="Equipos" asp-action="Index" class="kpi-card">
+                    <div class="kpi-icon-box bg-teal-50 text-teal-600">
+                        <i class="bi bi-pc-display-horizontal"></i>
+                    </div>
+                    <div>
+                        <p class="kpi-value">24</p>
+                        <p class="kpi-label">Equipos Totales</p>
+                    </div>
+                </a>
+            </div>
+            <div class="col-6 col-md-3">
+                <a asp-controller="ReservaEquipos" asp-action="Index" class="kpi-card">
+                    <div class="kpi-icon-box bg-orange-50 text-orange-600">
+                        <i class="bi bi-clock-history"></i>
+                    </div>
+                    <div>
+                        <p class="kpi-value">3</p>
+                        <p class="kpi-label">Tus Reservas Activas</p>
+                    </div>
+                </a>
+            </div>
+            <div class="col-6 col-md-3">
+                <a asp-controller="ZonaTrabajo" asp-action="Mapa" class="kpi-card">
+                    <div class="kpi-icon-box bg-rose-50 text-rose-600">
+                        <i class="bi bi-geo-alt"></i>
+                    </div>
+                    <div>
+                        <p class="kpi-value">8</p>
+                        <p class="kpi-label">Anaqueles</p>
+                    </div>
+                </a>
+            </div>
+            <div class="col-6 col-md-3">
+                <a asp-controller="Biblioteca" asp-action="Index" class="kpi-card">
+                    <div class="kpi-icon-box bg-violet-50 text-violet-600">
+                        <i class="bi bi-book"></i>
+                    </div>
+                    <div>
+                        <p class="kpi-value">145</p>
+                        <p class="kpi-label">Documentos</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Procesos -->
+    <div class="figma-card mb-4">
+        <p class="figma-section-title">Flujo Unificado de Reservas — Equipos, Reactivos e Implementos</p>
+        <div class="process-flow">
+            <!-- Paso 1 -->
+            <div class="process-step">
+                <a asp-controller="Equipos" asp-action="Index" class="process-btn">
+                    <div class="process-icon-box bg-teal-50 text-teal-600">
+                        <i class="bi bi-layers"></i>
+                        <span class="process-badge">1</span>
+                    </div>
+                    <div class="text-center">
+                        <p class="process-title">Catálogo</p>
+                        <p class="process-subtitle">Ver equipos disponibles</p>
+                    </div>
+                </a>
+                <div class="process-arrow"><i class="bi bi-chevron-right"></i></div>
+            </div>
+            <!-- Paso 2 -->
+            <div class="process-step">
+                <a asp-controller="ReservaEquipos" asp-action="Calendario" class="process-btn">
+                    <div class="process-icon-box bg-violet-50 text-violet-600">
+                        <i class="bi bi-calendar-week"></i>
+                        <span class="process-badge">2</span>
+                    </div>
+                    <div class="text-center">
+                        <p class="process-title">Ver Calendario</p>
+                        <p class="process-subtitle">Ver ocupación semanal</p>
+                    </div>
+                </a>
+                <div class="process-arrow"><i class="bi bi-chevron-right"></i></div>
+            </div>
+            <!-- Paso 3 -->
+            <div class="process-step">
+                <a asp-controller="Solicitudes" asp-action="Create" class="process-btn">
+                    <div class="process-icon-box bg-emerald-50 text-emerald-600">
+                        <i class="bi bi-plus-circle"></i>
+                        <span class="process-badge">3</span>
+                    </div>
+                    <div class="text-center">
+                        <p class="process-title">Crear Solicitud</p>
+                        <p class="process-subtitle">Equipo + Materiales</p>
+                    </div>
+                </a>
+                <div class="process-arrow"><i class="bi bi-chevron-right"></i></div>
+            </div>
+            <!-- Paso 4 -->
+            <div class="process-step">
+                <a asp-controller="Solicitudes" asp-action="Index" class="process-btn">
+                    <div class="process-icon-box bg-orange-50 text-orange-600">
+                        <i class="bi bi-clock-history"></i>
+                        <span class="process-badge">4</span>
+                    </div>
+                    <div class="text-center">
+                        <p class="process-title">Mis Solicitudes</p>
+                        <p class="process-subtitle">Ver estado de pedidos</p>
+                    </div>
+                </a>
+                <div class="process-arrow"><i class="bi bi-chevron-right"></i></div>
+            </div>
+            <!-- Paso 5 (solo Técnico) -->
+            @if (User.IsInRole("Tecnico") || User.IsInRole("Coordinador"))
+            {
+                <div class="process-step">
+                    <a asp-controller="Solicitudes" asp-action="Index" class="process-btn">
+                        <div class="process-icon-box bg-rose-50 text-rose-600">
+                            <i class="bi bi-shield-check"></i>
+                            <span class="process-badge">5</span>
+                        </div>
+                        <div class="text-center">
+                            <p class="process-title">Aprobar</p>
+                            <p class="process-subtitle">Bandeja del técnico</p>
+                        </div>
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Modulos / Pasos del Proceso (Grid) -->
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-md-6 col-lg-4">
+            <a asp-controller="Equipos" asp-action="Index" class="module-card">
+                <div class="module-icon bg-teal-50 text-teal-600"><i class="bi bi-layers"></i></div>
+                <div class="flex-grow-1">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <p class="module-title">Catálogo de Equipos</p>
+                        <i class="bi bi-chevron-right module-arrow"></i>
+                    </div>
+                    <p class="module-desc">Ver todos los equipos registrados, su estado y especificaciones técnicas.</p>
+                    <span class="module-badge" style="background-color: #f0fdfa; color: #0f766e; border: 1px solid #ccfbf1;">Técnico / Ver todos</span>
+                </div>
+            </a>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4">
+            <a asp-controller="UbicacionFisicas" asp-action="Index" class="module-card">
+                <div class="module-icon bg-blue-50 text-blue-600"><i class="bi bi-hdd-rack"></i></div>
+                <div class="flex-grow-1">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <p class="module-title">Configuración Anaqueles</p>
+                        <i class="bi bi-chevron-right module-arrow"></i>
+                    </div>
+                    <p class="module-desc">El técnico define los espacios físicos para almacenar los frascos.</p>
+                    <span class="module-badge" style="background-color: #eff6ff; color: #1d4ed8; border: 1px solid #dbeafe;">Solo técnico</span>
+                </div>
+            </a>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4">
+            <a asp-controller="Solicitudes" asp-action="Create" class="module-card">
+                <div class="module-icon bg-emerald-50 text-emerald-600"><i class="bi bi-calendar-plus"></i></div>
+                <div class="flex-grow-1">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <p class="module-title">Calendario de Reservas</p>
+                        <i class="bi bi-chevron-right module-arrow"></i>
+                    </div>
+                    <p class="module-desc">Crea tu solicitud aquí: reserva equipos, reactivos o implementos para tu proyecto de investigación.</p>
+                    <span class="module-badge" style="background-color: #ecfdf5; color: #059669; border: 1px solid #d1fae5;">Todos los involucrados</span>
+                </div>
+            </a>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4">
+            <a asp-controller="ReservaEquipos" asp-action="Calendario" class="module-card">
+                <div class="module-icon bg-violet-50 text-violet-600"><i class="bi bi-calendar-week"></i></div>
+                <div class="flex-grow-1">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <p class="module-title">Ver Ocupación Semanal</p>
+                        <i class="bi bi-chevron-right module-arrow"></i>
+                    </div>
+                    <p class="module-desc">Revisa qué equipos están ya reservados por semana antes de crear tu solicitud.</p>
+                    <span class="module-badge bg-light text-secondary border">Todos pueden ver</span>
+                </div>
+            </a>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4">
+            <a asp-controller="ReservaEquipos" asp-action="Index" class="module-card">
+                <div class="module-icon bg-orange-50 text-orange-600"><i class="bi bi-clock"></i></div>
+                <div class="flex-grow-1">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <p class="module-title">Gestión de Reservas</p>
+                        <i class="bi bi-chevron-right module-arrow"></i>
+                    </div>
+                    <p class="module-desc">Gestiona tus reservas activas. Al terminar, registra el check-out del equipo.</p>
+                    <span class="module-badge bg-light text-secondary border">Historial general</span>
+                </div>
+            </a>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4">
+            <a asp-controller="ZonaTrabajo" asp-action="Mapa" class="module-card">
+                <div class="module-icon bg-rose-50 text-rose-600"><i class="bi bi-geo-alt-fill"></i></div>
+                <div class="flex-grow-1">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <p class="module-title">Mapa de Anaqueles</p>
+                        <i class="bi bi-chevron-right module-arrow"></i>
+                    </div>
+                    <p class="module-desc">Vista visual de los estantes del cuarto de crecimiento. Ver qué lote está en cada nivel.</p>
+                    <span class="module-badge bg-light text-secondary border">Cuarto de crecimiento</span>
+                </div>
+            </a>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4">
+            <a asp-controller="Biblioteca" asp-action="Index" class="module-card">
+                <div class="module-icon" style="background-color: #f5f3ff; color: #7c3aed;"><i class="bi bi-book-half"></i></div>
+                <div class="flex-grow-1">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <p class="module-title">Biblioteca</p>
+                        <i class="bi bi-chevron-right module-arrow"></i>
+                    </div>
+                    <p class="module-desc">Recursos bibliográficos, manuales de investigación y libros de consulta del laboratorio.</p>
+                    <span class="module-badge bg-light text-secondary border">Documentación</span>
+                </div>
+            </a>
+        </div>
+
+        @* ─── CARD EXCLUSIVA DEL TÉCNICO ─── *@
+        @if (User.IsInRole("Tecnico") || User.IsInRole("Coordinador"))
+        {
+            <div class="col-12 col-md-6 col-lg-4">
+                <a asp-controller="Solicitudes" asp-action="Index" class="module-card" style="border: 2px solid #fecaca;">
+                    <div class="module-icon bg-rose-50 text-rose-600"><i class="bi bi-shield-check"></i></div>
+                    <div class="flex-grow-1">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <p class="module-title" style="color: #be123c;">Aprobación de Reservas</p>
+                            <i class="bi bi-chevron-right module-arrow"></i>
+                        </div>
+                        <p class="module-desc">Revisa y aprueba o rechaza solicitudes de equipos, reactivos e implementos de los proyectos.</p>
+                        <span class="module-badge" style="background-color: #fff1f2; color: #be123c; border: 1px solid #fecaca;">Solo Técnico de Lab</span>
+                    </div>
+                </a>
+            </div>
+        }
+        @if (!User.IsInRole("Tecnico"))
+        {
+            <div class="col-12 col-md-6 col-lg-4">
+                <a asp-controller="Proyectos" asp-action="Index" class="module-card">
+                    <div class="module-icon bg-emerald-50 text-emerald-600"><i class="bi bi-folder-fill"></i></div>
+                    <div class="flex-grow-1">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <p class="module-title">Mis Proyectos</p>
+                            <i class="bi bi-chevron-right module-arrow"></i>
+                        </div>
+                        <p class="module-desc">Accede rápidamente a tus carpetas de investigación, plantas madre y lotes de cultivo.</p>
+                        <span class="module-badge" style="background-color: #ecfdf5; color: #059669; border: 1px solid #d1fae5;">Acceso Rápido</span>
+                    </div>
+                </a>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <a asp-controller="ReservaEquipos" asp-action="Index" class="module-card">
+                    <div class="module-icon bg-orange-50 text-orange-600"><i class="bi bi-calendar2-check-fill"></i></div>
+                    <div class="flex-grow-1">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <p class="module-title">Mis Reservas</p>
+                            <i class="bi bi-chevron-right module-arrow"></i>
+                        </div>
+                        <p class="module-desc">Revisa tus reservas de equipos programadas para hoy o fechas futuras.</p>
+                        <span class="module-badge" style="background-color: #fff7ed; color: #ea580c; border: 1px solid #ffedd5;">Gestión personal</span>
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+</div>

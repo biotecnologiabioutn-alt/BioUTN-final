@@ -1,0 +1,137 @@
+@model BioUTN.Modelos.Reactivo
+
+@{
+    ViewData["Title"] = "Ingreso de Stock";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="bioutn-title mb-0">Ingreso de Stock</h2>
+    </div>
+    <a asp-action="Index" class="btn bioutn-btn bioutn-btn-secondary">
+        <i class="bi bi-arrow-left me-1"></i> Volver al Catálogo
+    </a>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8">
+        <div class="bioutn-card">
+            <div class="bioutn-card-header">
+                <h5><i class="bi bi-plus-circle me-2"></i> Formulario de Registro de Insumo/Reactivo</h5>
+            </div>
+            <div class="bioutn-card-body">
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="row">
+                        <div class="col-md-8 mb-3">
+                            <label asp-for="Nombre" class="control-label fw-bold small text-muted">Nombre del Insumo / Reactivo *</label>
+                            <input asp-for="Nombre" type="text" class="form-control" placeholder="Ej: Sales MS (Murashige & Skoog)" required />
+                            <span asp-validation-for="Nombre" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="Categoria" class="control-label fw-bold small text-muted">Categoría *</label>
+                            <select asp-for="Categoria" class="form-select" required>
+                                <option value="">-- Seleccionar --</option>
+                                <option value="Sales">Sales</option>
+                                <option value="Ácidos">Ácidos / Bases</option>
+                                <option value="Medios de Cultivo">Medios de Cultivo</option>
+                                <option value="Vitaminas">Vitaminas / Suplementos</option>
+                                <option value="Otros">Otros</option>
+                            </select>
+                            <span asp-validation-for="Categoria" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="IdUnidadMedida" class="control-label fw-bold small text-muted">Unidad de Medida *</label>
+                            <select asp-for="IdUnidadMedida" class="form-select" required>
+                                <option value="">-- Seleccionar --</option>
+                                @if (ViewBag.UnidadesMedida != null)
+                                {
+                                    foreach (var u in ViewBag.UnidadesMedida)
+                                    {
+                                        <option value="@u.Id">@u.Nombre (@u.Abreviatura)</option>
+                                    }
+                                }
+                            </select>
+                            <span asp-validation-for="IdUnidadMedida" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="StockActual" class="control-label fw-bold small text-muted">Stock Inicial *</label>
+                            <input asp-for="StockActual" type="number" step="0.01" class="form-control" required />
+                            <span asp-validation-for="StockActual" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="StockMinimo" class="control-label fw-bold small text-muted">Punto de Reorden (Crítico) *</label>
+                            <input asp-for="StockMinimo" type="number" step="0.01" class="form-control" required />
+                            <span asp-validation-for="StockMinimo" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="FechaCaducidad" class="control-label fw-bold small text-muted">Fecha de Caducidad</label>
+                            <input asp-for="FechaCaducidad" type="date" class="form-control" />
+                            <span asp-validation-for="FechaCaducidad" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Marca" class="control-label fw-bold small text-muted">Marca</label>
+                            <input asp-for="Marca" type="text" class="form-control" placeholder="Ej: Sigma-Aldrich" />
+                            <span asp-validation-for="Marca" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <h6 class="mt-4 mb-3 text-primary-custom border-bottom pb-2"><i class="bi bi-truck me-2"></i> Datos del Proveedor</h6>
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="ProveedorNombre" class="control-label fw-bold small text-muted">Nombre del Proveedor</label>
+                            <input asp-for="ProveedorNombre" type="text" class="form-control" placeholder="Ej: Distribuidora Química S.A." />
+                            <span asp-validation-for="ProveedorNombre" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="ProveedorTelefono" class="control-label fw-bold small text-muted">Teléfono</label>
+                            <input asp-for="ProveedorTelefono" type="text" class="form-control" placeholder="Ej: 0991234567" />
+                            <span asp-validation-for="ProveedorTelefono" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="ProveedorSucursal" class="control-label fw-bold small text-muted">Sucursal / Dirección</label>
+                            <input asp-for="ProveedorSucursal" type="text" class="form-control" placeholder="Ej: Matriz Quito" />
+                            <span asp-validation-for="ProveedorSucursal" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="ProveedorEmail" class="control-label fw-bold small text-muted">Correo Electrónico</label>
+                            <input asp-for="ProveedorEmail" type="email" class="form-control" placeholder="Ej: ventas@proveedor.com" />
+                            <span asp-validation-for="ProveedorEmail" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="ProveedorContacto" class="control-label fw-bold small text-muted">Persona de Contacto</label>
+                            <input asp-for="ProveedorContacto" type="text" class="form-control" placeholder="Ej: Juan Pérez" />
+                            <span asp-validation-for="ProveedorContacto" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="ProveedorRUC" class="control-label fw-bold small text-muted">RUC / ID Físcal</label>
+                            <input asp-for="ProveedorRUC" type="text" class="form-control" placeholder="Ej: 1790000000001" />
+                            <span asp-validation-for="ProveedorRUC" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="text-end mt-4 pt-3 border-top">
+                        <button type="submit" class="btn btn-success px-4 shadow-sm" style="background-color: #2e7d32; border-color: #2e7d32;">
+                            <i class="bi bi-save me-1"></i> Registrar Ingreso
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

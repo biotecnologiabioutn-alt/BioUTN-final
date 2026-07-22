@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="BioUTN.API/BioUTN.API.csproj" />
+  <Project Path="BioUTN.ApiConsumer/BioUTN.ApiConsumer.csproj" />
+  <Project Path="BioUTN.Modelos/BioUTN.Modelos.csproj" />
+  <Project Path="BioUTN.MVC/BioUTN.MVC.csproj" />
+  <Project Path="BioUTN.Servicios/BioUTN.Servicios.csproj" />
+</Solution>

@@ -1,0 +1,166 @@
+@model BioUTN.Modelos.UnidadFrasco
+
+@{
+    ViewData["Title"] = "Historial Clínico del Frasco";
+}
+
+@section Styles {
+<style>
+    .figma-container { font-family: 'Inter', -apple-system, sans-serif; background-color: #f9fafb; padding: 20px; border-radius: 12px; }
+    .figma-card { background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 0.75rem; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); padding: 1.5rem; }
+    .figma-title { font-size: 1.125rem; font-weight: 700; color: #111827; margin-bottom: 1rem; border-bottom: 1px solid #f3f4f6; padding-bottom: 0.5rem; }
+    .detail-label { font-size: 13px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.025em; margin-bottom: 0.25rem; }
+    .detail-value { font-size: 14px; font-weight: 500; color: #111827; margin-bottom: 1.25rem; }
+    .badge-status { display: inline-block; padding: 0.25rem 0.75rem; font-size: 12px; font-weight: 600; border-radius: 9999px; }
+    .badge-status-sano { background-color: #ecfdf5; color: #047857; }
+    .badge-status-enfermo { background-color: #fef2f2; color: #b91c1c; }
+    .badge-status-regular { background-color: #fffbeb; color: #b45309; }
+    .figma-btn-secondary { background-color: white; color: #374151; border: 1px solid #e5e7eb; padding: 0.5rem 1rem; border-radius: 0.5rem; font-size: 14px; font-weight: 500; transition: all 0.2s; text-decoration: none; display: inline-block; }
+    .figma-btn-secondary:hover { background-color: #f9fafb; color: #111827; }
+    .figma-btn-primary { background-color: #10b981; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; font-size: 14px; font-weight: 500; transition: all 0.2s; text-decoration: none; display: inline-block; }
+    
+    /* Timeline styles */
+    .timeline { position: relative; padding-left: 2rem; margin-top: 1.5rem; }
+    .timeline::before { content: ''; position: absolute; left: 0.5rem; top: 0; bottom: 0; width: 2px; background-color: #e5e7eb; }
+    .timeline-item { position: relative; margin-bottom: 1.5rem; }
+    .timeline-dot { position: absolute; left: -2.3rem; top: 0.25rem; width: 1.25rem; height: 1.25rem; border-radius: 50%; background-color: white; border: 2px solid #10b981; z-index: 1; }
+    .timeline-dot.enfermo { border-color: #ef4444; background-color: #fef2f2; }
+    .timeline-dot.regular { border-color: #f59e0b; background-color: #fffbeb; }
+    .timeline-content { background-color: #f9fafb; padding: 1rem; border-radius: 0.5rem; border: 1px solid #f3f4f6; }
+    .timeline-date { font-size: 0.75rem; color: #6b7280; font-weight: 600; margin-bottom: 0.25rem; }
+</style>
+}
+
+<div class="figma-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 style="font-weight: 700; color: #111827; font-size: 20px; margin-bottom: 0;">Frasco: <span class="font-mono text-primary">@Model.CodigoUnidad</span></h3>
+            <p class="text-muted mb-0" style="font-size: 13px;">Perteneciente al Lote @(Model.LoteCultivo?.CodigoTrazabilidad ?? "N/A")</p>
+        </div>
+        <div class="gap-2 d-flex">
+            <a asp-action="Index" class="figma-btn-secondary">Volver al Inventario</a>
+            <a asp-controller="MonitoreoFitosanitarios" asp-action="Create" asp-route-frascoId="@Model.Id" class="figma-btn-primary">
+                <i class="bi bi-heart-pulse me-1"></i> Registrar Evaluación
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Columna Izquierda: Detalles Genéticos y del Lote -->
+        <div class="col-md-5">
+            <div class="figma-card h-100">
+                <h4 class="figma-title">Origen y Contexto</h4>
+                
+                <div class="row">
+                    <div class="col-6">
+                        <div class="detail-label">Especie</div>
+                        <div class="detail-value" style="font-style: italic;">
+                            @(Model.LoteCultivo?.PlantaMadre?.Especie?.NombreCientifico ?? "N/A")
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="detail-label">Planta Madre</div>
+                        <div class="detail-value">@(Model.LoteCultivo?.PlantaMadre?.CodigoAsignado ?? "N/A")</div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-6">
+                        <div class="detail-label">Medio de Cultivo</div>
+                        <div class="detail-value">@(Model.LoteCultivo?.MedioCultivo?.Siglas ?? "N/A")</div>
+                    </div>
+                    <div class="col-6">
+                        <div class="detail-label">Resiembra #</div>
+                        <div class="detail-value">R @Model.NumeroResiembra</div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-6">
+                        <div class="detail-label">Fecha Lote</div>
+                        <div class="detail-value">@(Model.LoteCultivo?.FechaSiembra.ToString("dd/MM/yyyy") ?? "N/A")</div>
+                    </div>
+                    <div class="col-6">
+                        <div class="detail-label">Estado Actual</div>
+                        <div class="detail-value">
+                            @{
+                                var fitoClass = "badge-status-sano";
+                                var fito = Model.Estado?.ToLower() ?? "";
+                                if (fito.Contains("muerto") || fito.Contains("contaminado") || fito.Contains("hongo") || fito.Contains("bacteria"))
+                                    fitoClass = "badge-status-enfermo";
+                                else if (fito.Contains("oxidado") || fito.Contains("regular"))
+                                    fitoClass = "badge-status-regular";
+                            }
+                            <span class="badge-status @fitoClass">@Model.Estado</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Columna Derecha: Línea de Tiempo Clínica -->
+        <div class="col-md-7">
+            <div class="figma-card h-100">
+                <h4 class="figma-title">Historial Clínico (Monitoreos)</h4>
+                
+                @if (Model.Monitoreos != null && Model.Monitoreos.Any())
+                {
+                    <div class="timeline">
+                        @foreach (var mon in Model.Monitoreos)
+                        {
+                            var dotClass = "";
+                            if (mon.Muerte || mon.Hongos || mon.Bacterias) dotClass = "enfermo";
+                            else if (mon.NivelFenolizacion != "Ninguno" && mon.NivelFenolizacion != "Bajo") dotClass = "regular";
+
+                            <div class="timeline-item">
+                                <div class="timeline-dot @dotClass"></div>
+                                <div class="timeline-content">
+                                    <div class="d-flex justify-content-between">
+                                        <div class="timeline-date">
+                                            @mon.FechaEvaluacion.ToString("dd MMM yyyy HH:mm")
+                                            @if (Model.LoteCultivo != null)
+                                            {
+                                                <span> - Día @((mon.FechaEvaluacion - Model.LoteCultivo.FechaSiembra).Days)</span>
+                                            }
+                                        </div>
+                                        <div style="font-size: 11px; color: #9ca3af;">
+                                            Por: @(mon.Usuario?.Nombres ?? "Sist.")
+                                        </div>
+                                    </div>
+                                    <div style="font-size: 14px; font-weight: 500; color: #111827; margin-bottom: 8px;">
+                                        Estado reportado: @mon.Respuesta
+                                    </div>
+                                    
+                                    <div class="d-flex gap-2 flex-wrap mb-2">
+                                        @if (mon.Hongos) { <span class="badge bg-danger bg-opacity-10 text-danger" style="font-size: 11px;">Hongos</span> }
+                                        @if (mon.Bacterias) { <span class="badge bg-danger bg-opacity-10 text-danger" style="font-size: 11px;">Bacterias</span> }
+                                        @if (mon.NivelFenolizacion != "Ninguno") { <span class="badge bg-warning bg-opacity-10 text-warning" style="font-size: 11px;">Oxidación @mon.NivelFenolizacion</span> }
+                                        @if (mon.Muerte) { <span class="badge bg-dark text-white" style="font-size: 11px;">Muerte</span> }
+                                        @if (mon.RequiereResiembra) { <span class="badge bg-info bg-opacity-10 text-info" style="font-size: 11px;">Urge Resiembra</span> }
+                                    </div>
+                                    
+                                    @if (!string.IsNullOrEmpty(mon.Observaciones))
+                                    {
+                                        <div style="font-size: 13px; color: #4b5563; font-style: italic;">
+                                            "@mon.Observaciones"
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-5">
+                        <i class="bi bi-clipboard2-pulse fs-1 text-muted mb-3 d-block"></i>
+                        <p class="text-muted">Este frasco no tiene monitoreos registrados todavía.</p>
+                        <a asp-controller="MonitoreoFitosanitarios" asp-action="Create" asp-route-frascoId="@Model.Id" class="btn btn-sm btn-outline-success mt-2">
+                            Realizar primera evaluación
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

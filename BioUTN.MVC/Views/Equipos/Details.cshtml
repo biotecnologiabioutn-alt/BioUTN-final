@@ -1,0 +1,103 @@
+@model BioUTN.Modelos.Equipo
+
+@{
+    ViewData["Title"] = "Detalles del Equipo";
+}
+
+@section Styles {
+<style>
+    body { background-color: #f9fafb; font-family: 'Inter', -apple-system, sans-serif; }
+    .figma-container { padding: 40px 20px; max-width: 800px; margin: 0 auto; }
+    .figma-header { margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-end; }
+    .figma-title { font-size: 24px; font-weight: 700; color: #111827; margin-bottom: 0.25rem; }
+    .figma-subtitle { font-size: 14px; color: #6b7280; }
+    
+    .figma-card { background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 2rem; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+    
+    .figma-btn-primary { background-color: #10b981; color: white; border: none; padding: 0.5rem 1rem; border-radius: 8px; font-size: 14px; font-weight: 500; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; }
+    .figma-btn-primary:hover { background-color: #059669; color: white; transform: translateY(-1px); }
+
+    .figma-btn-secondary { background-color: white; color: #374151; border: 1px solid #e5e7eb; padding: 0.5rem 1rem; border-radius: 8px; font-size: 14px; font-weight: 500; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; }
+    .figma-btn-secondary:hover { background-color: #f9fafb; color: #111827; }
+
+    .detail-row { display: flex; padding: 1rem 0; border-bottom: 1px solid #f3f4f6; }
+    .detail-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .detail-label { width: 35%; font-size: 13px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; }
+    .detail-value { width: 65%; font-size: 15px; color: #111827; font-weight: 500; }
+    
+    .status-badge { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 9999px; font-size: 13px; font-weight: 600; }
+    .status-activo { background-color: #d1fae5; color: #065f46; }
+    .status-mantenimiento { background-color: #fef3c7; color: #92400e; }
+    .status-inactivo { background-color: #fee2e2; color: #991b1b; }
+</style>
+}
+
+<div class="figma-container">
+    <div class="figma-header">
+        <div>
+            <h1 class="figma-title">Detalles del Equipo</h1>
+            <p class="figma-subtitle">Información completa sobre el equipo seleccionado</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-action="Index" class="figma-btn-secondary">
+                <i class="bi bi-arrow-left"></i> Volver
+            </a>
+            @if(User.IsInRole("Coordinador") || User.IsInRole("Tecnico"))
+            {
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="figma-btn-primary">
+                    <i class="bi bi-pencil-square"></i> Editar Equipo
+                </a>
+            }
+        </div>
+    </div>
+
+    <div class="figma-card">
+        <div class="d-flex align-items-center gap-3 mb-4 pb-3" style="border-bottom: 1px solid #e5e7eb;">
+            <div style="width: 48px; height: 48px; background-color: #f3f4f6; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #4f46e5;">
+                <i class="bi bi-pc-display-horizontal"></i>
+            </div>
+            <div>
+                <h3 style="font-size: 18px; font-weight: 700; color: #111827; margin: 0;">@Model.Nombre</h3>
+                <p style="font-size: 14px; color: #6b7280; margin: 0;">@Model.CodigoInventario</p>
+            </div>
+        </div>
+
+        <div class="detail-row">
+            <div class="detail-label">ID Sistema</div>
+            <div class="detail-value">@Model.Id</div>
+        </div>
+        <div class="detail-row">
+            <div class="detail-label">Nombre del Equipo</div>
+            <div class="detail-value">@Model.Nombre</div>
+        </div>
+        <div class="detail-row">
+            <div class="detail-label">Marca y Modelo</div>
+            <div class="detail-value">@Model.Marca - @Model.Modelo</div>
+        </div>
+        <div class="detail-row">
+            <div class="detail-label">Próximo Mantenimiento</div>
+            <div class="detail-value">@(Model.FechaProximoMantenimiento?.ToString("dd MMMM yyyy") ?? "No agendado")</div>
+        </div>
+        <div class="detail-row">
+            <div class="detail-label">Código de Inventario</div>
+            <div class="detail-value" style="font-family: monospace; color: #4f46e5; font-size: 16px;">@Model.CodigoInventario</div>
+        </div>
+        <div class="detail-row">
+            <div class="detail-label">Estado</div>
+            <div class="detail-value">
+                @if(Model.Estado == "Disponible")
+                {
+                    <span class="status-badge status-activo"><i class="bi bi-check-circle-fill me-1"></i> Disponible</span>
+                }
+                else if(Model.Estado == "En Mantenimiento")
+                {
+                    <span class="status-badge status-mantenimiento"><i class="bi bi-tools me-1"></i> En Mantenimiento</span>
+                }
+                else
+                {
+                    <span class="status-badge status-inactivo"><i class="bi bi-x-circle-fill me-1"></i> Fuera de Servicio / Dañado</span>
+                }
+            </div>
+        </div>
+    </div>
+</div>

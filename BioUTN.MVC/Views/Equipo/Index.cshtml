@@ -1,0 +1,74 @@
+@model IEnumerable<BioUTN.Modelos.Equipo>
+@{
+    ViewData["Title"] = "Gestión de Equipos (Activos Físicos)";
+}
+
+<div class="container mt-4 pb-5">
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h5 class="fw-bold mb-0">Inventario de Equipos Críticos</h5>
+            <small class="text-muted">Cabinas de flujo, autoclaves, balanzas, etc.</small>
+        </div>
+        <a asp-action="Create" class="btn btn-primary-utn shadow-sm">
+            <i class="fas fa-plus"></i> Nuevo Equipo
+        </a>
+    </div>
+
+    <!-- Filtros Rápidos -->
+    <div class="d-flex gap-2 mb-4 overflow-auto pb-2">
+        <a asp-action="Index" class="btn btn-dark btn-sm rounded-pill px-3">Todos</a>
+        <a asp-action="Index" asp-route-estado="Operativo" class="btn btn-outline-success btn-sm rounded-pill px-3"><i class="fas fa-check-circle"></i> Operativos</a>
+        <a asp-action="Index" asp-route-estado="Mantenimiento" class="btn btn-outline-warning btn-sm rounded-pill px-3"><i class="fas fa-tools"></i> En Mantenimiento</a>
+        <a asp-action="Index" asp-route-estado="Baja" class="btn btn-outline-danger btn-sm rounded-pill px-3"><i class="fas fa-times-circle"></i> Baja</a>
+    </div>
+
+    <div class="bioutn-card">
+        <div class="bioutn-card-body p-0">
+            <div class="bioutn-table-wrap">
+                <table class="table bioutn-table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Código</th>
+                            <th>Estado</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@item.Nombre</td>
+                                    <td>@item.CodigoInventario</td>
+                                    <td>@item.Estado</td>
+                                    <td class="text-center">
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn-action-outline" title="Editar">
+                                            <i class="bi bi-pencil"></i> Editar
+                                        </a>
+                                        <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline">
+                                            <button type="submit" class="btn-action-delete" title="Eliminar" onclick="return confirm('¿Está seguro de dar de baja este equipo?');">
+                                                <i class="bi bi-trash3"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center py-5">
+                                    <i class="bi bi-inbox fs-1 text-muted mb-3 d-block"></i>
+                                    <p class="text-muted">No hay equipos registrados.</p>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

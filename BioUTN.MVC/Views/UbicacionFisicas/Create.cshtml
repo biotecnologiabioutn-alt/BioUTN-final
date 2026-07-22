@@ -1,0 +1,84 @@
+@model BioUTN.Modelos.UbicacionFisica
+
+@{
+    ViewData["Title"] = "Crear Anaquel";
+}
+
+@section Styles {
+<style>
+    .figma-container { font-family: 'Inter', -apple-system, sans-serif; background-color: #f9fafb; padding: 20px; border-radius: 12px; }
+    .figma-card { background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 0.75rem; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); padding: 1.5rem; }
+    .figma-label { font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 0.5rem; display: block; }
+    .figma-input { width: 100%; padding: 0.625rem 0.75rem; border-radius: 0.5rem; border: 1px solid #e5e7eb; font-size: 14px; color: #111827; outline: none; transition: all 0.2s; background-color: #ffffff; }
+    .figma-input:focus { border-color: rgba(16, 185, 129, 0.6); box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2); }
+    .figma-btn-primary { background-color: #10b981; color: white; border: none; padding: 0.625rem 1.25rem; border-radius: 0.5rem; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+    .figma-btn-primary:hover { background-color: #059669; color: white; }
+    .figma-btn-secondary { background-color: white; color: #374151; border: 1px solid #e5e7eb; padding: 0.625rem 1.25rem; border-radius: 0.5rem; font-size: 14px; font-weight: 500; transition: all 0.2s; text-decoration: none; display: inline-flex; align-items: center; }
+    .figma-btn-secondary:hover { background-color: #f9fafb; color: #111827; }
+</style>
+}
+
+<div class="figma-container">
+    <div class="mb-4">
+        <h3 style="font-weight: 700; color: #111827; font-size: 18px;">Nuevo Anaquel</h3>
+        <p class="text-muted" style="font-size: 13px;">Registra un nuevo espacio físico en el laboratorio para el almacenamiento de frascos in vitro.</p>
+    </div>
+
+    <div class="row">
+        <div class="col-md-10 col-lg-8">
+            <div class="figma-card">
+                <form asp-action="Create" class="space-y-4">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3" style="font-size: 13px;"></div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="CodigoAnaquel" class="figma-label">Código del Anaquel *</label>
+                            <input asp-for="CodigoAnaquel" class="figma-input" placeholder="Ej: L1, L2, A1" required />
+                            <span asp-validation-for="CodigoAnaquel" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                        <div class="col-md-8 mb-3">
+                            <label asp-for="NombreCuerpo" class="figma-label">Cuerpo / Sección *</label>
+                            <select asp-for="NombreCuerpo" class="figma-input form-select" required>
+                                <option value="Lado Izquierdo">Lado Izquierdo</option>
+                                <option value="Lado Derecho">Lado Derecho</option>
+                                <option value="Cuerpo Único">Cuerpo Único (Sin división)</option>
+                            </select>
+                            <span asp-validation-for="NombreCuerpo" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="NumeroPiso" class="figma-label">Número de Piso (Nivel) *</label>
+                            <input asp-for="NumeroPiso" class="figma-input" type="number" min="1" placeholder="Ej: 1" required />
+                            <span asp-validation-for="NumeroPiso" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="LimiteFrascos" class="figma-label">Límite de Frascos *</label>
+                            <input asp-for="LimiteFrascos" class="figma-input" type="number" min="1" placeholder="Ej: 50" required />
+                            <span asp-validation-for="LimiteFrascos" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="EstadoUbicacion" class="figma-label">Estado *</label>
+                            <select asp-for="EstadoUbicacion" class="figma-input form-select" required>
+                                <option value="Disponible">Disponible</option>
+                                <option value="Lleno">Lleno</option>
+                                <option value="En Mantenimiento">En Mantenimiento</option>
+                            </select>
+                            <span asp-validation-for="EstadoUbicacion" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 mt-4 pt-3" style="border-top: 1px solid #e5e7eb;">
+                        <a asp-action="Index" class="figma-btn-secondary">Cancelar</a>
+                        <button type="submit" class="figma-btn-primary">Registrar Anaquel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

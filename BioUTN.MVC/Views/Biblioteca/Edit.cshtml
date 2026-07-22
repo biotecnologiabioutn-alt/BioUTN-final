@@ -1,0 +1,100 @@
+@model BioUTN.Modelos.Documento
+
+@{
+    ViewData["Title"] = "Editar Documento";
+}
+
+@section Styles {
+<style>
+    body { background-color: #f9fafb; font-family: 'Inter', -apple-system, sans-serif; }
+    .figma-container { padding: 40px 20px; max-width: 800px; margin: 0 auto; }
+    .figma-header { margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-end; }
+    .figma-title { font-size: 24px; font-weight: 700; color: #111827; margin-bottom: 0.25rem; }
+    .figma-subtitle { font-size: 14px; color: #6b7280; }
+    
+    .figma-card { background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 2rem; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+    
+    .figma-label { font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 0.5rem; display: block; }
+    .figma-input { width: 100%; border: 1px solid #d1d5db; border-radius: 8px; padding: 0.6rem 1rem; font-size: 15px; transition: border-color 0.2s, box-shadow 0.2s; }
+    .figma-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+    
+    .figma-btn-primary { background-color: #10b981; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; font-size: 15px; font-weight: 500; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; text-decoration: none; width: 100%; cursor: pointer; }
+    .figma-btn-primary:hover { background-color: #059669; color: white; transform: translateY(-1px); }
+
+    .figma-btn-secondary { background-color: white; color: #374151; border: 1px solid #e5e7eb; padding: 0.5rem 1rem; border-radius: 8px; font-size: 14px; font-weight: 500; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; }
+    .figma-btn-secondary:hover { background-color: #f9fafb; color: #111827; }
+</style>
+}
+
+<div class="figma-container">
+    <div class="figma-header">
+        <div>
+            <h1 class="figma-title">Editar Documento</h1>
+            <p class="figma-subtitle">Actualiza la información y categoría del archivo</p>
+        </div>
+        <div>
+            <a asp-action="Index" class="figma-btn-secondary">
+                <i class="bi bi-arrow-left"></i> Volver a la Biblioteca
+            </a>
+        </div>
+    </div>
+
+    <div class="figma-card">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+            
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="UrlArchivo" />
+            <input type="hidden" asp-for="FechaSubida" />
+            <input type="hidden" asp-for="IdUsuario" />
+            <input type="hidden" asp-for="IdLoteCultivo" />
+            <input type="hidden" asp-for="IdProyecto" />
+
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <label asp-for="CategoriaId" class="figma-label">Categoría del Documento *</label>
+                    <select asp-for="CategoriaId" class="figma-input form-select" required>
+                        <option value="">-- Seleccionar Categoría --</option>
+                        @if (ViewBag.Categorias != null)
+                        {
+                            foreach (var cat in ViewBag.Categorias)
+                            {
+                                <option value="@cat.Id">@cat.Nombre</option>
+                            }
+                        }
+                    </select>
+                    <span asp-validation-for="CategoriaId" class="text-danger small mt-1 d-block"></span>
+                </div>
+
+                <div class="col-md-6 mb-4">
+                    <label asp-for="Titulo" class="figma-label">Título del Documento *</label>
+                    <input asp-for="Titulo" class="figma-input" required />
+                    <span asp-validation-for="Titulo" class="text-danger small mt-1 d-block"></span>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="Descripcion" class="figma-label">Descripción (Opcional)</label>
+                <textarea asp-for="Descripcion" class="figma-input" rows="3"></textarea>
+                <span asp-validation-for="Descripcion" class="text-danger small mt-1 d-block"></span>
+            </div>
+
+            <div class="mb-4">
+                <label class="figma-label">Archivo PDF (Lectura)</label>
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-file-earmark-pdf-fill text-danger fs-4 me-2"></i>
+                    <a href="@Model.UrlArchivo" target="_blank" class="text-decoration-none">Ver Archivo Actual</a>
+                </div>
+                <div class="text-muted small mt-1">El archivo PDF no se puede cambiar. Si necesitas otro archivo, elimina este registro y sube uno nuevo.</div>
+            </div>
+
+            <button type="submit" class="figma-btn-primary">
+                <i class="bi bi-save"></i> Guardar Cambios
+            </button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

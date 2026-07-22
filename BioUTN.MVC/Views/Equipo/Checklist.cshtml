@@ -1,0 +1,123 @@
+@{
+    ViewData["Title"] = "Auditoría Operativa y Checklist de Bioseguridad";
+}
+
+<style>
+    /* Toggle Switch estilo iOS */
+    .form-switch .form-check-input {
+        width: 3em;
+        height: 1.5em;
+        cursor: pointer;
+    }
+    .form-switch .form-check-input:checked {
+        background-color: var(--utn-green);
+        border-color: var(--utn-green);
+    }
+</style>
+
+<div class="container mt-4 pb-5">
+    
+    <!-- Trazabilidad: Lotes intervenidos -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <h6 class="text-uppercase text-muted fw-bold mb-3"><i class="fas fa-barcode text-primary"></i> Registro de Lotes Procesados</h6>
+            <div class="mb-2">
+                <label class="form-label small">Escanee o escriba los lotes manipulados en esta jornada:</label>
+                <div class="input-group mb-2">
+                    <input type="text" class="form-control" placeholder="Ej: Sion-R2..." id="inpLote">
+                    <button class="btn btn-outline-secondary" type="button" onclick="agregarLote()"><i class="fas fa-plus"></i></button>
+                </div>
+            </div>
+            <!-- Badges de Lotes (Mock) -->
+            <div id="listaLotes" class="d-flex flex-wrap gap-2">
+                <!-- Lotes escaneados aparecerán aquí -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Checklist de Bioseguridad (RF-17) -->
+    <div class="card shadow-sm border-0 mb-4 border-start border-4 border-warning">
+        <div class="card-body">
+            <h6 class="text-uppercase text-muted fw-bold mb-3"><i class="fas fa-clipboard-check text-warning"></i> Lista de Chequeo Obligatoria</h6>
+            <p class="small text-muted mb-4">Por normativas del laboratorio, el sistema no permitirá cerrar la jornada hasta que se hayan verificado todos los puntos.</p>
+            
+            <form id="checklistForm">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h6 class="mb-0 fw-bold">Desinfección Superficial</h6>
+                        <small class="text-muted">Mesa limpiada con Etanol al 70% o Hipoclorito.</small>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input chk-requerido" type="checkbox" onchange="verificarChecklist()">
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h6 class="mb-0 fw-bold">Gestión de Desechos</h6>
+                        <small class="text-muted">Material biológico descartado o enviado a autoclavado.</small>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input chk-requerido" type="checkbox" onchange="verificarChecklist()">
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h6 class="mb-0 fw-bold text-danger">Ciclo de Lámpara UV</h6>
+                        <small class="text-muted">Cabina cerrada y lámpara activada por 15 min.</small>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input chk-requerido" type="checkbox" onchange="verificarChecklist()">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <button type="button" id="btnCerrarJornada" class="btn btn-secondary w-100 btn-lg mb-4" disabled onclick="finalizarTurno()">
+        <i class="fas fa-lock"></i> Cerrar Jornada (Incompleto)
+    </button>
+</div>
+
+@section Scripts {
+    <script>
+        function agregarLote() {
+            const val = document.getElementById('inpLote').value;
+            if(val.trim() === '') return;
+            
+            const badge = document.createElement('span');
+            badge.className = "badge bg-primary fs-6 p-2";
+            badge.innerHTML = `<i class="fas fa-vial"></i> ${val}`;
+            
+            document.getElementById('listaLotes').appendChild(badge);
+            document.getElementById('inpLote').value = "";
+        }
+
+        // Lógica para obligatoriedad RF-17
+        function verificarChecklist() {
+            const checks = document.querySelectorAll('.chk-requerido');
+            const btn = document.getElementById('btnCerrarJornada');
+            
+            let todosMarcados = true;
+            checks.forEach(chk => {
+                if(!chk.checked) todosMarcados = false;
+            });
+
+            if(todosMarcados) {
+                btn.disabled = false;
+                btn.className = "btn btn-success w-100 btn-lg mb-4 shadow";
+                btn.innerHTML = '<i class="fas fa-check-circle"></i> Finalizar y Cerrar Jornada';
+            } else {
+                btn.disabled = true;
+                btn.className = "btn btn-secondary w-100 btn-lg mb-4";
+                btn.innerHTML = '<i class="fas fa-lock"></i> Cerrar Jornada (Incompleto)';
+            }
+        }
+
+        function finalizarTurno() {
+            alert("Jornada cerrada exitosamente. Su firma digital y estampa de tiempo han sido adjuntadas al historial de auditoría de los lotes procesados.");
+            window.location.href = '/Home/Index';
+        }
+    </script>
+}

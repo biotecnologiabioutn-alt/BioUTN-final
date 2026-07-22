@@ -1,0 +1,104 @@
+@model BioUTN.Modelos.UbicacionFisica
+
+@{
+    ViewData["Title"] = "Detalles del Anaquel";
+}
+
+@section Styles {
+<style>
+    body { background-color: #f9fafb; font-family: 'Inter', -apple-system, sans-serif; }
+    .figma-container { padding: 40px 20px; max-width: 800px; margin: 0 auto; }
+    .figma-header { margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-end; }
+    .figma-title { font-size: 24px; font-weight: 700; color: #111827; margin-bottom: 0.25rem; }
+    .figma-subtitle { font-size: 14px; color: #6b7280; }
+    
+    .figma-card { background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 2rem; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+    
+    .figma-btn-primary { background-color: #10b981; color: white; border: none; padding: 0.5rem 1rem; border-radius: 8px; font-size: 14px; font-weight: 500; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; }
+    .figma-btn-primary:hover { background-color: #059669; color: white; transform: translateY(-1px); }
+
+    .figma-btn-secondary { background-color: white; color: #374151; border: 1px solid #e5e7eb; padding: 0.5rem 1rem; border-radius: 8px; font-size: 14px; font-weight: 500; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; }
+    .figma-btn-secondary:hover { background-color: #f9fafb; color: #111827; }
+
+    .detail-row { display: flex; padding: 1rem 0; border-bottom: 1px solid #f3f4f6; }
+    .detail-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .detail-label { width: 35%; font-size: 13px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; }
+    .detail-value { width: 65%; font-size: 15px; color: #111827; font-weight: 500; }
+    
+    .status-badge { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 9999px; font-size: 13px; font-weight: 600; }
+    .status-disponible { background-color: #d1fae5; color: #065f46; }
+    .status-mantenimiento { background-color: #fef3c7; color: #92400e; }
+    .status-lleno { background-color: #fee2e2; color: #991b1b; }
+</style>
+}
+
+<div class="figma-container">
+    <div class="figma-header">
+        <div>
+            <h1 class="figma-title">Detalles del Anaquel / Espacio Físico</h1>
+            <p class="figma-subtitle">Información completa sobre la ubicación física</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-action="Index" class="figma-btn-secondary">
+                <i class="bi bi-arrow-left"></i> Volver
+            </a>
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="figma-btn-primary">
+                <i class="bi bi-pencil-square"></i> Editar Espacio
+            </a>
+        </div>
+    </div>
+
+    <div class="figma-card">
+        <div class="d-flex align-items-center gap-3 mb-4 pb-3" style="border-bottom: 1px solid #e5e7eb;">
+            <div style="width: 48px; height: 48px; background-color: #f3f4f6; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #3b82f6;">
+                <i class="bi bi-hdd-rack"></i>
+            </div>
+            <div>
+                <h3 style="font-size: 18px; font-weight: 700; color: #111827; margin: 0;">Anaquel @Model.CodigoAnaquel - Piso @Model.NumeroPiso</h3>
+                <p style="font-size: 14px; color: #6b7280; margin: 0;">@Model.NombreCuerpo</p>
+            </div>
+        </div>
+
+        <div class="detail-row">
+            <div class="detail-label">ID Sistema</div>
+            <div class="detail-value">@Model.Id</div>
+        </div>
+        <div class="detail-row">
+            <div class="detail-label">Código del Anaquel</div>
+            <div class="detail-value" style="font-family: monospace; color: #3b82f6; font-size: 16px;">@Model.CodigoAnaquel</div>
+        </div>
+        <div class="detail-row">
+            <div class="detail-label">Nombre del Cuerpo</div>
+            <div class="detail-value">@Model.NombreCuerpo</div>
+        </div>
+        <div class="detail-row">
+            <div class="detail-label">Número de Piso</div>
+            <div class="detail-value">
+                <span style="display: inline-flex; align-items: center; justify-content: center; background: #e5e7eb; width: 24px; height: 24px; border-radius: 6px; font-weight: bold; color: #374151;">
+                    @Model.NumeroPiso
+                </span>
+            </div>
+        </div>
+        <div class="detail-row">
+            <div class="detail-label">Límite de Frascos</div>
+            <div class="detail-value">@Model.LimiteFrascos</div>
+        </div>
+        <div class="detail-row">
+            <div class="detail-label">Estado de la Ubicación</div>
+            <div class="detail-value">
+                @if(Model.EstadoUbicacion == "Disponible")
+                {
+                    <span class="status-badge status-disponible"><i class="bi bi-check-circle-fill me-1"></i> Disponible</span>
+                }
+                else if(Model.EstadoUbicacion == "Lleno")
+                {
+                    <span class="status-badge status-lleno"><i class="bi bi-x-circle-fill me-1"></i> Lleno (Sin Espacio)</span>
+                }
+                else
+                {
+                    <span class="status-badge status-mantenimiento"><i class="bi bi-tools me-1"></i> En Mantenimiento</span>
+                }
+            </div>
+        </div>
+    </div>
+</div>

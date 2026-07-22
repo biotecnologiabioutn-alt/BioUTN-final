@@ -1,0 +1,64 @@
+@model BioUTN.Modelos.TareaOperativa
+
+@{
+    ViewData["Title"] = "Crear TareaOperativa";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="bioutn-title mb-0">Nuevo TareaOperativa</h2>
+    </div>
+    <a asp-action="Index" class="btn bioutn-btn bioutn-btn-secondary">
+        <i class="bi bi-arrow-left me-1"></i> Volver al Listado
+    </a>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="bioutn-card">
+            <div class="bioutn-card-header">
+                <h5><i class="bi bi-plus-circle me-2"></i> Formulario</h5>
+            </div>
+            <div class="bioutn-card-body">
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="IdUsuario" class="control-label">IdUsuario</label>
+                        <input asp-for="IdUsuario" type="number" class="form-control" />
+                        <span asp-validation-for="IdUsuario" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="TipoTarea" class="control-label">TipoTarea</label>
+                        <input asp-for="TipoTarea" type="text" class="form-control" />
+                        <span asp-validation-for="TipoTarea" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Estado" class="control-label">Estado</label>
+                        <input asp-for="Estado" type="text" class="form-control" />
+                        <span asp-validation-for="Estado" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="FechaAsignacion" class="control-label">FechaAsignacion</label>
+                        <input asp-for="FechaAsignacion" type="date" class="form-control" />
+                        <span asp-validation-for="FechaAsignacion" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="FechaCompletada" class="control-label">FechaCompletada</label>
+                        <input asp-for="FechaCompletada" type="text" class="form-control" />
+                        <span asp-validation-for="FechaCompletada" class="text-danger small"></span>
+                    </div>
+                    <div class="text-end mt-4">
+                        <button type="submit" class="btn bioutn-btn bioutn-btn-primary px-4 shadow-sm">
+                            <i class="bi bi-save me-1"></i> Guardar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

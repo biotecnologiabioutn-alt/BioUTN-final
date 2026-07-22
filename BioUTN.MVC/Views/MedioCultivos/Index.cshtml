@@ -1,0 +1,65 @@
+@model IEnumerable<BioUTN.Modelos.MedioCultivo>
+
+@{
+    ViewData["Title"] = "Gestión de MedioCultivo";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="bioutn-title mb-0"><i class="bi bi-table text-primary-custom me-2"></i> MedioCultivos</h2>
+        <p class="bioutn-subtitle mt-1">Listado general de mediocultivos</p>
+    </div>
+    <a asp-action="Create" class="btn bioutn-btn bioutn-btn-primary shadow-sm">
+        <i class="bi bi-plus-lg me-1"></i> Nuevo Registro
+    </a>
+</div>
+
+<div class="bioutn-card">
+    <div class="bioutn-card-header">
+        <h5><i class="bi bi-list me-2"></i> Registros</h5>
+    </div>
+    <div class="bioutn-card-body p-0">
+        <div class="bioutn-table-wrap">
+            <table class="table bioutn-table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Siglas</th>
+                        <th>Descripcion</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.Siglas</td>
+                                <td>@item.Descripcion</td>
+                                <td class="text-center">
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn-action-outline" title="Editar">
+                                        <i class="bi bi-pencil"></i> Editar</a>
+                                    <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline">
+                                        <button type="submit" class="btn-action-delete" title="Eliminar" onclick="return confirm('¿Está seguro de eliminar este registro?');">
+                                            <i class="bi bi-trash3"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="3" class="text-center py-5">
+                                <i class="bi bi-inbox fs-1 text-muted mb-3 d-block"></i>
+                                <p class="text-muted">No hay registros guardados.</p>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+

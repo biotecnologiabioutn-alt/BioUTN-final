@@ -1,0 +1,266 @@
+@model BioUTN.Modelos.PlantaMadre
+
+@{
+    ViewData["Title"] = "Árbol de Trazabilidad - " + Model.CodigoAsignado;
+    var lotes = ViewBag.Lotes as List<BioUTN.Modelos.LoteCultivo> ?? new List<BioUTN.Modelos.LoteCultivo>();
+    var frascos = ViewBag.Frascos as List<BioUTN.Modelos.UnidadFrasco> ?? new List<BioUTN.Modelos.UnidadFrasco>();
+
+    // Funciones helper
+    var siembrasOriginales = lotes.Where(l => l.IdLotePadre == null).ToList();
+
+    int ObtenerCantidadFrascosSanos(int loteId)
+    {
+        return frascos.Count(f => f.IdLoteCultivo == loteId && f.Estado == "Saludable");
+    }
+    int ObtenerCantidadFrascosTotal(int loteId)
+    {
+        return frascos.Count(f => f.IdLoteCultivo == loteId);
+    }
+}
+
+<style>
+    .figma-container { font-family: 'Inter', sans-serif; background-color: #f9fafb; padding: 20px; border-radius: 12px; }
+    
+    /* Estilos del árbol (Organigrama horizontal/vertical) */
+    .tree-container {
+        padding: 2rem 0;
+        overflow-x: auto;
+    }
+    
+    /* El conector vertical principal de la planta madre */
+    .tree-root-connector {
+        width: 2px;
+        height: 20px;
+        background-color: #d1d5db;
+        margin: 0 auto;
+    }
+
+    .node-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.75rem;
+        padding: 1rem;
+        width: 240px;
+        margin: 0 auto;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        position: relative;
+        text-align: left;
+    }
+    
+    .node-pm {
+        border: 2px solid #8b5cf6;
+        box-shadow: 0 4px 6px rgba(139, 92, 246, 0.2);
+    }
+    
+    .node-lote {
+        border-left: 4px solid #10b981;
+    }
+
+    .node-resiembra {
+        border-left: 4px solid #3b82f6;
+    }
+    
+    .badge-info {
+        font-size: 10px;
+        background: #f3f4f6;
+        color: #4b5563;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-weight: 600;
+    }
+
+    /* Líneas para los hijos */
+    .children-container {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        position: relative;
+        padding-top: 20px;
+    }
+    
+    .children-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 50%;
+        width: 2px;
+        height: 20px;
+        background: #d1d5db;
+    }
+
+    .child-wrapper {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    /* Línea horizontal superior para conectar hermanos */
+    .children-container.has-multiple > .child-wrapper::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        width: 100%;
+        height: 2px;
+        background: #d1d5db;
+    }
+    
+    /* Ajustes de bordes para el primer y último hermano */
+    .children-container.has-multiple > .child-wrapper:first-child::before {
+        left: 50%;
+        width: 50%;
+    }
+    .children-container.has-multiple > .child-wrapper:last-child::before {
+        right: 50%;
+        width: 50%;
+    }
+    
+    /* Línea vertical para cada hijo */
+    .child-wrapper::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 50%;
+        width: 2px;
+        height: 20px;
+        background: #d1d5db;
+    }
+</style>
+
+<div class="figma-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 style="font-weight: 700; color: #111827; font-size: 20px;">Trazabilidad: @Model.CodigoAsignado</h3>
+            <p class="text-muted" style="font-size: 13px;">Ciclo de vida in vitro desde la introducción al laboratorio</p>
+        </div>
+        <a asp-action="TrazabilidadIndex" class="btn btn-outline-secondary btn-sm" style="border-radius:0.5rem;">
+            <i class="bi bi-arrow-left"></i> Volver
+        </a>
+    </div>
+
+    <div class="tree-container text-center">
+        <!-- NODO RAÍZ: Planta Madre -->
+        <div class="node-card node-pm">
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <div class="bg-purple-100 text-purple-700 rounded-circle d-flex align-items-center justify-content-center" style="width:32px;height:32px;background:#f3e8ff;color:#7e22ce;">
+                    <i class="bi bi-tree-fill"></i>
+                </div>
+                <div>
+                    <h6 class="mb-0 fw-bold" style="font-size:13px; color:#4c1d95;">Planta Madre</h6>
+                    <small class="text-muted" style="font-size:11px;">@Model.CodigoAsignado</small>
+                </div>
+            </div>
+            <div class="d-flex gap-1 flex-wrap">
+                <span class="badge-info">Intro: @Model.FechaRecepcion.ToString("dd/MM/yy")</span>
+                <span class="badge-info text-success"><i class="bi bi-check-circle"></i> @Model.EstadoFitosanitario</span>
+            </div>
+        </div>
+
+        @if (siembrasOriginales.Any())
+        {
+            <div class="tree-root-connector"></div>
+            <div class="children-container @(siembrasOriginales.Count > 1 ? "has-multiple" : "")">
+                @foreach (var lote in siembrasOriginales)
+                {
+                    <div class="child-wrapper">
+                        <!-- NODO: Siembra -->
+                        <div class="node-card node-lote mt-3">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <div class="bg-emerald-100 text-emerald-700 rounded d-flex align-items-center justify-content-center" style="width:28px;height:28px;background:#d1fae5;color:#047857;">
+                                    <i class="bi bi-grid-fill"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 fw-bold" style="font-size:12px;">Siembra Original</h6>
+                                    <small class="text-muted" style="font-size:10px;">@lote.CodigoTrazabilidad</small>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-1 flex-wrap mb-2">
+                                <span class="badge-info">@lote.FechaSiembra.ToString("dd/MM/yy")</span>
+                                <span class="badge-info bg-warning bg-opacity-25 text-warning">R0</span>
+                            </div>
+                            <!-- Progreso Frascos -->
+                            @{
+                                int total = ObtenerCantidadFrascosTotal(lote.Id);
+                                int sanos = ObtenerCantidadFrascosSanos(lote.Id);
+                                double pct = total > 0 ? ((double)sanos / total) * 100 : 0;
+                            }
+                            <div style="font-size:10px;" class="mb-1 d-flex justify-content-between">
+                                <span class="text-muted">Frascos Sanos</span>
+                                <span class="fw-bold @(pct < 50 ? "text-danger" : "text-success")">@sanos / @total</span>
+                            </div>
+                            <div class="progress" style="height: 4px;">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: @pct%" aria-valuenow="@pct" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+
+                        <!-- Hijos Recursivos (Resiembras) -->
+                        @RenderHijos(lote.Id, lotes, frascos)
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@functions {
+    public Microsoft.AspNetCore.Html.IHtmlContent RenderHijos(int parentId, List<BioUTN.Modelos.LoteCultivo> allLotes, List<BioUTN.Modelos.UnidadFrasco> frascos)
+    {
+        var hijos = allLotes.Where(l => l.IdLotePadre == parentId).ToList();
+        if (!hijos.Any()) return Microsoft.AspNetCore.Html.HtmlString.Empty;
+
+        var sb = new System.Text.StringBuilder();
+        sb.Append("<div class='children-container " + (hijos.Count > 1 ? "has-multiple" : "") + "'>");
+        
+        foreach(var hijo in hijos)
+        {
+            sb.Append("<div class='child-wrapper'>");
+            
+            // Calculos frascos
+            int total = frascos.Count(f => f.IdLoteCultivo == hijo.Id);
+            int sanos = frascos.Count(f => f.IdLoteCultivo == hijo.Id && f.Estado == "Saludable");
+            double pct = total > 0 ? ((double)sanos / total) * 100 : 0;
+            string barColor = pct < 50 ? "bg-danger" : "bg-success";
+            string textColor = pct < 50 ? "text-danger" : "text-success";
+
+            sb.Append($@"
+                <div class='node-card node-resiembra mt-3'>
+                    <div class='d-flex align-items-center gap-2 mb-2'>
+                        <div class='bg-blue-100 text-blue-700 rounded d-flex align-items-center justify-content-center' style='width:28px;height:28px;background:#dbeafe;color:#1d4ed8;'>
+                            <i class='bi bi-diagram-2-fill'></i>
+                        </div>
+                        <div>
+                            <h6 class='mb-0 fw-bold' style='font-size:12px;'>Resiembra R{hijo.NumeroRepique}</h6>
+                            <small class='text-muted' style='font-size:10px;'>{hijo.CodigoTrazabilidad}</small>
+                        </div>
+                    </div>
+                    <div class='d-flex gap-1 flex-wrap mb-2'>
+                        <span class='badge-info'>{hijo.FechaSiembra.ToString("dd/MM/yy")}</span>
+                    </div>
+                    <div style='font-size:10px;' class='mb-1 d-flex justify-content-between'>
+                        <span class='text-muted'>Frascos Sanos</span>
+                        <span class='fw-bold {textColor}'>{sanos} / {total}</span>
+                    </div>
+                    <div class='progress' style='height: 4px;'>
+                        <div class='progress-bar {barColor}' role='progressbar' style='width: {pct}%'></div>
+                    </div>
+                </div>
+            ");
+
+            // Llamada recursiva
+            var htmlHijos = RenderHijos(hijo.Id, allLotes, frascos);
+            if (htmlHijos != null)
+            {
+                using (var writer = new System.IO.StringWriter())
+                {
+                    htmlHijos.WriteTo(writer, System.Text.Encodings.Web.HtmlEncoder.Default);
+                    sb.Append(writer.ToString());
+                }
+            }
+
+            sb.Append("</div>");
+        }
+        
+        sb.Append("</div>");
+        return new Microsoft.AspNetCore.Html.HtmlString(sb.ToString());
+    }
+}

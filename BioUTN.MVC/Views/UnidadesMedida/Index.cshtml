@@ -1,0 +1,65 @@
+@model IEnumerable<BioUTN.Modelos.UnidadMedida>
+@{
+    ViewData["Title"] = "Catálogo de Unidades de Medida";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="bioutn-title mb-0">Catálogo de Unidades de Medida</h2>
+        <p class="text-muted mb-0 mt-1">Gestión de unidades y factores de conversión</p>
+    </div>
+    <a asp-action="Create" class="btn bioutn-btn bioutn-btn-primary shadow-sm">
+        <i class="bi bi-plus-circle me-1"></i> Nueva Unidad
+    </a>
+</div>
+
+<div class="bioutn-card">
+    <div class="bioutn-card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0 bioutn-table">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">Nombre de la Unidad</th>
+                        <th>Abreviatura</th>
+                        <th>Unidad Base Interna</th>
+                        <th>Factor de Conversión</th>
+                        <th class="text-center pe-4" width="200">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model) {
+                        <tr>
+                            <td class="ps-4 fw-medium text-dark">
+                                @item.Nombre
+                            </td>
+                            <td><span class="badge bg-secondary">@item.Abreviatura</span></td>
+                            <td>@item.UnidadBase</td>
+                            <td>
+                                <strong>x @item.FactorConversion.ToString("0.##")</strong>
+                            </td>
+                            <td class="text-center pe-4">
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-info" title="Detalles">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-primary" title="Editar">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    @if(!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center py-4 text-muted">
+                                <i class="bi bi-inbox fs-2 d-block mb-2 text-black-50"></i>
+                                No hay unidades registradas. Crea tu primera unidad para los cálculos.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

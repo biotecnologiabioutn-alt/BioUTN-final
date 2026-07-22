@@ -1,0 +1,133 @@
+@{
+    ViewData["Title"] = "Reportes de Cultivos";
+}
+
+@section Styles {
+<style>
+    .report-stat-card {
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.07);
+        border-radius: 16px;
+        padding: 1.5rem;
+        position: relative;
+        overflow: hidden;
+    }
+    .report-stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 3px;
+        border-radius: 3px 3px 0 0;
+    }
+    .card-green::before { background: linear-gradient(90deg, #20c997, #0dcaf0); }
+    .card-red::before { background: linear-gradient(90deg, #dc3545, #fd7e14); }
+    .card-yellow::before { background: linear-gradient(90deg, #ffc107, #fd7e14); }
+    .card-purple::before { background: linear-gradient(90deg, #6610f2, #0dcaf0); }
+
+    .big-number {
+        font-size: 2.8rem;
+        font-weight: 900;
+        line-height: 1;
+    }
+</style>
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="bioutn-title mb-0"><i class="bi bi-bar-chart-line text-warning me-2"></i>Estadísticas de Cultivos</h2>
+        <p class="bioutn-subtitle mt-1">Índices de eficiencia, trazabilidad y análisis de contaminación del laboratorio.</p>
+    </div>
+    <a asp-controller="Cultivos" asp-action="Index" class="btn bioutn-btn bioutn-btn-secondary shadow-sm">
+        <i class="bi bi-arrow-left me-1"></i> Volver a Gestión
+    </a>
+</div>
+
+<!-- KPIs Principales -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="report-stat-card card-green">
+            <div class="text-muted small mb-1">Eficiencia Global</div>
+            <div class="big-number text-success">0%</div>
+            <div class="text-muted small mt-1"><i class="bi bi-dash text-muted me-1"></i>0% vs. mes anterior</div>
+            <div class="text-muted" style="font-size:0.7rem; margin-top:0.25rem;">0 de 0 frascos activos exitosos</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="report-stat-card card-red">
+            <div class="text-muted small mb-1">Tasa Contaminación</div>
+            <div class="big-number text-danger">0%</div>
+            <div class="text-muted small mt-1"><i class="bi bi-dash text-muted me-1"></i>0% vs. mes anterior</div>
+            <div class="text-muted" style="font-size:0.7rem; margin-top:0.25rem;">0 frascos contaminados este mes</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="report-stat-card card-yellow">
+            <div class="text-muted small mb-1">Lotes con Alerta</div>
+            <div class="big-number text-warning">0</div>
+            <div class="text-muted small mt-1">Resiembra requerida próximos 7 días</div>
+            <div class="text-muted" style="font-size:0.7rem; margin-top:0.25rem;">0 lotes en riesgo</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="report-stat-card card-purple">
+            <div class="text-muted small mb-1">Especies Registradas</div>
+            <div class="big-number" style="color:#a98eda;">0</div>
+            <div class="text-muted small mt-1">0 medicinales · 0 ornamentales · 0 forestales</div>
+            <div class="text-muted" style="font-size:0.7rem; margin-top:0.25rem;">0 requieren permiso ambiental</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Eficiencia por Operador -->
+    <div class="col-md-6">
+        <div class="bioutn-card p-4">
+            <h6 class="text-dark fw-bold mb-1"><i class="bi bi-people text-info me-2"></i>Eficiencia por Operador</h6>
+            <p class="text-muted small mb-3">Porcentaje de frascos exitosos por cada técnico/tesista</p>
+            
+            <div class="text-center py-4">
+                <i class="bi bi-inbox fs-1 text-muted mb-2 d-block"></i>
+                <p class="text-muted small">No hay datos de operadores registrados aún.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lotes por Especie -->
+    <div class="col-md-6">
+        <div class="bioutn-card p-4">
+            <h6 class="text-dark fw-bold mb-1"><i class="bi bi-flower1 text-success me-2"></i>Eficiencia por Especie</h6>
+            <p class="text-muted small mb-3">Porcentaje de viabilidad de cada especie cultivada</p>
+
+            <div class="text-center py-4">
+                <i class="bi bi-inbox fs-1 text-muted mb-2 d-block"></i>
+                <p class="text-muted small">No hay especies sembradas aún.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Historial de Alertas Recientes -->
+    <div class="col-md-6">
+        <div class="bioutn-card p-4">
+            <h6 class="text-dark fw-bold mb-1"><i class="bi bi-clock-history text-warning me-2"></i>Eventos Recientes</h6>
+            <p class="text-muted small mb-3">Últimos registros de contaminación y alertas</p>
+
+            <div class="text-center py-4">
+                <i class="bi bi-inbox fs-1 text-muted mb-2 d-block"></i>
+                <p class="text-muted small">No hay eventos recientes.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recomendaciones del Sistema -->
+    <div class="col-md-6">
+        <div class="bioutn-card p-4">
+            <h6 class="text-dark fw-bold mb-1"><i class="bi bi-lightbulb text-primary-custom me-2"></i>Recomendaciones del Sistema</h6>
+            <p class="text-muted small mb-3">Basadas en los datos de eficiencia actuales</p>
+
+            <div class="text-center py-4">
+                <i class="bi bi-inbox fs-1 text-muted mb-2 d-block"></i>
+                <p class="text-muted small">El sistema generará recomendaciones cuando existan datos suficientes.</p>
+            </div>
+        </div>
+    </div>
+</div>

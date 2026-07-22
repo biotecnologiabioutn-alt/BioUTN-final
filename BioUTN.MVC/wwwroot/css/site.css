@@ -1,0 +1,387 @@
+/* ========== VARIABLES DE COLOR (BioUTN - Light Mode) ========== */
+:root {
+    --sidebar-width: 260px;
+    
+    /* 60% Dominante */
+    --bg-base: #F5F7FA;
+    --surface: #FFFFFF;
+    
+    /* 30% Secundario */
+    --brand-primary: #2E7D32;
+    --text-main: #263238;
+    
+    /* 10% Acento */
+    --alert-danger: #D32F2F;
+    --alert-warning: #F57C00;
+ 
+    /* Tipografía */
+    --font-main: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    
+    /* Sombras y Bordes */
+    --shadow-sm: 0 2px 4px rgba(38, 50, 56, 0.05);
+    --shadow-md: 0 4px 12px rgba(38, 50, 56, 0.08);
+    --border-color: #E2E8F0;
+}
+ 
+body {
+    background-color: var(--bg-base);
+    color: var(--text-main);
+    font-family: var(--font-main);
+    margin: 0;
+}
+ 
+/* ========== ESTRUCTURA DE MÁRGENES ========== */
+#content-wrapper {
+    margin-left: var(--sidebar-width);
+    min-height: 100vh;
+    transition: all 0.3s ease;
+    padding: 2rem;
+}
+ 
+.navbar-custom-offset {
+    left: var(--sidebar-width) !important;
+    width: calc(100% - var(--sidebar-width)) !important;
+    background-color: var(--surface) !important;
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+}
+ 
+/* REGLAS PARA EL HOME (SIN SIDEBAR) */
+.layout-no-sidebar #content-wrapper {
+    margin-left: 0 !important;
+}
+ 
+.layout-no-sidebar .navbar-custom-offset {
+    left: 0 !important;
+    width: 100% !important;
+}
+ 
+/* ========== ESTILOS DEL SIDEBAR PROTOTIPO ========== */
+.sidebar {
+    width: var(--sidebar-width);
+    background-color: var(--surface);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    overflow-y: auto;
+    z-index: 1050;
+    box-shadow: none;
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.logo-icon {
+    background-color: var(--brand-primary);
+    color: white;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+    margin-right: 12px;
+}
+
+.logo-text h1 {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.2;
+    color: var(--text-main);
+}
+
+.logo-text p {
+    font-size: 11px;
+    color: #666666;
+    margin: 0;
+}
+
+.sidebar-nav {
+    padding: 20px 0;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.sidebar-nav::-webkit-scrollbar {
+    width: 6px;
+}
+.sidebar-nav::-webkit-scrollbar-thumb {
+    background: #CBD5E1;
+    border-radius: 4px;
+}
+
+.nav-category {
+    font-size: 11px;
+    color: #9e9e9e;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    padding: 0 20px;
+    text-transform: uppercase;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    color: #666666;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border-left: 4px solid transparent;
+}
+
+.nav-item i {
+    width: 24px;
+    font-size: 16px;
+    margin-right: 10px;
+    text-align: center;
+}
+
+.nav-item:hover {
+    background-color: #f9f9f9;
+    color: var(--text-main);
+}
+
+.nav-item.active {
+    background-color: rgba(46, 125, 50, 0.1);
+    color: var(--brand-primary);
+    border-left-color: var(--brand-primary);
+}
+ 
+/* ========== TARJETAS Y CONTENEDORES ========== */
+.bioutn-card, .card {
+    background-color: var(--surface) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 12px !important;
+    box-shadow: var(--shadow-sm) !important;
+    color: var(--text-main) !important;
+}
+ 
+.bioutn-card-header, .card-header {
+    background-color: transparent !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    padding: 1.25rem 1.5rem !important;
+    font-weight: 600;
+    color: var(--text-main) !important;
+}
+ 
+/* ========== TIPOGRAFÍA ========== */
+.bioutn-title, h1, h2, h3 {
+    color: var(--text-main) !important;
+    font-weight: 700;
+}
+ 
+.bioutn-subtitle, .text-muted {
+    color: #64748B !important;
+}
+ 
+.text-success { color: var(--brand-primary) !important; }
+.text-danger { color: var(--alert-danger) !important; }
+.text-warning { color: var(--alert-warning) !important; }
+ 
+/* ========== BOTONES ========== */
+.btn-primary, .bioutn-btn-success {
+    background-color: var(--brand-primary) !important;
+    color: var(--surface) !important;
+    border: none !important;
+    font-weight: 600 !important;
+    padding: 0.5rem 1.25rem !important;
+    border-radius: 6px !important;
+    transition: all 0.2s ease !important;
+}
+ 
+.btn-primary:hover, .bioutn-btn-success:hover {
+    background-color: #1B5E20 !important;
+    box-shadow: 0 4px 10px rgba(46, 125, 50, 0.3) !important;
+    transform: translateY(-1px);
+}
+ 
+.btn-secondary, .bioutn-btn-secondary {
+    background-color: transparent !important;
+    color: var(--brand-primary) !important;
+    border: 1px solid var(--brand-primary) !important;
+    font-weight: 600 !important;
+    padding: 0.5rem 1.25rem !important;
+    border-radius: 6px !important;
+}
+ 
+.btn-secondary:hover, .bioutn-btn-secondary:hover {
+    background-color: rgba(46, 125, 50, 0.05) !important;
+}
+ 
+.btn-danger {
+    background-color: var(--alert-danger) !important;
+    color: var(--surface) !important;
+    border: none !important;
+    font-weight: 600 !important;
+}
+ 
+.btn-warning {
+    background-color: var(--alert-warning) !important;
+    color: #fff !important;
+    border: none !important;
+}
+ 
+/* ========== FORMULARIOS Y TABLAS ========== */
+.form-control, .form-select, .bioutn-input {
+    background-color: var(--surface) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-main) !important;
+    border-radius: 6px !important;
+    padding: 0.6rem 1rem !important;
+}
+ 
+.form-control:focus, .form-select:focus, .bioutn-input:focus {
+    border-color: var(--brand-primary) !important;
+    box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.15) !important;
+}
+ 
+.form-label, label {
+    color: var(--text-main) !important;
+    font-weight: 600 !important;
+    font-size: 0.9rem !important;
+}
+ 
+.table {
+    color: var(--text-main) !important;
+}
+ 
+.table th {
+    background-color: #F8FAFC !important;
+    color: var(--text-main) !important;
+    font-weight: 600 !important;
+    border-bottom: 2px solid var(--border-color) !important;
+}
+ 
+.table td {
+    border-bottom: 1px solid var(--border-color) !important;
+    vertical-align: middle;
+}
+ 
+.input-group-text {
+    background-color: #F8FAFC !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-main) !important;
+}
+/* Dashboard Buttons mapped to Green */
+.bioutn-btn-primary, .bioutn-btn-secondary, .bioutn-btn-warn, .bioutn-btn-info, .bioutn-btn-danger { background-color: var(--brand-primary) !important; color: var(--surface) !important; border: none !important; font-weight: 600 !important; padding: 0.5rem 1.25rem !important; border-radius: 6px !important; transition: all 0.2s ease !important; }
+.bioutn-btn-primary:hover, .bioutn-btn-secondary:hover, .bioutn-btn-warn:hover, .bioutn-btn-info:hover, .bioutn-btn-danger:hover { background-color: #1B5E20 !important; transform: translateY(-1px); }
+/* ========== RESPONSIVE DESIGN ========== */
+@media (max-width: 992px) {
+    #sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        z-index: 1040;
+    }
+    .sidebar-open #sidebar {
+        transform: translateX(0);
+    }
+    #content-wrapper {
+        margin-left: 0 !important;
+        padding: 1rem;
+    }
+    .navbar-custom-offset {
+        left: 0 !important;
+        width: 100% !important;
+    }
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 1030;
+    }
+    .sidebar-open .sidebar-overlay {
+        display: block;
+    }
+}
+@media (max-width: 576px) {
+    .calendar-grid {
+        gap: 2px !important;
+    }
+    .cal-day {
+        width: 30px !important;
+        height: 30px !important;
+        font-size: 0.85rem !important;
+    }
+    .shelf-row {
+        grid-template-columns: 1fr !important;
+    }
+}
+@media (min-width: 577px) and (max-width: 992px) {
+    .shelf-row {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+@media (max-width: 576px) {
+    #detailPanel {
+        width: 100% !important;
+        right: -100% !important;
+        padding: 1.5rem 1rem !important;
+    }
+    #detailPanel.open {
+        right: 0 !important;
+    }
+}
+/* ========== TABLE ACTION BUTTONS ========== */
+.btn-action-outline {
+    background-color: transparent !important;
+    border: 1px solid #275432 !important;
+    color: #275432 !important;
+    border-radius: 6px !important;
+    padding: 6px 14px !important;
+    font-size: 0.85rem !important;
+    font-weight: 600 !important;
+    transition: all 0.2s !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+}
+.btn-action-outline:hover {
+    background-color: rgba(39, 84, 50, 0.05) !important;
+}
+.btn-action-delete {
+    background-color: #E3000F !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 6px !important;
+    padding: 6px 12px !important;
+    font-size: 0.95rem !important;
+    transition: all 0.2s !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+.btn-action-delete:hover {
+    background-color: #B3000C !important;
+    color: white !important;
+}
+.btn-action-text {
+    background-color: transparent !important;
+    border: none !important;
+    color: #64748B !important;
+    font-size: 0.85rem !important;
+    font-weight: 600 !important;
+    padding: 6px 10px !important;
+    transition: all 0.2s !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+}
+.btn-action-text:hover {
+    color: #275432 !important;
+}

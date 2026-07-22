@@ -1,0 +1,151 @@
+@model IEnumerable<BioUTN.Modelos.Usuario>
+
+@{
+    ViewData["Title"] = "Directorio de Usuarios";
+}
+
+@section Styles {
+<style>
+    body { background-color: #f9fafb; font-family: 'Inter', -apple-system, sans-serif; }
+    .figma-container { padding: 40px 20px; max-width: 1200px; margin: 0 auto; }
+    .figma-header { margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-end; }
+    .figma-title { font-size: 24px; font-weight: 700; color: #111827; margin-bottom: 0.25rem; }
+    .figma-subtitle { font-size: 14px; color: #6b7280; }
+    
+    .figma-btn-primary { background-color: #10b981; color: white; border: none; padding: 0.5rem 1rem; border-radius: 8px; font-size: 14px; font-weight: 500; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; }
+    .figma-btn-primary:hover { background-color: #059669; color: white; transform: translateY(-1px); }
+    
+    .figma-table-card { background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+    .figma-table { width: 100%; margin: 0; border-collapse: separate; border-spacing: 0; }
+    .figma-table th { background-color: #f9fafb; padding: 12px 16px; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #e5e7eb; text-align: left; }
+    .figma-table td { padding: 16px; font-size: 14px; color: #111827; border-bottom: 1px solid #e5e7eb; vertical-align: middle; }
+    .figma-table tr:last-child td { border-bottom: none; }
+    .figma-table tbody tr:hover { background-color: #f9fafb; }
+    
+    .figma-badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 9999px; font-size: 12px; font-weight: 500; }
+    .badge-active { background-color: #d1fae5; color: #065f46; }
+    .badge-inactive { background-color: #fee2e2; color: #991b1b; }
+    .badge-role { background-color: #f3f4f6; color: #374151; }
+    
+    .figma-action-btn { background: none; border: none; padding: 6px; border-radius: 6px; color: #6b7280; transition: all 0.2s; display: inline-flex; }
+    .figma-action-btn:hover { background-color: #f3f4f6; color: #111827; }
+    .figma-action-btn.delete:hover { background-color: #fee2e2; color: #dc2626; }
+</style>
+}
+
+<div class="figma-container">
+    <div class="figma-header">
+        <div>
+            <h1 class="figma-title">Directorio de Usuarios</h1>
+            <p class="figma-subtitle">Gestiona el personal con acceso al sistema</p>
+        </div>
+        <div>
+            @if (User.IsInRole("Coordinador") || User.IsInRole("Tecnico"))
+            {
+                <a asp-action="Create" class="figma-btn-primary">
+                    <i class="bi bi-plus-lg"></i> Nuevo Usuario
+                </a>
+            }
+        </div>
+    </div>
+
+    <div class="figma-table-card">
+        <table class="figma-table">
+            <thead>
+                <tr>
+                    <th>Nombre Completo</th>
+                    <th>Email</th>
+                    <th>Identificación</th>
+                    <th>Rol</th>
+                    <th>Estado</th>
+                    @if (User.IsInRole("Coordinador") || User.IsInRole("Tecnico"))
+                    {
+                        <th class="text-end">Acciones</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                <div style="font-weight: 500; color: #111827;">@item.Nombres @item.Apellidos</div>
+                            </td>
+                            <td><span style="color: #6b7280;">@item.Email</span></td>
+                            <td>@item.NumeroIdentificacion</td>
+                            <td>
+                                <span class="figma-badge badge-role">@(item.Rol != null ? item.Rol.NombreRol : "ID: " + item.IdRol)</span>
+                            </td>
+                            <td>
+                                @if(item.CuentaBloqueada)
+                                {
+                                    <span class="figma-badge badge-inactive"><i class="bi bi-lock-fill me-1"></i>Bloqueada</span>
+                                }
+                                else if(item.Activo)
+                                {
+                                    <span class="figma-badge badge-active">Activo</span>
+                                }
+                                else
+                                {
+                                    <span class="figma-badge badge-inactive">Inactivo</span>
+                                }
+                            </td>
+                            @if (User.IsInRole("Coordinador") || User.IsInRole("Tecnico"))
+                            {
+                                <td class="text-end">
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="figma-action-btn" title="Ver Detalles">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="figma-action-btn" title="Editar">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline form-delete">
+                                        <button type="button" class="figma-action-btn delete btn-delete" title="Eliminar">
+                                            <i class="bi bi-trash3"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            }
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="@(User.IsInRole("Coordinador") || User.IsInRole("Tecnico") ? 6 : 5)" class="text-center py-5">
+                            <i class="bi bi-people fs-1 text-muted mb-3 d-block"></i>
+                            <p class="text-muted mb-0">No hay usuarios registrados en el sistema.</p>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.querySelectorAll('.btn-delete').forEach(button => {
+            button.addEventListener('click', function(e) {
+                var form = this.closest('form');
+                Swal.fire({
+                    title: '¿Estás seguro?',
+                    text: "Esta acción no se puede deshacer.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc2626',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                })
+            });
+        });
+    </script>
+}

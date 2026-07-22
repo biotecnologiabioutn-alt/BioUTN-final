@@ -1,0 +1,369 @@
+@model BioUTN.Modelos.Proyecto
+
+@{
+    ViewData["Title"] = "Detalles del Proyecto";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var colorClass = Model.TipoProyecto == "Tesis" ? "success" : "info";
+}
+
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-header bg-@colorClass text-white rounded-top-4 py-3 d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0 fw-bold"><i class="bi bi-info-circle me-2"></i>Detalles del Proyecto</h4>
+                    <span class="badge bg-white text-@colorClass fs-6">@Model.Estado</span>
+                </div>
+                <div class="card-body p-4 p-md-5">
+                    
+                    <h3 class="fw-bold text-@colorClass mb-4">@Model.NombreProyecto</h3>
+
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-4">
+                            <h6 class="text-muted fw-bold mb-1">Tipo de Proyecto</h6>
+                            <p class="fs-5">@Model.TipoProyecto</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h6 class="text-muted fw-bold mb-1"><i class="bi bi-flower1 text-@colorClass"></i> Especie Botánica</h6>
+                            <p class="fs-5 fst-italic">@(Model.Especie?.NombreCientifico ?? "No asignada")</p>
+                        </div>
+                        @if(Model.TipoProyecto != "Tesis") {
+                            <div class="col-md-4">
+                                <h6 class="text-muted fw-bold mb-1">Uso</h6>
+                                <p class="fs-5">@(string.IsNullOrEmpty(Model.Uso) ? "N/A" : Model.Uso)</p>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <h6 class="text-muted fw-bold mb-1"><i class="bi bi-person-badge text-@colorClass"></i> @(Model.TipoProyecto == "Tesis" ? "Director(es)" : "Docente(s)")</h6>
+                            <p class="fs-6">
+                                @if(string.IsNullOrEmpty(Model.DirectoresNombres)) {
+                                    <span class="text-muted fst-italic">Sin asignar</span>
+                                } else {
+                                    @Model.DirectoresNombres
+                                }
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            @if(Model.TipoProyecto == "Tesis") {
+                                <h6 class="text-muted fw-bold mb-1"><i class="bi bi-person text-@colorClass"></i> Estudiante Tesista</h6>
+                                <p class="fs-6">
+                                    @if(Model.Tesista == null) {
+                                        <span class="text-muted fst-italic">Sin asignar</span>
+                                    } else {
+                                        @(Model.Tesista.Nombres + " " + Model.Tesista.Apellidos)
+                                    }
+                                </p>
+                            } else {
+                                <h6 class="text-muted fw-bold mb-1"><i class="bi bi-people text-@colorClass"></i> Estudiantes / Asistentes</h6>
+                                <p class="fs-6">
+                                    @if(string.IsNullOrEmpty(Model.EstudiantesNombres)) {
+                                        <span class="text-muted fst-italic">Sin asignar</span>
+                                    } else {
+                                        @Model.EstudiantesNombres
+                                    }
+                                </p>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <h6 class="text-muted fw-bold mb-1"><i class="bi bi-calendar-event text-@colorClass"></i> Fecha de Inicio</h6>
+                            <p class="fs-6">@Model.FechaInicio.ToString("dd/MM/yyyy")</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted fw-bold mb-1"><i class="bi bi-calendar-check text-@colorClass"></i> Fecha de Fin</h6>
+                            <p class="fs-6">@(Model.FechaFin?.ToString("dd/MM/yyyy") ?? "En curso")</p>
+                        </div>
+                    </div>
+
+                    @if(!string.IsNullOrEmpty(Model.Descripcion)) {
+                        <div class="mb-4">
+                            <h6 class="text-muted fw-bold mb-2">@(Model.TipoProyecto == "Tesis" ? "Proyecto UTN ecominga Crea:" : "Descripción / Información Adicional")</h6>
+                            <div class="p-3 bg-light rounded border border-light">
+                                @Model.Descripcion
+                            </div>
+                        </div>
+                    }
+
+                    @if (!User.IsInRole("Tecnico"))
+                    {
+                        <!-- Stepper -->
+                        <div class="mt-5 mb-4">
+                            <h5 class="fw-bold text-@colorClass mb-4"><i class="bi bi-diagram-3 me-2"></i>Flujo de Trabajo del Proyecto</h5>
+                            <div class="d-flex justify-content-between align-items-center position-relative">
+                                <!-- Linea conectora -->
+                                <div class="position-absolute w-100" style="top: 25px; left: 0; height: 2px; background-color: #e5e7eb; z-index: 0;"></div>
+                                
+                                <!-- Paso 1 -->
+                                <div class="text-center position-relative" style="z-index: 1; flex: 1;">
+                                    @if (!Model.PlantasMadresConfirmadas)
+                                    {
+                                        <button type="button" data-bs-toggle="modal" data-bs-target="#plantaMadreModal" class="btn btn-@colorClass rounded-circle shadow-sm d-flex align-items-center justify-content-center mx-auto mb-2" style="width: 50px; height: 50px; border: none;">
+                                            <i class="bi bi-tree text-white fs-5"></i>
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <div class="bg-success rounded-circle shadow-sm d-flex align-items-center justify-content-center mx-auto mb-2 text-white" style="width: 50px; height: 50px;">
+                                            <i class="bi bi-check-lg fs-4"></i>
+                                        </div>
+                                    }
+                                    <span class="d-block fw-bold small text-dark">1. Planta Madre</span>
+                                    <span class="text-muted" style="font-size: 0.75rem;">Registro de Origen</span>
+                                </div>
+                                
+                                <!-- Paso 2 -->
+                                <div class="text-center position-relative" style="z-index: 1; flex: 1;">
+                                    <a asp-controller="Solicitudes" asp-action="Create" class="btn btn-outline-@colorClass bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center mx-auto mb-2" style="width: 50px; height: 50px; border-width: 2px;">
+                                        <i class="bi bi-clock-history fs-5"></i>
+                                    </a>
+                                    <span class="d-block fw-bold small text-dark">2. Reservas</span>
+                                    <span class="text-muted" style="font-size: 0.75rem;">Equipos y Reactivos</span>
+                                </div>
+                                
+                                <!-- Paso 3 -->
+                                <div class="text-center position-relative" style="z-index: 1; flex: 1;">
+                                    <a asp-controller="LoteCultivos" asp-action="Index" class="btn btn-outline-@colorClass bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center mx-auto mb-2" style="width: 50px; height: 50px; border-width: 2px;">
+                                        <i class="bi bi-box-seam fs-5"></i>
+                                    </a>
+                                    <span class="d-block fw-bold small text-dark">3. Siembra</span>
+                                    <span class="text-muted" style="font-size: 0.75rem;">Lote de Introducción</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        @if (ViewBag.PlantasMadres != null && ((List<BioUTN.Modelos.PlantaMadre>)ViewBag.PlantasMadres).Any())
+                        {
+                            <div class="mt-4 p-3 bg-light rounded border">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="fw-bold text-dark m-0"><i class="bi bi-list-check me-2"></i>Plantas Madres Registradas</h6>
+                                </div>
+                                <div class="d-flex flex-wrap gap-2">
+                                    @foreach(var pm in (List<BioUTN.Modelos.PlantaMadre>)ViewBag.PlantasMadres)
+                                    {
+                                        <div class="btn-group shadow-sm">
+                                            <a asp-controller="PlantaMadres" asp-action="Details" asp-route-id="@pm.Id" class="btn btn-sm btn-@colorClass text-white" target="_blank">
+                                                <i class="bi bi-tree me-1"></i> @pm.CodigoAsignado
+                                            </a>
+                                            @if (!Model.PlantasMadresConfirmadas)
+                                            {
+                                                <a asp-controller="PlantaMadres" asp-action="Edit" asp-route-id="@pm.Id" class="btn btn-sm btn-outline-@colorClass bg-white" style="color: var(--bs-@colorClass);" target="_blank">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    }
+
+                    <div class="d-flex justify-content-end align-items-center gap-2 mt-5 pt-3 border-top">
+                        @if (!Model.PlantasMadresConfirmadas && !User.IsInRole("Tecnico"))
+                        {
+                            <form asp-controller="Proyectos" asp-action="ConfirmarPlantasMadres" asp-route-id="@Model.Id" method="post" class="m-0 me-auto" onsubmit="return confirm('¿Estás seguro de confirmar la fase de Plantas Madres? Ya no podrás registrar nuevas Plantas ni editarlas.');">
+                                <button type="submit" class="btn btn-success rounded-pill fw-bold px-4">
+                                    <i class="bi bi-check-circle me-1"></i> Confirmar Fase
+                                </button>
+                            </form>
+                        }
+                        
+                        <a asp-action="Index" class="btn btn-light rounded-pill px-4">Volver al Catálogo</a>
+                        @if (User.IsInRole("Tecnico") || User.IsInRole("Coordinador"))
+                        {
+                            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning rounded-pill px-4 text-white">
+                                <i class="bi bi-pencil me-1"></i> Editar Proyecto
+                            </a>
+                        }
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Planta Madre -->
+<div class="modal fade" id="plantaMadreModal" tabindex="-1" aria-labelledby="plantaMadreModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow" style="border-radius: 12px;">
+            <div class="modal-header bg-light border-0" style="border-radius: 12px 12px 0 0;">
+                <h5 class="modal-title fw-bold text-dark" id="plantaMadreModalLabel">
+                    <i class="bi bi-tree me-2 text-success"></i>Registrar Planta Madre para @Model.NombreProyecto
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4 bg-white">
+                <form asp-action="Create" asp-controller="PlantaMadres" method="post" enctype="multipart/form-data" id="formPlantaMadre">
+                    <input type="hidden" name="IdProyecto" value="@Model.Id" />
+                    <input type="hidden" name="IdUsuario" value="@Model.IdUsuarioResponsable" />
+                    <input type="hidden" name="IdEspecie" value="@Model.IdEspecie" />
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted">Especie Botánica *</label>
+                            <input type="text" class="form-control bg-light text-muted" value="@(Model.Especie?.NombreCientifico ?? "No asignada en el proyecto")" readonly />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted">Código de Planta *</label>
+                            <input type="text" class="form-control bg-light text-muted" value="Generado Automáticamente" readonly />
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label class="form-label fw-bold small text-muted mb-0">Estado Fitosanitario *</label>
+                                <button type="button" id="btnNuevoEstado" class="btn btn-sm btn-link text-decoration-none p-0" style="font-size: 12px; color: #10b981;">
+                                    <i class="bi bi-plus-circle me-1"></i>Nuevo
+                                </button>
+                            </div>
+                            <select name="EstadoFitosanitario" id="EstadoFitosanitario" class="form-select" required>
+                                <option value="Sano">Sano (Recomendado)</option>
+                                <option value="Cuarentena">En Cuarentena</option>
+                                <option value="Con plagas">Con presencia de plagas</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted">Procedencia (Lugar de Colecta) *</label>
+                            <input name="Procedencia" class="form-control" placeholder="Ej. Reserva Ecológica Antisana" required />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted">Fecha de Colecta</label>
+                            <input name="FechaColecta" type="date" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted">Responsable(s) de Colecta</label>
+                            <input type="hidden" name="ResponsablesColectaNombres" id="ResponsablesColectaHiddenModal" />
+                            <select id="colecta_select_modal" class="form-select select2-multiple" multiple="multiple" asp-items="ViewBag.UsuariosColecta">
+                            </select>
+                        </div>
+
+                        <div class="col-12 mt-4 mb-2">
+                            <h6 class="fw-bold border-bottom pb-2">Información del Explante Introducido</h6>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted">Fecha de Recepción *</label>
+                            <input name="FechaRecepcion" type="date" class="form-control" id="fechaIntro" required />
+                        </div>
+                        <!-- Responsable de Introducción removido -->
+
+                        <!-- Protocolo de introduccion removido -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted">Permiso Ambiental (Ministerio)</label>
+                            <select name="IdDocumentoPermiso" class="form-select" asp-items="ViewBag.Documentos">
+                                <option value="">No aplica</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted">Herbario de Referencia</label>
+                            <input name="HerbarioReferencia" class="form-control" placeholder="Ej. Herbario QCA" />
+                        </div>
+
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold small text-muted">Observaciones</label>
+                            <textarea name="Observaciones" class="form-control" rows="2" placeholder="Notas adicionales sobre la planta..."></textarea>
+                        </div>
+
+                        <div class="col-12 mt-4 mb-2">
+                            <h6 class="fw-bold border-bottom pb-2">Multimedia</h6>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold small text-muted">Fotografía (Subir archivo)</label>
+                            <input type="file" name="fotoFisica" accept="image/*" class="form-control mb-2" />
+                            <!-- UrlFotografia removida -->
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-0 bg-light" style="border-radius: 0 0 12px 12px;">
+                <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success rounded-pill px-4" id="btnGuardarPM">Registrar Planta Madre</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var fi = document.getElementById('fechaIntro');
+            if(fi) { fi.valueAsDate = new Date(); }
+            
+            $('#colecta_select_modal').select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                placeholder: "-- Seleccionar Persona(s) --",
+                dropdownParent: $('#plantaMadreModal'),
+                allowClear: true
+            });
+
+            $('#colecta_select_modal').on('change', function() {
+                var data = $(this).select2('data');
+                var nombres = data.map(function(item) {
+                    return item.text;
+                }).join(', ');
+                $('#ResponsablesColectaHiddenModal').val(nombres);
+            });
+            
+            document.getElementById('btnGuardarPM').addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                var form = document.getElementById('formPlantaMadre');
+                if (!form.checkValidity()) {
+                    form.reportValidity();
+                    return;
+                }
+
+                Swal.fire({
+                    title: '¿Registrar Planta Madre?',
+                    text: "El ecotipo inicial es la base biológica del laboratorio.",
+                    icon: 'info',
+                    showCancelButton: true,
+                    confirmButtonColor: '#10b981',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Sí, Registrar',
+                    cancelButtonText: 'Revisar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                })
+            });
+
+            document.getElementById('btnNuevoEstado').addEventListener('click', function() {
+                Swal.fire({
+                    title: 'Nuevo Estado Fitosanitario',
+                    input: 'text',
+                    inputPlaceholder: 'Ej. Hongo leve',
+                    showCancelButton: true,
+                    confirmButtonText: 'Añadir',
+                    cancelButtonText: 'Cancelar',
+                    inputValidator: (value) => {
+                        if (!value) return '¡Necesitas escribir un estado!'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        var selectEstado = document.getElementById('EstadoFitosanitario');
+                        var option = document.createElement("option");
+                        option.text = result.value;
+                        option.value = result.value;
+                        selectEstado.add(option);
+                        selectEstado.value = result.value;
+                        Swal.fire('Añadido', 'El nuevo estado se ha añadido a la lista.', 'success');
+                    }
+                });
+            });
+        });
+    </script>
+}

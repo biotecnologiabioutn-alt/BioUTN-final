@@ -1,0 +1,231 @@
+@model BioUTN.Modelos.PlantaMadre
+
+@{
+    ViewData["Title"] = "Editar PlantaMadre";
+}
+
+@section Styles {
+<style>
+    .figma-container { font-family: 'Inter', -apple-system, sans-serif; background-color: #f9fafb; padding: 20px; border-radius: 12px; }
+    .figma-card { background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 0.75rem; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); padding: 1.5rem; }
+    .figma-label { font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 0.5rem; display: block; }
+    .figma-input { width: 100%; padding: 0.625rem 0.75rem; border-radius: 0.5rem; border: 1px solid #e5e7eb; font-size: 14px; color: #111827; outline: none; transition: all 0.2s; background-color: #ffffff; }
+    .figma-input:focus { border-color: rgba(16, 185, 129, 0.6); box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2); }
+    .figma-btn-primary { background-color: #10b981; color: white; border: none; padding: 0.625rem 1.25rem; border-radius: 0.5rem; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+    .figma-btn-primary:hover { background-color: #059669; color: white; }
+    .figma-btn-secondary { background-color: white; color: #374151; border: 1px solid #e5e7eb; padding: 0.625rem 1.25rem; border-radius: 0.5rem; font-size: 14px; font-weight: 500; transition: all 0.2s; text-decoration: none; display: inline-flex; align-items: center; }
+    .figma-btn-secondary:hover { background-color: #f9fafb; color: #111827; }
+</style>
+}
+
+<div class="figma-container">
+    <div class="mb-4">
+        <h3 style="font-weight: 700; color: #111827; font-size: 18px;">Editar Planta Madre — @Model?.CodigoAsignado</h3>
+        <p class="text-muted" style="font-size: 13px;">Actualizar registro del espécimen élite</p>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 col-lg-6">
+            <div class="figma-card">
+                <form asp-action="Edit" class="space-y-4" enctype="multipart/form-data">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3" style="font-size: 13px;"></div>
+                    <input type="hidden" asp-for="Id" />
+
+                    <div class="mb-3">
+                        <label asp-for="IdEspecie" class="figma-label">Especie Botánica *</label>
+                        <select asp-for="IdEspecie" class="figma-input form-select select2-basico" asp-items="ViewBag.Especies" required>
+                            <option value="">-- Seleccionar Especie --</option>
+                        </select>
+                        <span asp-validation-for="IdEspecie" class="text-danger small mt-1 d-block"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="IdProyecto" class="figma-label">Proyecto Asociado *</label>
+                        <select asp-for="IdProyecto" class="figma-input form-select select2-basico" asp-items="ViewBag.Proyectos" required>
+                            <option value="">-- Seleccionar Proyecto --</option>
+                        </select>
+                        <span asp-validation-for="IdProyecto" class="text-danger small mt-1 d-block"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="CodigoAsignado" class="figma-label">Código de Planta *</label>
+                        <input asp-for="CodigoAsignado" type="text" class="figma-input bg-light text-muted" readonly />
+                        <span asp-validation-for="CodigoAsignado" class="text-danger small mt-1 d-block"></span>
+                    </div>
+
+
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label asp-for="EstadoFitosanitario" class="figma-label mb-0">Estado Fitosanitario *</label>
+                            <button type="button" id="btnNuevoEstado" class="btn btn-sm btn-link text-decoration-none p-0" style="font-size: 12px; color: #10b981;">
+                                <i class="bi bi-plus-circle me-1"></i>Nuevo
+                            </button>
+                        </div>
+                        <select asp-for="EstadoFitosanitario" class="figma-input form-select" required>
+                            <option value="Sano">Sano (Recomendado)</option>
+                            <option value="Cuarentena">En Cuarentena</option>
+                            <option value="Con plagas">Con presencia de plagas</option>
+                        </select>
+                        <span asp-validation-for="EstadoFitosanitario" class="text-danger small mt-1 d-block"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="figma-label">Técnico/Responsable *</label>
+                        <input type="text" class="figma-input bg-light text-muted" value="@ViewBag.LoggedUserNombre" readonly />
+                        <input type="hidden" asp-for="IdUsuario" />
+                        <span asp-validation-for="IdUsuario" class="text-danger small mt-1 d-block"></span>
+                    </div>                    <h4 class="mt-4 mb-3" style="font-size: 15px; font-weight: 700; color: #111827; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">Origen y Colecta en Campo</h4>
+
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <label asp-for="Procedencia" class="figma-label">Procedencia (Lugar de Colecta) *</label>
+                            <input asp-for="Procedencia" class="figma-input" placeholder="Ej. Reserva Ecológica Antisana" required />
+                            <span asp-validation-for="Procedencia" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label asp-for="FechaColecta" class="figma-label">Fecha de Colecta</label>
+                            <input asp-for="FechaColecta" type="date" class="figma-input" />
+                            <span asp-validation-for="FechaColecta" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label asp-for="ResponsablesColectaNombres" class="figma-label">Responsable(s) de Colecta</label>
+                            <input type="hidden" asp-for="ResponsablesColectaNombres" id="ResponsablesColectaHidden" />
+                            <select id="colecta_select" class="figma-input form-select select2-multiple" multiple="multiple" asp-items="ViewBag.UsuariosColecta">
+                            </select>
+                            <span asp-validation-for="ResponsablesColectaNombres" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                    </div>
+
+                    <h4 class="mt-4 mb-3" style="font-size: 15px; font-weight: 700; color: #111827; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">Información del Explante Introducido</h4>
+
+
+
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label asp-for="FechaRecepcion" class="figma-label">Fecha de Recepción *</label>
+                            <input asp-for="FechaRecepcion" type="date" class="figma-input" required />
+                            <span asp-validation-for="FechaRecepcion" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                        <!-- Responsable Introduccion Removido -->
+                    </div>
+                    
+                    <!-- Protocolo de introduccion removido -->
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label asp-for="IdDocumentoPermiso" class="figma-label">Permiso Ambiental (Ministerio)</label>
+                            <select asp-for="IdDocumentoPermiso" class="figma-input form-select select2-basico" asp-items="ViewBag.Documentos">
+                                <option value="">No aplica</option>
+                            </select>
+                            <span asp-validation-for="IdDocumentoPermiso" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label asp-for="HerbarioReferencia" class="figma-label">Herbario de Referencia</label>
+                            <input asp-for="HerbarioReferencia" class="figma-input" placeholder="Ej. Herbario QCA" />
+                            <span asp-validation-for="HerbarioReferencia" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Observaciones" class="figma-label">Observaciones</label>
+                        <textarea asp-for="Observaciones" class="figma-input" rows="2" placeholder="Notas adicionales sobre la planta..."></textarea>
+                        <span asp-validation-for="Observaciones" class="text-danger small mt-1 d-block"></span>
+                    </div>
+
+                    <h4 class="mt-4 mb-3" style="font-size: 15px; font-weight: 700; color: #111827; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">Multimedia</h4>
+                    
+                    <div class="mb-3">
+                        <label asp-for="UrlFotografia" class="figma-label">Fotografía (Subir archivo)</label>
+                        @if (!string.IsNullOrEmpty(Model?.UrlFotografia))
+                        {
+                            <div class="mb-2">
+                                <img src="@Model.UrlFotografia" alt="Foto actual" style="max-height: 100px; border-radius: 8px;" />
+                            </div>
+                        }
+                        <input type="file" name="fotoFisica" accept="image/*" class="figma-input mb-2" />
+                        <input asp-for="UrlFotografia" type="hidden" />
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 mt-4 pt-3" style="border-top: 1px solid #e5e7eb;">
+                        <a asp-action="Index" class="figma-btn-secondary">Cancelar</a>
+                        <button type="submit" class="figma-btn-primary">Actualizar Planta</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        $(document).ready(function() {
+            $('.select2-basico').select2({
+                theme: 'bootstrap-5',
+                width: '100%'
+            });
+
+            $('#colecta_select').select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                placeholder: "-- Seleccionar Persona(s) --",
+                allowClear: true
+            });
+
+            $('#colecta_select').on('change', function() {
+                var data = $(this).select2('data');
+                var nombres = data.map(function(item) {
+                    return item.text;
+                }).join(', ');
+                $('#ResponsablesColectaHidden').val(nombres);
+            });
+
+            // Auto-seleccionar valores actuales
+            function preselectSelect2(hiddenId, selectId) {
+                var val = $('#' + hiddenId).val();
+                if(val) {
+                    var names = val.split(',').map(item => item.trim());
+                    var ids = [];
+                    $('#' + selectId + ' option').each(function() {
+                        if(names.includes($(this).text().trim())) {
+                            ids.push($(this).val());
+                        }
+                    });
+                    $('#' + selectId).val(ids).trigger('change');
+                }
+            }
+
+            preselectSelect2('ResponsablesColectaHidden', 'colecta_select');
+        });
+
+        document.getElementById('btnNuevoEstado').addEventListener('click', function() {
+            Swal.fire({
+                title: 'Nuevo Estado Fitosanitario',
+                input: 'text',
+                inputPlaceholder: 'Ej. Hongo leve',
+                showCancelButton: true,
+                confirmButtonText: 'Añadir',
+                cancelButtonText: 'Cancelar',
+                inputValidator: (value) => {
+                    if (!value) return '¡Necesitas escribir un estado!'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    var selectEstado = document.getElementById('EstadoFitosanitario');
+                    var option = document.createElement("option");
+                    option.text = result.value;
+                    option.value = result.value;
+                    selectEstado.add(option);
+                    selectEstado.value = result.value;
+                    Swal.fire('Añadido', 'El nuevo estado se ha añadido a la lista.', 'success');
+                }
+            });
+        });
+    </script>
+}

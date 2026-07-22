@@ -1,0 +1,228 @@
+@model BioUTN.Modelos.SolicitudLab
+@{
+    ViewData["Title"] = "Detalle de Solicitud";
+    bool esTecnico = ViewBag.EsTecnico ?? false;
+    var detalles = ViewBag.Detalles as List<BioUTN.Modelos.SolicitudDetalleMaterial> ?? new();
+    var reactivos = ViewBag.Reactivos as List<BioUTN.Modelos.Reactivo> ?? new();
+    var equipos = ViewBag.Equipos as List<BioUTN.Modelos.Equipo> ?? new();
+    var proyectos = ViewBag.Proyectos as List<BioUTN.Modelos.Proyecto> ?? new();
+    var usuarios = ViewBag.Usuarios as List<BioUTN.Modelos.Usuario> ?? new();
+
+    var proyecto = proyectos.FirstOrDefault(p => p.Id == Model.IdProyecto);
+    var solicitante = usuarios.FirstOrDefault(u => u.Id == Model.IdSolicitante);
+    var aprobador = usuarios.FirstOrDefault(u => u.Id == Model.IdAprobador);
+    var equipo = equipos.FirstOrDefault(e => e.Id == Model.IdEquipo);
+
+    string estadoClass = Model.Estado switch {
+        "Aprobada" => "success",
+        "Rechazada" => "danger",
+        _ => "warning"
+    };
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="bioutn-title mb-0">SOL-@Model.Id.ToString("D4")</h2>
+        <p class="text-muted mb-0 mt-1">Creada el @Model.FechaSolicitud.ToString("dd/MM/yyyy HH:mm")</p>
+    </div>
+    <a asp-action="Index" class="btn bioutn-btn bioutn-btn-secondary">
+        <i class="bi bi-arrow-left me-1"></i> Volver
+    </a>
+</div>
+
+<div class="row">
+    <!-- Columna izquierda -->
+    <div class="col-md-8">
+        <!-- Encabezado de la solicitud -->
+        <div class="bioutn-card mb-4">
+            <div class="bioutn-card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Información General</h5>
+                <span class="badge bg-@estadoClass">@Model.Estado</span>
+            </div>
+            <div class="bioutn-card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4 text-muted">Proyecto</dt>
+                    <dd class="col-sm-8 fw-bold">@(proyecto?.NombreProyecto ?? "—")</dd>
+
+                    <dt class="col-sm-4 text-muted">Solicitante</dt>
+                    <dd class="col-sm-8">@(solicitante != null ? $"{solicitante.Nombres} {solicitante.Apellidos}" : "—")</dd>
+
+                    <dt class="col-sm-4 text-muted">Tipo</dt>
+                    <dd class="col-sm-8"><span class="badge bg-secondary">@Model.TipoSolicitud</span></dd>
+
+                    @if(Model.TipoSolicitud == "Materiales" || Model.TipoSolicitud == "Mixta")
+                    {
+                        <dt class="col-sm-4 text-muted">Pri. Reactivos</dt>
+                        <dd class="col-sm-8 mb-1">
+                            @if(!string.IsNullOrEmpty(Model.PrioridadReactivos)) {
+                                <span class="badge @(Model.PrioridadReactivos == "Urgente" ? "bg-danger" : "bg-info")">@Model.PrioridadReactivos</span>
+                                @if(Model.PrioridadReactivos == "Planificada" && Model.FechaReactivos.HasValue) {
+                                    <small class="text-muted ms-2"><i class="bi bi-calendar"></i> @Model.FechaReactivos.Value.ToString("dd/MM/yyyy") <i class="bi bi-clock ms-1"></i> @Model.HoraReactivos</small>
+                                }
+                            } else { <span class="text-muted small">No solicitados</span> }
+                        </dd>
+
+                        <dt class="col-sm-4 text-muted">Pri. Implementos</dt>
+                        <dd class="col-sm-8">
+                            @if(!string.IsNullOrEmpty(Model.PrioridadImplementos)) {
+                                <span class="badge @(Model.PrioridadImplementos == "Urgente" ? "bg-danger" : "bg-info")">@Model.PrioridadImplementos</span>
+                                @if(Model.PrioridadImplementos == "Planificada" && Model.FechaImplementos.HasValue) {
+                                    <small class="text-muted ms-2"><i class="bi bi-calendar"></i> @Model.FechaImplementos.Value.ToString("dd/MM/yyyy") <i class="bi bi-clock ms-1"></i> @Model.HoraImplementos</small>
+                                }
+                            } else { <span class="text-muted small">No solicitados</span> }
+                        </dd>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model.Observaciones))
+                    {
+                        <dt class="col-sm-4 text-muted">Observaciones</dt>
+                        <dd class="col-sm-8">@Model.Observaciones</dd>
+                    }
+
+                    @if (Model.Estado == "Rechazada" && !string.IsNullOrEmpty(Model.MotivoRechazo))
+                    {
+                        <dt class="col-sm-4 text-muted text-danger">Motivo Rechazo</dt>
+                        <dd class="col-sm-8 text-danger">@Model.MotivoRechazo</dd>
+                    }
+
+                    @if (Model.FechaGestion.HasValue)
+                    {
+                        <dt class="col-sm-4 text-muted">Fecha de Gestión</dt>
+                        <dd class="col-sm-8">@Model.FechaGestion.Value.ToString("dd/MM/yyyy HH:mm")</dd>
+
+                        <dt class="col-sm-4 text-muted">Gestionado por</dt>
+                        <dd class="col-sm-8">@(aprobador != null ? $"{aprobador.Nombres} {aprobador.Apellidos}" : "—")</dd>
+                    }
+                </dl>
+            </div>
+        </div>
+
+        <!-- Detalle de materiales -->
+        @if (detalles.Any())
+        {
+            <div class="bioutn-card mb-4">
+                <div class="bioutn-card-header">
+                    <h5 class="mb-0"><i class="bi bi-flask me-2"></i>Materiales Solicitados</h5>
+                </div>
+                <div class="bioutn-card-body p-0">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4">Material</th>
+                                <th>Categoría</th>
+                                <th>Cantidad Solicitada</th>
+                                <th>Stock Disponible</th>
+                                <th>Observación</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var d in detalles)
+                            {
+                                var reactivo = reactivos.FirstOrDefault(r => r.Id == d.IdReactivo);
+                                var stockOk = reactivo != null && reactivo.StockActual >= d.CantidadSolicitada;
+                                <tr>
+                                    <td class="ps-4 fw-medium">@(reactivo?.Nombre ?? $"ID: {d.IdReactivo}")</td>
+                                    <td><span class="badge bg-light text-dark">@(reactivo?.Categoria ?? "—")</span></td>
+                                    <td class="fw-bold">@d.CantidadSolicitada</td>
+                                    <td class="@(stockOk ? "text-success" : "text-danger") fw-bold">
+                                        @(reactivo?.StockActual.ToString() ?? "—")
+                                        @if (!stockOk)
+                                        {
+                                            <i class="bi bi-exclamation-triangle ms-1" title="Stock insuficiente"></i>
+                                        }
+                                    </td>
+                                    <td class="text-muted small">@(d.Observacion ?? "—")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+
+        <!-- Reserva de equipo -->
+        @if (Model.IdEquipo.HasValue)
+        {
+            <div class="bioutn-card">
+                <div class="bioutn-card-header">
+                    <h5 class="mb-0"><i class="bi bi-cpu me-2"></i>Reserva de Equipo</h5>
+                </div>
+                <div class="bioutn-card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4 text-muted">Equipo</dt>
+                        <dd class="col-sm-8 fw-bold">@(equipo?.Nombre ?? "—") — @(equipo?.Marca ?? "—")</dd>
+
+                        <dt class="col-sm-4 text-muted">Fecha de Uso</dt>
+                        <dd class="col-sm-8">@Model.FechaReservaEquipo?.ToString("dd/MM/yyyy")</dd>
+
+                        <dt class="col-sm-4 text-muted">Horario</dt>
+                        <dd class="col-sm-8">@Model.HoraInicioEquipo — @Model.HoraFinEquipo</dd>
+                    </dl>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Columna derecha: acciones del técnico -->
+    <div class="col-md-4">
+        @if (esTecnico && Model.Estado == "Pendiente")
+        {
+            <div class="bioutn-card border-warning">
+                <div class="bioutn-card-header bg-warning bg-opacity-10">
+                    <h5 class="mb-0 text-warning"><i class="bi bi-shield-check me-2"></i>Acción del Técnico</h5>
+                </div>
+                <div class="bioutn-card-body">
+                    <p class="text-muted small mb-3">
+                        Revisa los detalles de la solicitud antes de aprobar. 
+                        Al aprobar, el stock se descontará automáticamente.
+                    </p>
+                    <form asp-action="Aprobar" asp-route-id="@Model.Id" method="post" class="mb-2">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-success w-100"
+                                onclick="return confirm('¿Confirmar aprobación? Se descontará el stock.')">
+                            <i class="bi bi-check-circle me-1"></i> Aprobar Solicitud
+                        </button>
+                    </form>
+
+                    <button class="btn btn-outline-danger w-100" onclick="document.getElementById('seccionRechazo').style.display='block'">
+                        <i class="bi bi-x-circle me-1"></i> Rechazar Solicitud
+                    </button>
+
+                    <div id="seccionRechazo" style="display:none;" class="mt-3">
+                        <form asp-action="Rechazar" asp-route-id="@Model.Id" method="post">
+                            @Html.AntiForgeryToken()
+                            <label class="fw-bold small text-muted mb-1">Motivo del Rechazo</label>
+                            <textarea name="motivoRechazo" class="form-control mb-2" rows="3" 
+                                      placeholder="Ej: Stock insuficiente..." required></textarea>
+                            <button type="submit" class="btn btn-danger w-100">
+                                <i class="bi bi-x-lg me-1"></i> Confirmar Rechazo
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="bioutn-card">
+                <div class="bioutn-card-body text-center py-4">
+                    @if (Model.Estado == "Aprobada")
+                    {
+                        <i class="bi bi-check-circle-fill text-success fs-1 d-block mb-2"></i>
+                        <span class="fw-bold text-success">Solicitud Aprobada</span>
+                    }
+                    else if (Model.Estado == "Rechazada")
+                    {
+                        <i class="bi bi-x-circle-fill text-danger fs-1 d-block mb-2"></i>
+                        <span class="fw-bold text-danger">Solicitud Rechazada</span>
+                    }
+                    else
+                    {
+                        <i class="bi bi-clock-history text-warning fs-1 d-block mb-2"></i>
+                        <span class="fw-bold text-warning">Pendiente de Revisión</span>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>

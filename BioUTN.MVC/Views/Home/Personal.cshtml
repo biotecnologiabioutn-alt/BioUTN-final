@@ -1,0 +1,31 @@
+@{
+    ViewData["Title"] = "Gestión de Personal";
+    Layout = "_DashboardLayout";
+}
+
+<div class="card panel-personal" style="max-width: 800px; margin: 0 auto;">
+    <h3 class="card-title"><i class="fa-solid fa-users-cog"></i> Gestión Personal (Admin)</h3>
+    <table>
+        <tr>
+            <th>Avatar</th>
+            <th>Nombre</th>
+            <th>Rol</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+        <tr>
+            <td><div class="avatar">A</div></td>
+            <td>Ana</td>
+            <td>Tesista</td>
+            <td><span class="badge badge-success">Activa</span></td>
+            <td><a href="#" style="color: var(--primary-color);">Detalle</a></td>
+        </tr>
+        <tr>
+            <td><div class="avatar" style="background: #9ca3af;">J</div></td>
+            <td>José</td>
+            <td>Técnico</td>
+            <td><span class="badge badge-warning">Fuera línea</span></td>
+            <td><a href="#" style="color: var(--primary-color);">Detalle</a></td>
+        </tr>
+    </table>
+</div>

@@ -1,0 +1,144 @@
+@{
+    ViewData["Title"] = "Reserva de Cabinas y Autoclave";
+}
+
+<div class="container mt-4 pb-5">
+    
+    <!-- Simulador de Rol (Solo para MVP) -->
+    <div class="alert alert-warning small mb-4 py-2 border-0 shadow-sm d-flex justify-content-between align-items-center">
+        <span><i class="fas fa-user-shield"></i> Simular Rol:</span>
+        <select id="simRole" class="form-select form-select-sm w-auto" onchange="verificarRol()">
+            <option value="tesista">Tesista (Estudiante)</option>
+            <option value="docente">Docente / Técnico</option>
+        </select>
+    </div>
+
+    <!-- Calendario del Día -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body p-0">
+            <h6 class="text-uppercase text-muted fw-bold p-3 border-bottom mb-0 bg-light">Ocupación Hoy (Cabina 1)</h6>
+            <div class="list-group list-group-flush">
+                <div class="list-group-item">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h6 class="mb-1 fw-bold"><i class="far fa-clock"></i> 08:00 - 10:00</h6>
+                        <span class="badge bg-success">Completado</span>
+                    </div>
+                    <p class="mb-1 small">Prof. Cristina Echeverría (Siembra In Vitro)</p>
+                </div>
+                <div class="list-group-item bg-light border-start border-4 border-danger">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h6 class="mb-1 fw-bold"><i class="far fa-clock"></i> 10:00 - 12:00</h6>
+                        <span class="badge bg-danger">Ocupado</span>
+                    </div>
+                    <p class="mb-1 small">Francis Anaguano (Resiembra Lote U01)</p>
+                    <small class="text-muted fst-italic">Rol: Tesista</small>
+                </div>
+                <div class="list-group-item">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h6 class="mb-1 fw-bold text-muted"><i class="far fa-clock"></i> 12:00 - 14:00</h6>
+                        <span class="badge bg-secondary">Disponible</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulario de Reserva -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <h6 class="text-uppercase text-muted fw-bold mb-3"><i class="fas fa-calendar-plus text-primary"></i> Nueva Reserva</h6>
+            
+            <form id="reservaForm">
+                <div class="row">
+                    <div class="col-12 mb-3">
+                        <label class="form-label small fw-bold">Equipo</label>
+                        <select class="form-select">
+                            <option>Cabina de Flujo Laminar 1</option>
+                            <option>Cabina de Flujo Laminar 2</option>
+                            <option>Autoclave Principal</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-6 mb-3">
+                        <label class="form-label small fw-bold">Hora Inicio</label>
+                        <select id="horaInicio" class="form-select" onchange="verificarDisponibilidad()">
+                            <option value="08:00">08:00</option>
+                            <option value="10:00">10:00</option>
+                            <option value="12:00" selected>12:00</option>
+                            <option value="14:00">14:00</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-6 mb-3">
+                        <label class="form-label small fw-bold">Hora Fin</label>
+                        <select class="form-select">
+                            <option value="10:00">10:00</option>
+                            <option value="12:00">12:00</option>
+                            <option value="14:00" selected>14:00</option>
+                            <option value="16:00">16:00</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Alertas de Conflicto -->
+                <div id="alertaConflicto" class="alert alert-danger d-none small mb-3">
+                    <i class="fas fa-exclamation-triangle"></i> <strong>Traslape de horario:</strong> El equipo ya está reservado a esa hora por "Francis Anaguano (Tesista)".
+                </div>
+
+                <!-- Botones Dinámicos -->
+                <button type="button" id="btnReservarNormal" class="btn btn-primary-utn w-100" onclick="confirmarReserva()">Agendar Reserva</button>
+                <button type="button" id="btnOverride" class="btn btn-danger w-100 d-none" onclick="sobreescribirReserva()">
+                    <i class="fas fa-radiation-alt"></i> Sobrescribir por Urgencia (Privilegio Docente)
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Jerarquía de Urgencia (RF-16)
+        function verificarRol() {
+            verificarDisponibilidad();
+        }
+
+        function verificarDisponibilidad() {
+            const hora = document.getElementById('horaInicio').value;
+            const rol = document.getElementById('simRole').value;
+            
+            const alerta = document.getElementById('alertaConflicto');
+            const btnNormal = document.getElementById('btnReservarNormal');
+            const btnOverride = document.getElementById('btnOverride');
+
+            // Simulamos que las 10:00 están ocupadas por un Tesista
+            if (hora === '10:00') {
+                alerta.classList.remove('d-none');
+                btnNormal.classList.add('d-none');
+                
+                if (rol === 'docente') {
+                    // Docente tiene jerarquía para pisar turnos de tesistas
+                    btnOverride.classList.remove('d-none');
+                } else {
+                    // Si es otro tesista, se bloquea sin opción
+                    btnOverride.classList.add('d-none');
+                }
+            } else {
+                alerta.classList.add('d-none');
+                btnNormal.classList.remove('d-none');
+                btnOverride.classList.add('d-none');
+            }
+        }
+
+        function confirmarReserva() {
+            alert("Reserva guardada exitosamente en el calendario.");
+            window.location.href = "/Home/Index";
+        }
+
+        function sobreescribirReserva() {
+            if(confirm("ATENCIÓN: Está a punto de cancelar unilateralmente el turno de un tesista debido a una urgencia. El usuario afectado recibirá una notificación. ¿Proceder?")) {
+                alert("Reserva sobrescrita con éxito aplicando Regla de Jerarquía.");
+                window.location.href = "/Home/Index";
+            }
+        }
+    </script>
+}

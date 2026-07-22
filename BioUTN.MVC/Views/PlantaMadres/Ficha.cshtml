@@ -1,0 +1,394 @@
+@model BioUTN.Modelos.PlantaMadre
+
+@{
+    ViewData["Title"] = "Ficha Planta Madre";
+    Layout = null; // No layout for printing
+    bool isGreen = Model.Proyecto?.TipoProyecto == "Tesis";
+    string themeColor = isGreen ? "#3c763d" : "#0d6efd"; // Dark green or primary blue
+    string borderColor = isGreen ? "#5cb85c" : "#89c2d9";
+    string bgColor = isGreen ? "#dff0d8" : "#e0f2fe";
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"]</title>
+    <style>
+        @@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .ficha-container {
+            width: 800px;
+            background-color: #fff;
+            border: 2px solid #ccc;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid @themeColor;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .header img {
+            height: 40px;
+        }
+
+        .header h3 {
+            margin: 0;
+            color: #d32f2f;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 20px;
+        }
+
+        /* LEFT SIDE */
+        .left-col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .titulo-seccion {
+            text-align: center;
+            color: #888;
+            font-weight: 500;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            position: relative;
+            margin-bottom: 5px;
+        }
+
+        .titulo-seccion::before, .titulo-seccion::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            width: 25%;
+            height: 1px;
+            background-color: #ccc;
+        }
+        .titulo-seccion::before { left: 0; }
+        .titulo-seccion::after { right: 0; }
+
+        .nombre-cientifico {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            font-style: italic;
+            color: @themeColor;
+            text-align: center;
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .nombre-comun {
+            background-color: @themeColor;
+            color: white;
+            text-align: center;
+            padding: 5px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .img-planta {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 3px solid #333;
+        }
+
+        .tags-row {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .tag-box {
+            flex: 1;
+            background-color: @bgColor;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid @borderColor;
+        }
+
+        .tag-box h5 {
+            margin: 0;
+            font-size: 0.8rem;
+            color: @themeColor;
+            text-transform: uppercase;
+        }
+
+        .tag-box p {
+            margin: 5px 0 0 0;
+            font-weight: 600;
+            font-size: 1rem;
+            color: #333;
+        }
+
+        /* RIGHT SIDE */
+        .right-col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .qr-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .qr-box {
+            border: 2px solid @themeColor;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            width: 140px;
+        }
+
+        .qr-box img {
+            width: 100%;
+            height: auto;
+        }
+
+        .accede-list {
+            background-color: @bgColor;
+            padding: 15px;
+            border-radius: 12px;
+            flex: 1;
+        }
+        
+        .accede-list h4 {
+            margin: 0 0 10px 0;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .accede-list ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .accede-list li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 12px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .accede-list li::before {
+            content: "✦";
+            color: @themeColor;
+            position: absolute;
+            left: 0;
+            font-size: 1.2rem;
+            top: -3px;
+        }
+
+        .info-rows {
+            border-top: 1px solid @borderColor;
+            margin-top: 10px;
+        }
+
+        .info-row {
+            padding: 12px 0;
+            border-bottom: 1px solid @borderColor;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-row h6 {
+            margin: 0;
+            font-size: 0.8rem;
+            color: @themeColor;
+            text-transform: uppercase;
+        }
+
+        .info-row p {
+            margin: 5px 0 0 0;
+            font-size: 0.9rem;
+            color: #333;
+        }
+
+        /* Botón imprimir */
+        .no-print {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .btn-print {
+            background-color: #333;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        @@media print {
+            body { background: none; padding: 0; }
+            .ficha-container { box-shadow: none; border: none; width: 100%; }
+            .no-print { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div>
+        <div class="ficha-container">
+            <div class="header">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/4/4b/Logo_UTN.png" alt="UTN" style="height:45px;" />
+                <h3>Universidad Técnica del Norte</h3>
+                <img src="https://i.imgur.com/Qh0FvP9.png" alt="Biotecnología" style="height:35px;" />
+            </div>
+
+            <div class="content-wrapper">
+                <!-- IZQUIERDA -->
+                <div class="left-col">
+                    <div class="titulo-seccion">Nombre Científico</div>
+                    <h1 class="nombre-cientifico">
+                        @(Model.Especie?.NombreCientifico ?? "N/A")
+                    </h1>
+                    
+                    @if(!isGreen) {
+                        <div class="nombre-comun">
+                            Nombre común: @(Model.Especie?.NombreComun ?? "N/A")
+                        </div>
+                    } else {
+                        <div class="nombre-comun">
+                            @(Model.Proyecto?.NombreProyecto ?? "N/A")
+                        </div>
+                    }
+
+                    @if(!string.IsNullOrEmpty(Model.UrlFotografia)) {
+                        <img src="@Model.UrlFotografia" class="img-planta" />
+                    } else {
+                        <div class="img-planta" style="display:flex; align-items:center; justify-content:center; background:#eee; border:none;">
+                            <span style="color:#aaa;">Sin fotografía</span>
+                        </div>
+                    }
+
+                    <div class="tags-row">
+                        <div class="tag-box">
+                            <h5>Categoría:</h5>
+                            <p>@(Model.Especie?.TipoPlanta?.Nombre ?? "Ornamental")</p>
+                        </div>
+                        <div class="tag-box">
+                            <h5>Código:</h5>
+                            <p style="color: @themeColor;">@Model.CodigoAsignado</p>
+                        </div>
+                    </div>
+
+                    <div class="info-rows" style="margin-top: 15px; border-top: 2px solid #ccc;">
+                        <div class="info-row">
+                            <h6>Procedencia:</h6>
+                            <p>@(string.IsNullOrEmpty(Model.Procedencia) ? "No especificada" : Model.Procedencia)</p>
+                        </div>
+                        <div class="info-row">
+                            <h6>Fecha de Colecta:</h6>
+                            <p>@(Model.FechaColecta?.ToString("dd/MM/yyyy") ?? "No registrada")</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DERECHA -->
+                <div class="right-col">
+                    <div class="titulo-seccion">Información Digital</div>
+                    <div class="qr-section">
+                        <div class="qr-box">
+                            <span style="font-size:0.7rem; color:#888;">SCAN ME</span>
+                            @if(!string.IsNullOrEmpty(Model.UrlQr)) {
+                                <img src="@Model.UrlQr" alt="QR Code" />
+                            } else {
+                                <div style="height:100px; line-height:100px; color:#aaa;">No QR</div>
+                            }
+                            <span style="font-size:0.7rem; color:#888;">SCAN ME</span>
+                        </div>
+                        <div class="accede-list">
+                            <h4>ACCEDE A:</h4>
+                            <ul>
+                                <li>Información de la especie</li>
+                                <li>Historial del cultivo</li>
+                                <li>Protocolos</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="info-rows">
+                        @if (isGreen)
+                        {
+                            <!-- CARPETA VERDE -->
+                            <div class="info-row">
+                                <h6>Proyecto UTN:</h6>
+                                <p>@Model.Proyecto?.Descripcion</p>
+                            </div>
+                            <div class="info-row">
+                                <h6>Tesista:</h6>
+                                <p>@(Model.Proyecto?.Tesista?.Nombres ?? "N/A") @(Model.Proyecto?.Tesista?.Apellidos)</p>
+                            </div>
+                            <div class="info-row">
+                                <h6>Director:</h6>
+                                <p>Prof. @(Model.Proyecto?.Director?.Nombres ?? "N/A") @(Model.Proyecto?.Director?.Apellidos)</p>
+                            </div>
+                        }
+                        else
+                        {
+                            <!-- CARPETA AZUL -->
+                            <div class="info-row">
+                                <h6>Docente:</h6>
+                                <p>Prof. @(Model.Proyecto?.Director?.Nombres ?? "N/A") @(Model.Proyecto?.Director?.Apellidos)</p>
+                            </div>
+                            <div class="info-row">
+                                <h6>Uso:</h6>
+                                <p>@(Model.Proyecto?.Uso ?? "Docencia")</p>
+                            </div>
+                            <div class="info-row">
+                                <h6>Estudiantes:</h6>
+                                <p>@(Model.Proyecto?.EstudiantesNombres ?? "N/A")</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="no-print">
+            <button class="btn-print" onclick="window.print()">🖨️ Imprimir Ficha</button>
+            <br/><br/>
+            <a href="javascript:history.back()" style="color:#555; text-decoration:none;">&larr; Volver</a>
+        </div>
+    </div>
+
+</body>
+</html>

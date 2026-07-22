@@ -1,0 +1,185 @@
+@{
+    ViewData["Title"] = "Acceso";
+    ViewData["HideSidebar"] = true; // Variable defined in _Layout.cshtml to hide sidebar
+}
+
+<style>
+    body {
+        background-color: white !important;
+    }
+    .login-container {
+        max-width: 440px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+        background: transparent;
+    }
+    .login-logo {
+        width: 70px;
+        height: 70px;
+        background-color: #F0F6F1;
+        color: #275432;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.2rem;
+        margin: 0 auto 1.5rem;
+    }
+    .login-title {
+        font-weight: 800;
+        font-size: 1.6rem;
+        color: #0A192F;
+        margin-bottom: 0.2rem;
+        text-align: center;
+    }
+    .login-subtitle {
+        color: #6B7A90;
+        font-size: 0.9rem;
+        text-align: center;
+        margin-bottom: 2.5rem;
+    }
+    .form-label-custom {
+        font-weight: 700;
+        color: #0A192F;
+        font-size: 0.85rem;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+    .input-wrapper {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+    .input-wrapper i {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #64748B;
+        font-size: 1.1rem;
+    }
+    .input-wrapper input {
+        width: 100%;
+        padding: 14px 15px 14px 45px;
+        border: 1px solid #E2E8F0;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        color: #334155;
+        transition: border-color 0.2s;
+    }
+    .input-wrapper input:focus {
+        border-color: #275432;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(39, 84, 50, 0.1);
+    }
+    .input-wrapper input::placeholder {
+        color: #94A3B8;
+    }
+    .btn-login {
+        background-color: #1E5128;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 14px;
+        width: 100%;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: background-color 0.2s;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 6px;
+    }
+    .btn-login:hover {
+        background-color: #153E1E;
+        color: white;
+    }
+    .divider-container {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        margin: 1.5rem 0;
+        color: #64748B;
+        font-size: 0.85rem;
+    }
+    .divider-container::before, .divider-container::after {
+        content: '';
+        flex: 1;
+        border-bottom: 1px solid #E2E8F0;
+    }
+    .divider-container:not(:empty)::before {
+        margin-right: .5em;
+    }
+    .divider-container:not(:empty)::after {
+        margin-left: .5em;
+    }
+    .btn-guest {
+        background-color: #E8F5E9;
+        color: #1E5128;
+        border: 1px solid #C8E6C9;
+        border-radius: 10px;
+        padding: 12px;
+        width: 100%;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: all 0.2s;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+    }
+    .btn-guest:hover {
+        background-color: #C8E6C9;
+    }
+    .login-footer {
+        text-align: center;
+        margin-top: 1rem;
+        font-size: 0.8rem;
+        color: #828C9A;
+    }
+</style>
+
+<div class="row justify-content-center align-items-center" style="min-height: 85vh;">
+    <div class="col-md-7 col-lg-5 col-xl-4">
+        <div class="login-container">
+            
+            <div class="login-logo">
+                <i class="bi bi-command"></i>
+            </div>
+            
+            <h2 class="login-title">Plataforma BIO UTN</h2>
+            <p class="login-subtitle">Acceso Seguro al Sistema Biotecnológico</p>
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="alert alert-danger bg-danger bg-opacity-10 border-danger text-danger py-2 small mb-4">
+                    <i class="bi bi-exclamation-triangle-fill me-1"></i> @ViewBag.Error
+                </div>
+            }
+
+            <form asp-action="Login" method="post">
+                <label class="form-label-custom">Usuario / Correo Institucional</label>
+                <div class="input-wrapper">
+                    <i class="bi bi-people"></i>
+                    <input type="email" name="email" placeholder="Tst. Apellido / ejemplo@utn.edu.ec" required />
+                </div>
+
+                <label class="form-label-custom">Contraseña</label>
+                <div class="input-wrapper">
+                    <i class="bi bi-key" style="color: #E59866; font-size: 1.2rem; transform: translateY(-50%) rotate(45deg);"></i>
+                    <input type="password" name="password" placeholder="••••••••••••" required />
+                </div>
+                
+                <div class="d-flex justify-content-end mb-3">
+                    <a asp-action="RecoverPassword" class="text-decoration-none text-success" style="font-size: 0.85rem; font-weight: 600;">¿Olvidó su contraseña?</a>
+                </div>
+
+                <button type="submit" class="btn-login shadow-sm">
+                    Ingresar al Sistema <i class="bi bi-chevron-right ms-1" style="font-size: 0.75rem; font-weight: bold;"></i>
+                </button>
+            </form>
+
+
+
+        </div>
+    </div>
+</div>

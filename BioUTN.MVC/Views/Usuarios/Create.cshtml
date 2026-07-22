@@ -1,0 +1,153 @@
+@model BioUTN.Modelos.Usuario
+
+@{
+    ViewData["Title"] = "Nuevo Usuario";
+}
+
+@section Styles {
+<style>
+    body { background-color: #f9fafb; font-family: 'Inter', -apple-system, sans-serif; }
+    .figma-container { padding: 40px 20px; max-width: 800px; margin: 0 auto; }
+    .figma-header { margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-end; }
+    .figma-title { font-size: 24px; font-weight: 700; color: #111827; margin-bottom: 0.25rem; }
+    .figma-subtitle { font-size: 14px; color: #6b7280; }
+    
+    .figma-btn-secondary { background-color: white; color: #374151; border: 1px solid #e5e7eb; padding: 0.5rem 1rem; border-radius: 8px; font-size: 14px; font-weight: 500; transition: all 0.2s; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; }
+    .figma-btn-secondary:hover { background-color: #f9fafb; color: #111827; }
+    .figma-btn-primary { background-color: #10b981; color: white; border: none; padding: 0.5rem 1.5rem; border-radius: 8px; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+    .figma-btn-primary:hover { background-color: #059669; }
+    
+    .figma-card { background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 2rem; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+    .figma-label { font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 0.5rem; display: block; }
+    .figma-input { width: 100%; padding: 0.625rem 0.75rem; border-radius: 0.5rem; border: 1px solid #e5e7eb; font-size: 14px; color: #111827; outline: none; transition: all 0.2s; }
+    .figma-input:focus { border-color: rgba(16, 185, 129, 0.6); box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2); }
+</style>
+}
+
+<div class="figma-container">
+    <div class="figma-header">
+        <div>
+            <h1 class="figma-title">Nuevo Usuario</h1>
+            <p class="figma-subtitle">Registrar personal, tesistas o docentes</p>
+        </div>
+        <div>
+            <a asp-action="Index" class="figma-btn-secondary">
+                <i class="bi bi-arrow-left"></i> Cancelar
+            </a>
+        </div>
+    </div>
+
+    <div class="figma-card">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3" style="font-size: 13px;"></div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Nombres" class="figma-label">Nombres *</label>
+                    <input asp-for="Nombres" class="figma-input" required />
+                    <span asp-validation-for="Nombres" class="text-danger small mt-1 d-block"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Apellidos" class="figma-label">Apellidos *</label>
+                    <input asp-for="Apellidos" class="figma-input" required />
+                    <span asp-validation-for="Apellidos" class="text-danger small mt-1 d-block"></span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="IdTipoIdentificacion" class="figma-label">Tipo de Identificación *</label>
+                    <select asp-for="IdTipoIdentificacion" class="figma-input form-select" asp-items="ViewBag.TiposIdentificacion" required>
+                        <option value="">-- Seleccionar --</option>
+                    </select>
+                    <span asp-validation-for="IdTipoIdentificacion" class="text-danger small mt-1 d-block"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="NumeroIdentificacion" class="figma-label">Número de Identificación *</label>
+                    <input asp-for="NumeroIdentificacion" class="figma-input" required />
+                    <span asp-validation-for="NumeroIdentificacion" class="text-danger small mt-1 d-block"></span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Email" class="figma-label">Correo Electrónico *</label>
+                    <input asp-for="Email" type="email" class="figma-input" required />
+                    <span asp-validation-for="Email" class="text-danger small mt-1 d-block"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Telefono" class="figma-label">Teléfono</label>
+                    <input asp-for="Telefono" class="figma-input" />
+                    <span asp-validation-for="Telefono" class="text-danger small mt-1 d-block"></span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="IdRol" class="figma-label">Rol del Sistema *</label>
+                    <select asp-for="IdRol" class="figma-input form-select" asp-items="ViewBag.Roles" required>
+                        <option value="">-- Seleccionar Rol --</option>
+                    </select>
+                    <span asp-validation-for="IdRol" class="text-danger small mt-1 d-block"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="IdGenero" class="figma-label">Género *</label>
+                    <select asp-for="IdGenero" class="figma-input form-select" asp-items="ViewBag.Generos" required>
+                        <option value="">-- Seleccionar --</option>
+                    </select>
+                    <span asp-validation-for="IdGenero" class="text-danger small mt-1 d-block"></span>
+                </div>
+            </div>
+
+            <div class="mb-4 pb-3" style="border-bottom: 1px solid #e5e7eb; background-color: #f8fafc; padding: 15px; border-radius: 8px;">
+                <div class="d-flex gap-3 align-items-center">
+                    <i class="bi bi-info-circle text-primary fs-4"></i>
+                    <div>
+                        <p class="mb-1" style="font-size: 13px; font-weight: 600; color: #1e293b;">Generación automática de contraseña</p>
+                        <p class="mb-0" style="font-size: 12px; color: #64748b;">La contraseña inicial del usuario se generará automáticamente con el formato: <strong>BIOU + [Número de Identificación]</strong>. El usuario podrá cambiarla posteriormente.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Valores Ocultos por defecto -->
+            <input type="hidden" asp-for="IntentosFallidos" value="0" />
+            <input type="hidden" asp-for="CuentaBloqueada" value="false" />
+            <input type="hidden" asp-for="Activo" value="true" />
+
+            <div class="d-flex justify-content-end gap-2 mt-4">
+                <button type="button" id="btnGuardar" class="figma-btn-primary">Registrar Usuario</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.getElementById('btnGuardar').addEventListener('click', function (e) {
+            e.preventDefault();
+            
+            var form = this.closest('form');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            Swal.fire({
+                title: '¿Registrar Usuario?',
+                text: "El usuario recibirá acceso al sistema con el rol asignado.",
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#10b981',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Sí, Registrar',
+                cancelButtonText: 'Revisar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            })
+        });
+    </script>
+}

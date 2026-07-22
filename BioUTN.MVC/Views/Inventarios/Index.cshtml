@@ -1,0 +1,171 @@
+@{
+    ViewData["Title"] = "Gestión de Inventario";
+}
+
+<style>
+    .kardex-card {
+        background-color: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        padding: 20px;
+        display: flex;
+        align-items: flex-start;
+        transition: all 0.2s ease-in-out;
+        text-decoration: none;
+        color: inherit;
+        position: relative;
+        cursor: pointer;
+    }
+
+    .kardex-card:hover {
+        border-color: #d1d5db;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    .icon-container {
+        position: relative;
+        width: 60px;
+        height: 60px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 20px;
+        flex-shrink: 0;
+    }
+
+    .icon-container.light-blue {
+        background-color: #e0f8f5;
+        color: #008b8b;
+        font-size: 24px;
+    }
+
+    .icon-container.light-orange {
+        background-color: #fdf5e6;
+        color: #d97706;
+        font-size: 24px;
+    }
+
+    .number-badge {
+        position: absolute;
+        top: -8px;
+        left: -8px;
+        background-color: #1b5e20;
+        color: white;
+        font-size: 12px;
+        font-weight: bold;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid white;
+    }
+
+    .card-content {
+        flex-grow: 1;
+    }
+
+    .card-title-custom {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 6px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .card-title-custom i.fa-chevron-right {
+        color: #9ca3af;
+        font-size: 14px;
+    }
+
+    .card-description {
+        font-size: 0.9rem;
+        color: #6b7280;
+        margin-bottom: 15px;
+        line-height: 1.5;
+    }
+
+    .bottom-badge {
+        display: inline-block;
+        background-color: #f3f4f6;
+        color: #4b5563;
+        font-size: 0.75rem;
+        font-weight: 500;
+        padding: 4px 12px;
+        border-radius: 20px;
+    }
+</style>
+
+<div class="container mt-5" style="max-width: 900px;">
+    <div class="mb-4">
+        <h5 class="text-uppercase fw-bold" style="color: #6b7280; letter-spacing: 1px; font-size: 0.9rem;">GESTIÓN DE MATERIALES</h5>
+    </div>
+
+    <div class="row g-4">
+        <!-- Card 1: Insumos y Stock -->
+        <div class="col-md-6">
+            <a asp-controller="Reactivos" asp-action="Index" class="kardex-card">
+                <div class="icon-container light-blue">
+                    <div class="number-badge">1</div>
+                    <i class="bi bi-basket3"></i>
+                </div>
+                <div class="card-content">
+                    <div class="card-title-custom">
+                        Insumos y Stock
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </div>
+                    <div class="card-description">
+                        Ver stock, registrar ingresos/egresos (Kardex) y gestionar materiales propios de tesis.
+                    </div>
+                    <div class="bottom-badge">Stock y Kardex</div>
+                </div>
+            </a>
+        </div>
+
+
+        <!-- Card 3: Unidades de Medida -->
+        <div class="col-md-6">
+            <a asp-controller="UnidadesMedida" asp-action="Index" class="kardex-card">
+                <div class="icon-container" style="background-color: #f3e8ff; color: #7e22ce; font-size: 24px;">
+                    <div class="number-badge" style="background-color: #581c87;">2</div>
+                    <i class="bi bi-rulers"></i>
+                </div>
+                <div class="card-content">
+                    <div class="card-title-custom">
+                        Unidades de Medida
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </div>
+                    <div class="card-description">
+                        Gestionar el catálogo de unidades y sus factores de conversión para el inventario.
+                    </div>
+                    <div class="bottom-badge">Solo Administradores</div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Card 4: Implementos de Laboratorio -->
+        <div class="col-md-6">
+            <a asp-controller="Implementos" asp-action="Index" class="kardex-card">
+                <div class="icon-container" style="background-color: #f0fdfa; color: #0f766e; font-size: 24px;">
+                    <div class="number-badge" style="background-color: #115e59;">4</div>
+                    <i class="bi bi-tools"></i>
+                </div>
+                <div class="card-content">
+                    <div class="card-title-custom">
+                        Implementos de Lab
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </div>
+                    <div class="card-description">
+                        Materiales y herramientas como cucharas, pinzas, frascos, etc.
+                    </div>
+                    <div class="bottom-badge">Inventario Físico</div>
+                </div>
+            </a>
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,359 @@
+@model BioUTN.Modelos.LoteCultivo
+
+@{
+    ViewData["Title"] = "Nueva Siembra / Lote de Cultivo";
+}
+
+@section Styles {
+<style>
+    .figma-container { font-family: 'Inter', -apple-system, sans-serif; background-color: #f9fafb; padding: 20px; border-radius: 12px; }
+    .figma-card { background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 0.75rem; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); padding: 1.5rem; }
+    .figma-label { font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 0.5rem; display: block; }
+    .figma-input { width: 100%; padding: 0.625rem 0.75rem; border-radius: 0.5rem; border: 1px solid #e5e7eb; font-size: 14px; color: #111827; outline: none; transition: all 0.2s; background-color: #ffffff; }
+    .figma-input:focus { border-color: rgba(16, 185, 129, 0.6); box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2); }
+    .figma-btn-primary { background-color: #10b981; color: white; border: none; padding: 0.625rem 1.25rem; border-radius: 0.5rem; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+    .figma-btn-primary:hover { background-color: #059669; color: white; }
+    .figma-btn-secondary { background-color: white; color: #374151; border: 1px solid #e5e7eb; padding: 0.625rem 1.25rem; border-radius: 0.5rem; font-size: 14px; font-weight: 500; transition: all 0.2s; text-decoration: none; display: inline-flex; align-items: center; }
+    .figma-btn-secondary:hover { background-color: #f9fafb; color: #111827; }
+
+    .code-preview-box {
+        background: #111827;
+        border: 1px solid rgba(16,185,129,0.3);
+        border-radius: 0.75rem;
+        padding: 1.2rem 1.5rem;
+        font-family: 'Courier New', monospace;
+        font-size: 1.1rem;
+        color: #34d399;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-align: center;
+        min-height: 56px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s;
+    }
+    .code-preview-box.empty { color: rgba(255,255,255,0.4); font-size: 0.85rem; letter-spacing: 0; }
+    .resiembra-alert {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        border-radius: 0.5rem;
+        padding: 0.75rem 1rem;
+        font-size: 0.85rem;
+        color: #ef4444;
+        display: none;
+    }
+    .resiembra-alert.visible { display: flex; gap: 0.5rem; align-items: center; }
+
+    .section-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        color: #6b7280;
+        margin-bottom: 1rem;
+        margin-top: 1.5rem;
+        padding-bottom: 0.4rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    .section-label:first-of-type { margin-top: 0; }
+</style>
+}
+
+<div class="figma-container">
+    <div class="mb-4">
+        <h3 style="font-weight: 700; color: #111827; font-size: 18px;">
+            @(Model?.IdLotePadre.HasValue == true ? "Nueva Resiembra (Sub-Lote)" : "Nueva Siembra")
+        </h3>
+        <p class="text-muted" style="font-size: 13px;">El código de trazabilidad se generará automáticamente al completar el formulario.</p>
+        
+        @if (ViewBag.LotePadreInfo != null)
+        {
+            <div class="alert alert-info mt-2" style="font-size: 14px; background-color: #eff6ff; border-color: #bfdbfe; color: #1d4ed8;">
+                <i class="bi bi-diagram-3-fill me-2"></i> Creando resiembra a partir del Lote Padre: <strong>@ViewBag.LotePadreInfo</strong>
+            </div>
+        }
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="figma-card">
+                <form asp-action="Create" id="siembraForm" class="space-y-4">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3" style="font-size: 13px;"></div>
+                    
+                    @if (Model?.IdLotePadre.HasValue == true)
+                    {
+                        <input type="hidden" asp-for="IdLotePadre" />
+                    }
+
+                    <!-- SECCIÓN 1: Origen Biológico -->
+                    <div class="section-label">1 · Origen Biológico</div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="IdPlantaMadre" class="figma-label">Planta Madre *</label>
+                            @if (Model?.IdLotePadre.HasValue == true)
+                            {
+                                <select asp-for="IdPlantaMadre" id="selPlantaMadre" class="figma-input form-select" required disabled>
+                                    <option value="">-- Seleccionar Planta Madre --</option>
+                                    @if (ViewBag.PlantaMadres != null) {
+                                        foreach(var item in ViewBag.PlantaMadres as SelectList) {
+                                            <option value="@item.Value" data-codigo="@item.Text">@item.Text</option>
+                                        }
+                                    }
+                                </select>
+                            }
+                            else
+                            {
+                                <select asp-for="IdPlantaMadre" id="selPlantaMadre" class="figma-input form-select" required onchange="updateCode()">
+                                    <option value="">-- Seleccionar Planta Madre --</option>
+                                    @if (ViewBag.PlantaMadres != null) {
+                                        foreach(var item in ViewBag.PlantaMadres as SelectList) {
+                                            <option value="@item.Value" data-codigo="@item.Text">@item.Text</option>
+                                        }
+                                    }
+                                </select>
+                            }
+
+                            @if (Model?.IdLotePadre.HasValue == true)
+                            {
+                                <input type="hidden" asp-for="IdPlantaMadre" />
+                                
+                                <div class="mt-3">
+                                    <label asp-for="IdUnidadFrascoOrigen" class="figma-label" style="color: #6366f1;">
+                                        <i class="bi bi-bezier2"></i> Frasco Origen (Opcional)
+                                    </label>
+                                    <select asp-for="IdUnidadFrascoOrigen" class="figma-input form-select" asp-items="ViewBag.FrascosOrigen">
+                                        <option value="">-- Seleccionar Frasco del Lote Padre --</option>
+                                    </select>
+                                    <span asp-validation-for="IdUnidadFrascoOrigen" class="text-danger small mt-1 d-block"></span>
+                                </div>
+                            }
+                            <span asp-validation-for="IdPlantaMadre" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="IdUsuario" class="figma-label">Usuario Responsable *</label>
+                            <select asp-for="IdUsuario" class="figma-input form-select" asp-items="ViewBag.Usuarios" required>
+                                <option value="">-- Seleccionar Responsable --</option>
+                            </select>
+                            <span asp-validation-for="IdUsuario" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                    </div>
+
+                    <!-- SECCIÓN 2: Detalles del Lote -->
+                    <div class="section-label">2 · Detalles del Lote</div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="figma-label">Número de Resiembra (R)</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-secondary text-muted"><i class="bi bi-arrow-repeat"></i></span>
+                                <input type="number" name="NumeroRepique" id="numRepique" class="form-control figma-input" min="0" max="10" value="@(Model?.NumeroRepique ?? 0)" required onchange="updateCode()" oninput="checkRepique(this)" @(Model?.IdLotePadre.HasValue == true ? "readonly" : "")>
+                            </div>
+                            <div class="resiembra-alert mt-2" id="repAlert">
+                                <i class="bi bi-exclamation-triangle-fill"></i>
+                                <span>¡LÍMITE GENÉTICO! En R10 se deben introducir tejidos nuevos para evitar mutaciones.</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="figma-label">Fecha de Siembra</label>
+                            <input type="date" asp-for="FechaSiembra" class="figma-input" required />
+                            <span asp-validation-for="FechaSiembra" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="IdMedioCultivo" class="figma-label">Medio de Cultivo *</label>
+                            <select asp-for="IdMedioCultivo" id="selMedio" class="figma-input form-select" required onchange="updateCode()">
+                                <option value="">-- Seleccionar Medio --</option>
+                                @if (ViewBag.MediosCultivo != null) {
+                                    foreach(var item in ViewBag.MediosCultivo as SelectList) {
+                                        <option value="@item.Value" data-cod="MS@(item.Value)">@item.Text</option>
+                                    }
+                                }
+                            </select>
+                            <span asp-validation-for="IdMedioCultivo" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="IdProyecto" class="figma-label">Proyecto *</label>
+                            @if (Model?.IdLotePadre.HasValue == true)
+                            {
+                                <select asp-for="IdProyecto" class="figma-input form-select" asp-items="ViewBag.Proyectos" required disabled>
+                                    <option value="">-- Seleccionar Proyecto --</option>
+                                </select>
+                            }
+                            else
+                            {
+                                <select asp-for="IdProyecto" class="figma-input form-select" asp-items="ViewBag.Proyectos" required>
+                                    <option value="">-- Seleccionar Proyecto --</option>
+                                </select>
+                            }
+                            @if (Model?.IdLotePadre.HasValue == true)
+                            {
+                                <input type="hidden" asp-for="IdProyecto" />
+                            }
+                            <span asp-validation-for="IdProyecto" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="TotalUnidades" class="figma-label">Total Unidades (Frascos)</label>
+                            <input type="number" asp-for="TotalUnidades" class="figma-input" min="1" id="numFrascos" onchange="updateCode()" required />
+                            <span asp-validation-for="TotalUnidades" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="IdFaseCultivo" class="figma-label">Fase de Desarrollo *</label>
+                            <select asp-for="IdFaseCultivo" class="figma-input form-select" asp-items="ViewBag.FasesCultivo" required>
+                                <option value="">-- Seleccionar Fase --</option>
+                            </select>
+                            <span asp-validation-for="IdFaseCultivo" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="TipoExplante" class="figma-label">Tipo de Explante *</label>
+                            <input asp-for="TipoExplante" class="figma-input" placeholder="Ej: Yema apical, Nudo..." required />
+                            <span asp-validation-for="TipoExplante" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="ExplantesPorUnidad" class="figma-label">Explantes por Frasco *</label>
+                            <input asp-for="ExplantesPorUnidad" type="number" class="figma-input" min="1" value="1" required />
+                            <span asp-validation-for="ExplantesPorUnidad" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="FrecuenciaMonitoreoDias" class="figma-label">Frecuencia de Monitoreo (Días) *</label>
+                            <select asp-for="FrecuenciaMonitoreoDias" class="figma-input form-select" required>
+                                <option value="7">Cada 7 días (Estándar)</option>
+                                <option value="10">Cada 10 días</option>
+                                <option value="15">Cada 15 días</option>
+                            </select>
+                            <span asp-validation-for="FrecuenciaMonitoreoDias" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="IdDocumentoProtocolo" class="figma-label">Protocolo a Seguir (Biblioteca)</label>
+                            <select asp-for="IdDocumentoProtocolo" class="figma-input form-select" asp-items="ViewBag.Documentos">
+                                <option value="">-- Seleccionar Protocolo --</option>
+                            </select>
+                            <span asp-validation-for="IdDocumentoProtocolo" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                    </div>
+
+                    <!-- SECCIÓN 3: Ubicación Física -->
+                    <div class="section-label">3 · Ubicación en el Laboratorio</div>
+                    <div class="mb-3">
+                        <label asp-for="IdUbicacionFisica" class="figma-label">Anaquel / Posición (ID) *</label>
+                        <select asp-for="IdUbicacionFisica" class="figma-input form-select" asp-items="ViewBag.UbicacionesFisicas" required>
+                            <option value="">-- Seleccionar Ubicación --</option>
+                        </select>
+                        <span asp-validation-for="IdUbicacionFisica" class="text-danger small mt-1 d-block"></span>
+                    </div>
+
+                    <!-- Código de Trazabilidad (auto-generado) -->
+                    <div class="section-label">4 · Código de Trazabilidad (Automático)</div>
+                    <div class="mb-1 text-muted small">El código se genera automáticamente al completar los campos. No modifiques manualmente.</div>
+                    <div class="code-preview-box empty mb-3" id="codePreview">
+                        Completa los campos para ver el código
+                    </div>
+                    <input type="hidden" asp-for="CodigoTrazabilidad" id="hiddenCode" value="" />
+
+                    <div class="d-flex justify-content-end gap-2 mt-4 pt-3" style="border-top: 1px solid #e5e7eb;">
+                        <a asp-action="Index" class="figma-btn-secondary">Cancelar</a>
+                        <button type="submit" class="figma-btn-primary">Registrar Siembra</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel lateral informativo -->
+    <div class="col-lg-4">
+        <div class="figma-card p-4 mb-3 sticky-top" style="top: 80px;">
+            <h6 class="text-muted text-uppercase fw-bold small mb-3">
+                <i class="bi bi-info-circle me-1"></i> Guía de Codificación
+            </h6>
+            <div class="mb-3 p-3 rounded" style="background:#111827; font-family: 'Courier New'; color: #34d399; font-weight:700; letter-spacing: 1px;">
+                C-NUB-PM1-F20-R2
+            </div>
+            <div style="font-size: 0.78rem; color: #6b7280;">
+                <div class="d-flex gap-2 mb-2"><span class="badge bg-success bg-opacity-25 text-success">C-NUB</span><span>Código de especie</span></div>
+                <div class="d-flex gap-2 mb-2"><span class="badge bg-info bg-opacity-25 text-info">PM1</span><span>Planta madre</span></div>
+                <div class="d-flex gap-2 mb-2"><span class="badge bg-primary bg-opacity-25 text-primary">F20</span><span>Total de frascos</span></div>
+                <div class="d-flex gap-2 mb-2"><span class="badge bg-warning bg-opacity-25 text-warning">R2</span><span>Número de resiembra</span></div>
+            </div>
+
+            <hr class="my-4" style="border-color: #e5e7eb;">
+
+            <div class="p-3 rounded mb-3" style="background:#fef2f2; border:1px solid #fecaca; font-size:0.8rem; color:#ef4444;">
+                <i class="bi bi-exclamation-triangle me-1"></i>
+                <strong>Regla biológica:</strong> Máximo 10 resiembras. En R10, reintroducir tejido fresco de invernadero.
+            </div>
+            <div class="p-3 rounded" style="background:#fffbeb; border:1px solid #fde68a; font-size:0.8rem; color:#d97706;">
+                <i class="bi bi-clock me-1"></i>
+                <strong>Monitoreo:</strong> Revisar a las 24h (bacterias) y a los 7 días (hongos) después de la siembra.
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+<script>
+    function updateCode() {
+        const pmSel = document.getElementById('selPlantaMadre');
+        const medioSel = document.getElementById('selMedio');
+        const repique = document.getElementById('numRepique').value;
+
+        const pmOpt = pmSel.options[pmSel.selectedIndex];
+        const medioOpt = medioSel.options[medioSel.selectedIndex];
+
+        // Se usa data-codigo para extraer el CodigoEstricto si existiera, o se deja genérico
+        const pmCod = pmSel.value ? 'PM' + pmSel.value : '';
+        const lCod = 'L#'; // Lote Auto-generado por el servidor
+        const rCod = repique !== '' ? 'R' + repique : '';
+        const msCod = medioOpt && medioOpt.dataset.cod ? medioOpt.dataset.cod : '';
+
+        const preview = document.getElementById('codePreview');
+        const hidden = document.getElementById('hiddenCode');
+
+        if (pmCod && rCod && msCod) {
+            const code = '[ESP]-' + pmCod + '-' + lCod + '-' + rCod + '-' + msCod;
+            preview.textContent = code;
+            preview.classList.remove('empty');
+            // El hidden value ya no es estrictamente necesario porque el servidor lo generará, pero lo dejamos vacío
+            hidden.value = ''; 
+        } else {
+            const parts = [
+                '[ESP]',
+                pmCod || '[PM#]',
+                lCod,
+                rCod || '[R#]',
+                msCod || '[MS#]'
+            ];
+            preview.textContent = parts.join('-');
+            preview.classList.add('empty');
+            hidden.value = '';
+        }
+    }
+
+    function checkRepique(el) {
+        const val = parseInt(el.value);
+        const alert = document.getElementById('repAlert');
+        if (val >= 10) {
+            alert.classList.add('visible');
+        } else {
+            alert.classList.remove('visible');
+        }
+        updateCode();
+    }
+
+    // Inicializar con fecha de hoy
+    document.querySelector('[name="FechaSiembra"]').valueAsDate = new Date();
+    updateCode();
+</script>
+}

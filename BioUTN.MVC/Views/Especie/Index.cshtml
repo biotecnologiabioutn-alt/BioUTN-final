@@ -1,0 +1,205 @@
+@model IEnumerable<BioUTN.MVC.Models.EspecieViewModel>
+@{
+    ViewData["Title"] = "Catálogo Taxonómico";
+}
+
+<div class="container mt-4 pb-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="position-relative flex-grow-1 me-3">
+            <i class="fas fa-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+            <input type="text" id="searchInput" class="form-control ps-5" placeholder="Buscar por código o nombre científico..." onkeyup="filterEspecies()">
+        </div>
+        <!-- Botón que abre el modal en vez de ir a otra vista -->
+        <button class="btn btn-primary-utn text-nowrap" data-bs-toggle="modal" data-bs-target="#especieModal" onclick="prepararCrear()">
+            <i class="fas fa-plus"></i> Nueva Especie
+        </button>
+    </div>
+
+    <div class="row" id="especiesContainer">
+        @foreach (var sp in Model)
+        {
+            var badgeIucn = sp.EstadoIucn == "CR" ? "bg-danger" : (sp.EstadoIucn == "NT" ? "bg-warning text-dark" : "bg-success");
+            
+            <div class="col-12 mb-3 especie-card" id="card-@sp.CodigoInterno">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <span class="badge bg-light">@sp.CodigoInterno</span>
+                                <span class="badge @badgeIucn ms-1" title="Estado IUCN">@sp.EstadoIucn</span>
+                            </div>
+                            <div>
+                                <button class="btn btn-sm btn-light text-primary" title="Editar" onclick="abrirEditar('@sp.CodigoInterno', '@sp.NombreCientifico', '@sp.Familia', '@sp.NombreComun', '@sp.CategoriaBiotecnologica', '@sp.EstadoIucn')"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-sm btn-light text-danger" title="Eliminar" onclick="intentarBorrar('@sp.CodigoInterno', '@sp.NombreCientifico', @sp.LotesVinculados)"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                        <h5 class="card-title fst-italic mb-1 especie-nombre">@sp.NombreCientifico</h5>
+                        <p class="card-text text-muted small mb-2">@sp.Familia | @sp.NombreComun</p>
+                        <div class="d-flex gap-2">
+                            <span class="badge bg-light text-dark border">@sp.CategoriaBiotecnologica</span>
+                            <span class="badge bg-light text-dark border"><i class="fas fa-layer-group"></i> Lotes: @sp.LotesVinculados</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Modal CRUD Especie -->
+<div class="modal fade" id="especieModal" tabindex="-1" aria-labelledby="especieModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title fw-bold" id="especieModalLabel">Nueva Especie</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formEspecie">
+                    <input type="hidden" id="modalModo" value="crear">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label small fw-bold">Código Interno Estricto (5 caracteres)</label>
+                            <input type="text" class="form-control" id="modCodigo" placeholder="Ej. C-NUB" maxlength="5" style="text-transform:uppercase" required>
+                            <small class="text-muted">Prohibido texto libre o iniciales informales.</small>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label small fw-bold">Nombre Científico</label>
+                            <input type="text" class="form-control fst-italic" id="modCientifico" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label small fw-bold">Familia</label>
+                            <input type="text" class="form-control" id="modFamilia" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label small fw-bold">Nombre Común</label>
+                            <input type="text" class="form-control" id="modComun" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label small fw-bold">Categoría</label>
+                            <select class="form-select" id="modCat" required>
+                                <option value="Ornamental">Ornamental</option>
+                                <option value="Alimenticia">Alimenticia</option>
+                                <option value="Medicinal">Medicinal</option>
+                                <option value="Amenazada">Amenazada</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label small fw-bold">Estado IUCN</label>
+                            <select class="form-select" id="modIucn" required>
+                                <option value="LC">LC - Preocupación Menor</option>
+                                <option value="NT">NT - Casi Amenazada</option>
+                                <option value="CR">CR - Peligro Crítico</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary-utn" onclick="guardarEspecie()">Guardar Cambios</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- LEY DE FITTS: Toast Undo -->
+<div id="undoToastEspecie" class="fixed-bottom w-100 d-flex justify-content-center p-3" style="z-index: 2000; bottom: 20px; display: none !important; pointer-events: none;">
+    <div class="bg-light text-dark px-4 py-3 rounded shadow-lg d-flex justify-content-between align-items-center w-100" style="max-width: 400px; pointer-events: auto;">
+        <span id="undoMessageEspecie">Especie inactivada.</span>
+        <button class="btn btn-link text-warning fw-bold text-uppercase text-decoration-none p-0 ms-3" onclick="deshacerInactivar()">Deshacer</button>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function filterEspecies() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.especie-card');
+            
+            cards.forEach(card => {
+                const codigo = card.querySelector('.bg-light').innerText.toLowerCase();
+                const nombre = card.querySelector('.especie-nombre').innerText.toLowerCase();
+                
+                if (codigo.includes(query) || nombre.includes(query)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function prepararCrear() {
+            document.getElementById('formEspecie').reset();
+            document.getElementById('modalModo').value = 'crear';
+            document.getElementById('especieModalLabel').innerText = 'Nueva Especie';
+            document.getElementById('modCodigo').readOnly = false;
+        }
+
+        function abrirEditar(codigo, cientifico, familia, comun, cat, iucn) {
+            document.getElementById('formEspecie').reset();
+            document.getElementById('modalModo').value = 'editar';
+            document.getElementById('especieModalLabel').innerText = 'Editar Especie: ' + codigo;
+            
+            document.getElementById('modCodigo').value = codigo;
+            document.getElementById('modCodigo').readOnly = true;
+            document.getElementById('modCientifico').value = cientifico;
+            document.getElementById('modFamilia').value = familia;
+            document.getElementById('modComun').value = comun;
+            document.getElementById('modCat').value = cat;
+            document.getElementById('modIucn').value = iucn;
+            
+            var myModal = new bootstrap.Modal(document.getElementById('especieModal'));
+            myModal.show();
+        }
+
+        function guardarEspecie() {
+            const form = document.getElementById('formEspecie');
+            if(!form.checkValidity()){
+                form.reportValidity();
+                return;
+            }
+            const modo = document.getElementById('modalModo').value;
+            alert(modo === 'crear' ? 'Nueva especie registrada exitosamente con nomenclatura estricta.' : 'Especie actualizada.');
+            var myModal = bootstrap.Modal.getInstance(document.getElementById('especieModal'));
+            myModal.hide();
+        }
+
+        let idInactivado = null;
+        let htmlInactivado = null;
+        let undoTimeoutEspecie;
+
+        function intentarBorrar(codigo, nombre, lotes) {
+            if (lotes > 0) {
+                alert(`REGLA DE NEGOCIO: No se puede eliminar "${nombre}" porque tiene ${lotes} lote(s) vinculados (historial inmutable).`);
+            } else {
+                const card = document.getElementById('card-' + codigo);
+                htmlInactivado = card.innerHTML;
+                idInactivado = codigo;
+                
+                card.style.display = 'none';
+                
+                const toast = document.getElementById('undoToastEspecie');
+                document.getElementById('undoMessageEspecie').innerText = `Especie ${codigo} inactivada.`;
+                toast.style.setProperty('display', 'flex', 'important');
+                
+                clearTimeout(undoTimeoutEspecie);
+                undoTimeoutEspecie = setTimeout(() => {
+                    toast.style.setProperty('display', 'none', 'important');
+                    idInactivado = null;
+                }, 5000);
+            }
+        }
+
+        function deshacerInactivar() {
+            if (idInactivado) {
+                const card = document.getElementById('card-' + idInactivado);
+                card.style.display = 'block';
+                card.innerHTML = htmlInactivado;
+                
+                document.getElementById('undoToastEspecie').style.setProperty('display', 'none', 'important');
+                idInactivado = null;
+            }
+        }
+    </script>
+}

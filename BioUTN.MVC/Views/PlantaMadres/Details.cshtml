@@ -1,0 +1,177 @@
+@model BioUTN.Modelos.PlantaMadre
+
+@{
+    ViewData["Title"] = "Detalles de Planta Madre";
+}
+
+@section Styles {
+<style>
+    .figma-container { font-family: 'Inter', -apple-system, sans-serif; background-color: #f9fafb; padding: 20px; border-radius: 12px; }
+    .figma-card { background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 0.75rem; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); padding: 1.5rem; }
+    .figma-title { font-size: 1.125rem; font-weight: 700; color: #111827; margin-bottom: 1rem; border-bottom: 1px solid #f3f4f6; padding-bottom: 0.5rem; }
+    .detail-label { font-size: 13px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.025em; margin-bottom: 0.25rem; }
+    .detail-value { font-size: 14px; font-weight: 500; color: #111827; margin-bottom: 1.25rem; }
+    .badge-status { display: inline-block; padding: 0.25rem 0.75rem; font-size: 12px; font-weight: 600; border-radius: 9999px; background-color: #d1fae5; color: #065f46; }
+    .badge-status-enfermo { background-color: #fef2f2; color: #b91c1c; }
+    .badge-status-regular { background-color: #fffbeb; color: #b45309; }
+    .figma-btn-secondary { background-color: white; color: #374151; border: 1px solid #e5e7eb; padding: 0.5rem 1rem; border-radius: 0.5rem; font-size: 14px; font-weight: 500; transition: all 0.2s; text-decoration: none; display: inline-block; }
+    .figma-btn-secondary:hover { background-color: #f9fafb; color: #111827; }
+    .figma-btn-primary { background-color: #10b981; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; font-size: 14px; font-weight: 500; transition: all 0.2s; text-decoration: none; display: inline-block; }
+    .figma-btn-primary:hover { background-color: #059669; color: white; }
+</style>
+}
+
+<div class="figma-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 style="font-weight: 700; color: #111827; font-size: 20px; margin-bottom: 0;">Planta Madre: @Model.CodigoAsignado</h3>
+            <p class="text-muted mb-0" style="font-size: 13px;">Espécimen élite - Código completo: @((Model.Especie != null) ? $"{Model.Especie.CodigoEstricto}-{Model.CodigoAsignado}" : Model.CodigoAsignado)</p>
+        </div>
+        <div class="gap-2 d-flex">
+            <a asp-action="Index" class="figma-btn-secondary">Volver al listado</a>
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="figma-btn-primary">
+                <i class="bi bi-pencil-square me-1"></i> Editar Planta
+            </a>
+            <a asp-action="Ficha" asp-route-id="@Model.Id" class="figma-btn-secondary" style="color: #0d6efd;" target="_blank">
+                <i class="bi bi-printer me-1"></i> Generar Ficha
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="figma-card h-100">
+                <h4 class="figma-title">Información Principal</h4>
+                
+                <div class="row">
+                    <div class="col-6">
+                        <div class="detail-label">Código Asignado</div>
+                        <div class="detail-value font-mono">@Model.CodigoAsignado</div>
+                    </div>
+                    <div class="col-6">
+                        <div class="detail-label">Especie Asociada</div>
+                        <div class="detail-value">@(Model.Especie?.NombreCientifico ?? "N/A")</div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-6">
+                        <div class="detail-label">Proyecto Asociado</div>
+                        <div class="detail-value">@(Model.Proyecto?.NombreProyecto ?? "N/A")</div>
+                    </div>
+                    <div class="col-6">
+                        <div class="detail-label">Estado Fitosanitario</div>
+                        <div class="detail-value">
+                            @{
+                                var fitosanitarioClass = "badge-status";
+                                var fito = Model.EstadoFitosanitario?.ToLower() ?? "";
+                                if (fito.Contains("enfermo") || fito.Contains("plaga") || fito.Contains("hongo"))
+                                {
+                                    fitosanitarioClass = "badge-status badge-status-enfermo";
+                                }
+                                else if (fito.Contains("regular") || fito.Contains("observacion"))
+                                {
+                                    fitosanitarioClass = "badge-status badge-status-regular";
+                                }
+                            }
+                            <span class="@fitosanitarioClass">@Model.EstadoFitosanitario</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-6">
+                        <div class="detail-label">Técnico / Registrador</div>
+                        <div class="detail-value">@(Model.Usuario?.Nombres ?? "N/A") @(Model.Usuario?.Apellidos)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="figma-card h-100">
+                <h4 class="figma-title">Información del Explante Introducido</h4>
+
+                <div class="row mt-3">
+                    <div class="col-6">
+                        <div class="detail-label">Fecha de Introducción</div>
+                        <div class="detail-value">@Model.FechaRecepcion.ToString("dd/MM/yyyy")</div>
+                    </div>
+                    <div class="col-6">
+                        <div class="detail-label">Responsable de Introducción</div>
+                        <div class="detail-value">@(Model.ResponsableIntroduccion?.Nombres ?? "N/A") @(Model.ResponsableIntroduccion?.Apellidos)</div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <div class="detail-label">Protocolo de Introducción</div>
+                        <div class="detail-value">@(Model.Protocolo?.Titulo ?? "Ninguno seleccionado")</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="figma-card h-100">
+                <h4 class="figma-title">Origen y Colecta</h4>
+                
+                <div class="row">
+                    <div class="col-12">
+                        <div class="detail-label">Procedencia (Lugar de Colecta)</div>
+                        <div class="detail-value">@(string.IsNullOrEmpty(Model.Procedencia) ? "N/A" : Model.Procedencia)</div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-4">
+                        <div class="detail-label">Fecha de Colecta</div>
+                        <div class="detail-value">@(Model.FechaColecta.HasValue ? Model.FechaColecta.Value.ToString("dd/MM/yyyy") : "N/A")</div>
+                    </div>
+                    <div class="col-6">
+                        <div class="detail-label">Responsable de Colecta</div>
+                        <div class="detail-value">@(Model.ResponsableColecta?.Nombres ?? "N/A") @(Model.ResponsableColecta?.Apellidos)</div>
+                    </div>
+                </div>
+                
+                <div class="row mt-3">
+                    <div class="col-6">
+                        <div class="detail-label">Herbario de Referencia</div>
+                        <div class="detail-value">@(string.IsNullOrEmpty(Model.HerbarioReferencia) ? "N/A" : Model.HerbarioReferencia)</div>
+                    </div>
+                    <div class="col-6">
+                        <div class="detail-label">Permiso Ambiental</div>
+                        <div class="detail-value">@(Model.DocumentoPermiso?.Titulo ?? "Sin adjunto")</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="figma-card h-100">
+                <h4 class="figma-title">Observaciones</h4>
+                <div class="detail-value mb-0" style="white-space: pre-line;">
+                    @(string.IsNullOrEmpty(Model.Observaciones) ? "Sin observaciones registradas." : Model.Observaciones)
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="figma-card h-100">
+                <h4 class="figma-title">Fotografía</h4>
+                @if (!string.IsNullOrEmpty(Model.UrlFotografia))
+                {
+                    <div class="text-center">
+                        <img src="@Model.UrlFotografia" alt="Foto Planta Madre" style="max-width: 100%; border-radius: 8px; max-height: 250px; object-fit: cover; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);" />
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center text-muted p-4" style="background-color: #f3f4f6; border-radius: 8px;">
+                        <i class="bi bi-image" style="font-size: 2rem;"></i>
+                        <p class="mt-2 mb-0" style="font-size: 13px;">Sin imagen disponible</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

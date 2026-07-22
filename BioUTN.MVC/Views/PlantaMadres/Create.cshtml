@@ -1,0 +1,283 @@
+@model BioUTN.Modelos.PlantaMadre
+
+@{
+    ViewData["Title"] = "Registro de Planta Madre";
+}
+
+@section Styles {
+<style>
+    .figma-container { font-family: 'Inter', -apple-system, sans-serif; background-color: #f9fafb; padding: 20px; border-radius: 12px; }
+    .figma-card { background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 0.75rem; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); padding: 1.5rem; }
+    .figma-label { font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 0.5rem; display: block; }
+    .figma-input { width: 100%; padding: 0.625rem 0.75rem; border-radius: 0.5rem; border: 1px solid #e5e7eb; font-size: 14px; color: #111827; outline: none; transition: all 0.2s; background-color: #ffffff; }
+    .figma-input:focus { border-color: rgba(16, 185, 129, 0.6); box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2); }
+    .figma-btn-primary { background-color: #10b981; color: white; border: none; padding: 0.625rem 1.25rem; border-radius: 0.5rem; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+    .figma-btn-primary:hover { background-color: #059669; color: white; }
+    .figma-btn-secondary { background-color: white; color: #374151; border: 1px solid #e5e7eb; padding: 0.625rem 1.25rem; border-radius: 0.5rem; font-size: 14px; font-weight: 500; transition: all 0.2s; text-decoration: none; display: inline-flex; align-items: center; }
+    .figma-btn-secondary:hover { background-color: #f9fafb; color: #111827; }
+</style>
+}
+
+<div class="figma-container">
+    <div class="mb-4">
+        <h3 style="font-weight: 700; color: #111827; font-size: 18px;">Nueva Planta Madre</h3>
+        <p class="text-muted" style="font-size: 13px;">Ingreso de material vegetal base al laboratorio.</p>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 col-lg-6">
+            <div class="figma-card">
+                <form asp-action="Create" class="space-y-4" enctype="multipart/form-data">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3" style="font-size: 13px;"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="IdEspecie" class="figma-label">Especie Botánica *</label>
+                        <select asp-for="IdEspecie" class="figma-input form-select select2-basico" asp-items="ViewBag.Especies" required>
+                            <option value="">-- Seleccionar Especie --</option>
+                        </select>
+                        <span asp-validation-for="IdEspecie" class="text-danger small mt-1 d-block"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="figma-label">Técnico/Responsable *</label>
+                        <input type="text" class="figma-input bg-light text-muted" value="@ViewBag.LoggedUserNombre" readonly />
+                        <input type="hidden" asp-for="IdUsuario" value="@ViewBag.LoggedUserId" />
+                        <span asp-validation-for="IdUsuario" class="text-danger small mt-1 d-block"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label asp-for="IdProyecto" class="figma-label mb-0">Proyecto Asociado *</label>
+                            <button type="button" id="btnNuevoProyecto" class="btn btn-sm btn-link text-decoration-none p-0" style="font-size: 12px; color: #10b981;">
+                                <i class="bi bi-plus-circle me-1"></i>Nuevo
+                            </button>
+                        </div>
+                        <select asp-for="IdProyecto" class="figma-input form-select select2-basico" asp-items="ViewBag.Proyectos" required>
+                            <option value="">-- Seleccionar Proyecto --</option>
+                        </select>
+                        <span asp-validation-for="IdProyecto" class="text-danger small mt-1 d-block"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="figma-label">Código de Planta *</label>
+                        <input type="text" class="figma-input bg-light text-muted" value="Generado Automáticamente" readonly />
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label asp-for="EstadoFitosanitario" class="figma-label mb-0">Estado Fitosanitario *</label>
+                            <button type="button" id="btnNuevoEstado" class="btn btn-sm btn-link text-decoration-none p-0" style="font-size: 12px; color: #10b981;">
+                                <i class="bi bi-plus-circle me-1"></i>Nuevo
+                            </button>
+                        </div>
+                        <select asp-for="EstadoFitosanitario" class="figma-input form-select" required>
+                            <option value="Sano">Sano (Recomendado)</option>
+                            <option value="Cuarentena">En Cuarentena</option>
+                            <option value="Con plagas">Con presencia de plagas</option>
+                        </select>
+                        <span asp-validation-for="EstadoFitosanitario" class="text-danger small mt-1 d-block"></span>
+                    </div>
+                    <h4 class="mt-4 mb-3" style="font-size: 15px; font-weight: 700; color: #111827; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">Origen y Colecta en Campo</h4>
+
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <label asp-for="Procedencia" class="figma-label">Procedencia (Lugar de Colecta) *</label>
+                            <input asp-for="Procedencia" class="figma-input" placeholder="Ej. Reserva Ecológica Antisana" required />
+                            <span asp-validation-for="Procedencia" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label asp-for="FechaColecta" class="figma-label">Fecha de Colecta</label>
+                            <input asp-for="FechaColecta" type="date" class="figma-input" />
+                            <span asp-validation-for="FechaColecta" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label asp-for="ResponsablesColectaNombres" class="figma-label">Responsable(s) de Colecta</label>
+                            <input type="hidden" asp-for="ResponsablesColectaNombres" id="ResponsablesColectaHidden" />
+                            <select id="colecta_select" class="figma-input form-select select2-multiple" multiple="multiple" asp-items="ViewBag.UsuariosColecta">
+                            </select>
+                            <span asp-validation-for="ResponsablesColectaNombres" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                    </div>
+
+                    <h4 class="mt-4 mb-3" style="font-size: 15px; font-weight: 700; color: #111827; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">Información del Explante Introducido</h4>
+
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label asp-for="FechaRecepcion" class="figma-label">Fecha de Recepción *</label>
+                            <input asp-for="FechaRecepcion" type="date" class="figma-input" required />
+                            <span asp-validation-for="FechaRecepcion" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label asp-for="IdDocumentoPermiso" class="figma-label">Permiso Ambiental (Ministerio)</label>
+                            <select asp-for="IdDocumentoPermiso" class="figma-input form-select select2-basico" asp-items="ViewBag.Documentos">
+                                <option value="">No aplica</option>
+                            </select>
+                            <span asp-validation-for="IdDocumentoPermiso" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label asp-for="HerbarioReferencia" class="figma-label">Herbario de Referencia</label>
+                            <input asp-for="HerbarioReferencia" class="figma-input" placeholder="Ej. Herbario QCA" />
+                            <span asp-validation-for="HerbarioReferencia" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Observaciones" class="figma-label">Observaciones</label>
+                        <textarea asp-for="Observaciones" class="figma-input" rows="2" placeholder="Notas adicionales sobre la planta..."></textarea>
+                        <span asp-validation-for="Observaciones" class="text-danger small mt-1 d-block"></span>
+                    </div>
+
+                    <h4 class="mt-4 mb-3" style="font-size: 15px; font-weight: 700; color: #111827; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">Multimedia</h4>
+                    
+                    <div class="mb-3">
+                        <label asp-for="UrlFotografia" class="figma-label">Fotografía (Subir archivo)</label>
+                        <input type="file" name="fotoFisica" accept="image/*" class="figma-input mb-2" />
+                        <!-- UrlFotografia removida -->
+                    </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4 pt-3" style="border-top: 1px solid #e5e7eb;">
+                        <a asp-action="Index" class="figma-btn-secondary">Cancelar</a>
+                        <button type="button" id="btnGuardar" class="figma-btn-primary">Registrar Planta</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    $(document).ready(function() {
+        $('.select2-basico').select2({
+            theme: 'bootstrap-5',
+            width: '100%'
+        });
+
+        $('#colecta_select').select2({
+            theme: 'bootstrap-5',
+            width: '100%',
+            placeholder: "-- Seleccionar Persona(s) --",
+            allowClear: true
+        });
+
+        $('#colecta_select').on('change', function() {
+            var data = $(this).select2('data');
+            var nombres = data.map(function(item) {
+                return item.text;
+            }).join(', ');
+            $('#ResponsablesColectaHidden').val(nombres);
+        });
+    });
+
+    var fi = document.querySelector('[name="FechaRecepcion"]');
+    if(fi) fi.valueAsDate = new Date();
+
+    document.getElementById('btnGuardar').addEventListener('click', function (e) {
+        e.preventDefault();
+        
+        var form = this.closest('form');
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+
+        Swal.fire({
+            title: '¿Registrar Planta Madre?',
+            text: "El ecotipo inicial es la base biológica del laboratorio.",
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonColor: '#10b981',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Sí, Registrar',
+            cancelButtonText: 'Revisar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        })
+    });
+
+    document.getElementById('btnNuevoProyecto').addEventListener('click', function() {
+        var idUsuario = document.getElementById('IdUsuario').value;
+        if (!idUsuario) {
+            Swal.fire('Atención', 'Por favor, selecciona primero un Técnico/Responsable arriba antes de crear el proyecto.', 'warning');
+            return;
+        }
+
+        Swal.fire({
+            title: 'Nuevo Proyecto',
+            input: 'text',
+            inputPlaceholder: 'Nombre del Proyecto (ej. Propagación In-Vitro Arándano)',
+            showCancelButton: true,
+            confirmButtonText: 'Crear Rápido',
+            cancelButtonText: 'Cancelar',
+            inputValidator: (value) => {
+                if (!value) return '¡Necesitas escribir un nombre!'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch('/PlantaMadres/CrearProyectoAjax', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'nombre=' + encodeURIComponent(result.value) + '&idUsuario=' + encodeURIComponent(idUsuario)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        var select = document.getElementById('IdProyecto');
+                        select.innerHTML = '<option value="">-- Seleccionar Proyecto --</option>';
+                        var lastId = '';
+                        data.data.forEach(item => {
+                            var option = document.createElement('option');
+                            option.value = item.id;
+                            option.text = item.nombreProyecto;
+                            select.appendChild(option);
+                            lastId = item.id; 
+                        });
+                        select.value = lastId;
+                        Swal.fire('Creado!', 'El proyecto ha sido agregado.', 'success');
+                    } else {
+                        Swal.fire('Error', 'No se pudo crear.', 'error');
+                    }
+                })
+                .catch(error => Swal.fire('Error', 'Ocurrió un problema de red.', 'error'));
+            }
+        });
+    });
+
+    document.getElementById('btnNuevoEstado').addEventListener('click', function() {
+        Swal.fire({
+            title: 'Nuevo Estado Fitosanitario',
+            input: 'text',
+            inputPlaceholder: 'Ej. Hongo leve',
+            showCancelButton: true,
+            confirmButtonText: 'Añadir',
+            cancelButtonText: 'Cancelar',
+            inputValidator: (value) => {
+                if (!value) return '¡Necesitas escribir un estado!'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var selectEstado = document.getElementById('EstadoFitosanitario');
+                var option = document.createElement("option");
+                option.text = result.value;
+                option.value = result.value;
+                selectEstado.add(option);
+                selectEstado.value = result.value;
+                Swal.fire('Añadido', 'El nuevo estado se ha añadido a la lista.', 'success');
+            }
+        });
+    });
+</script>
+}

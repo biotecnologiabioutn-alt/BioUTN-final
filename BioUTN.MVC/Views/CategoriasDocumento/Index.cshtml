@@ -1,0 +1,93 @@
+@model IEnumerable<BioUTN.Modelos.CategoriaDocumento>
+
+@{
+    ViewData["Title"] = "Categorías de Documentos";
+}
+
+@section Styles {
+    <style>
+        body { background-color: #f9fafb; font-family: 'Inter', -apple-system, sans-serif; }
+        .figma-container { padding: 40px 20px; max-width: 1200px; margin: 0 auto; }
+        .page-title { font-size: 28px; font-weight: 700; color: #111827; margin-bottom: 24px; letter-spacing: -0.5px; }
+        .kpi-card { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); margin-bottom: 24px; border: 1px solid #f3f4f6; }
+        .btn-modern { background-color: #10b981; color: white; padding: 10px 20px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-block; transition: all 0.2s; border: none; box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2); }
+        .btn-modern:hover { background-color: #059669; color: white; transform: translateY(-1px); box-shadow: 0 6px 8px rgba(16, 185, 129, 0.3); }
+        .btn-edit { background-color: #6366f1; color: white; padding: 6px 12px; border-radius: 6px; font-size: 14px; text-decoration: none; transition: all 0.2s; }
+        .btn-edit:hover { background-color: #4f46e5; color: white; }
+        .btn-delete { background-color: #ef4444; color: white; padding: 6px 12px; border-radius: 6px; font-size: 14px; text-decoration: none; transition: all 0.2s; }
+        .btn-delete:hover { background-color: #dc2626; color: white; }
+        .modern-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+        .modern-table th { background-color: #f8fafc; color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 12px; padding: 16px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        .modern-table td { padding: 16px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; color: #334155; }
+        .modern-table tr:hover td { background-color: #f8fafc; }
+        .badge-general { background-color: #d1fae5; color: #065f46; padding: 4px 8px; border-radius: 9999px; font-size: 12px; font-weight: 600; }
+    </style>
+}
+
+<div class="figma-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="page-title mb-0">Gestión de Categorías (Biblioteca)</h1>
+        <a asp-action="Create" class="btn-modern">
+            <i class="bi bi-plus-lg me-2"></i>Nueva Categoría
+        </a>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert" style="border-radius: 12px; font-weight: 500;">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: 12px; font-weight: 500;">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="kpi-card">
+        <div class="table-responsive">
+            <table class="modern-table">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+
+                        <th class="text-end">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="fw-bold">@item.Nombre</td>
+                            <td>@item.Descripcion</td>
+
+                            <td class="text-end">
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn-edit me-2"><i class="bi bi-pencil"></i></a>
+                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn-delete"><i class="bi bi-trash"></i></a>
+                            </td>
+                        </tr>
+                    }
+                    @if(!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="4" class="text-center py-4 text-muted">
+                                No hay categorías registradas. Crea una nueva categoría para comenzar.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div class="mt-4">
+        <a asp-controller="Biblioteca" asp-action="Index" class="btn btn-outline-secondary" style="border-radius: 8px;">
+            <i class="bi bi-arrow-left me-2"></i>Volver a Biblioteca
+        </a>
+    </div>
+</div>

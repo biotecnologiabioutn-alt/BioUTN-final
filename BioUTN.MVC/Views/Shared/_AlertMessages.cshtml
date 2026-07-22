@@ -1,0 +1,23 @@
+@if (TempData["Success"] != null)
+{
+    <div class="alert bioutn-alert bioutn-alert-success alert-dismissible fade show shadow-sm mt-3" role="alert">
+        <strong><i class="bi bi-check-circle-fill me-2"></i>¡Éxito!</strong> @TempData["Success"]
+        <button type="button" class="btn-close btn-close-white opacity-50" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert bioutn-alert bioutn-alert-danger alert-dismissible fade show shadow-sm mt-3" role="alert">
+        <strong><i class="bi bi-exclamation-triangle-fill me-2"></i>¡Error!</strong> @TempData["Error"]
+        <button type="button" class="btn-close btn-close-white opacity-50" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["Warning"] != null)
+{
+    <div class="alert bioutn-alert alert-warning alert-dismissible fade show shadow-sm mt-3" role="alert" style="background: rgba(255,193,7,0.15); border: 1px solid rgba(255,193,7,0.3); color: #ffeb3b;">
+        <strong><i class="bi bi-exclamation-circle-fill me-2"></i>Aviso:</strong> @TempData["Warning"]
+        <button type="button" class="btn-close btn-close-white opacity-50" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}

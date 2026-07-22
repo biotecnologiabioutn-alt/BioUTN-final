@@ -1,0 +1,28 @@
+@{
+    ViewData["Title"] = "Ficha Detallada Muestra";
+    Layout = "_DashboardLayout";
+}
+
+<div class="card panel-ficha" style="max-width: 700px; margin: 0 auto;">
+    <h3 class="card-title"><i class="fa-solid fa-vial"></i> Ficha Detallada (C-NUB-PM1-F20-R0)</h3>
+    <div style="font-size: 0.9rem; color: var(--text-dark); margin-bottom: 1.5rem;">Inicio > Inventario > C-NUB...</div>
+    <div style="display: flex; justify-content: space-between; gap: 2rem;">
+        <div style="flex: 1;">
+            <div style="margin-bottom: 0.8rem;"><strong>Especie:</strong> Clinopodium nubigenum</div>
+            <div style="margin-bottom: 0.8rem;"><strong>Lote:</strong> PM1-F20-R0</div>
+            <div style="margin-bottom: 0.8rem;"><strong>Ubicación:</strong> Anaquel L</div>
+            <div style="margin-bottom: 0.8rem;"><strong>Estado:</strong> <span class="badge badge-success">Sano</span></div>
+            <div class="form-group" style="margin-top: 1.5rem;">
+                <label>Notas</label>
+                <textarea class="form-control" rows="4"></textarea>
+            </div>
+        </div>
+        <div style="flex: 1;">
+            <div style="font-weight: 600; margin-bottom: 1rem; color: var(--text-dark);">Trazabilidad y Log</div>
+            <div class="timeline">
+                <div class="timeline-item">20 Dec <br><i class="fa-regular fa-image" style="font-size: 2rem; color: var(--text-dark); margin-top: 0.5rem;"></i></div>
+                <div class="timeline-item">28 Dec <br><i class="fa-regular fa-image" style="font-size: 2rem; color: var(--text-dark); margin-top: 0.5rem;"></i></div>
+            </div>
+        </div>
+    </div>
+</div>

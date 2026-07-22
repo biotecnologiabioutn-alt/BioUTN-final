@@ -1,0 +1,238 @@
+@model IEnumerable<BioUTN.Modelos.Reactivo>
+
+@{
+    ViewData["Title"] = "Inventario de Insumos y Reactivos";
+    var totalItemsCriticos = Model?.Count(r => r.StockActual <= r.StockMinimo) ?? 0;
+}
+
+<style>
+    .kardex-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .kardex-title {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #111827;
+        margin: 0;
+        display: flex;
+        align-items: center;
+    }
+
+    .kardex-subtitle {
+        font-size: 0.85rem;
+        color: #6b7280;
+        margin: 0;
+        margin-left: 24px;
+    }
+
+    .btn-ingreso {
+        background-color: #2e7d32;
+        color: white;
+        font-weight: 500;
+        border-radius: 8px;
+        padding: 8px 16px;
+        text-decoration: none;
+    }
+
+    .btn-ingreso:hover {
+        background-color: #1b5e20;
+        color: white;
+    }
+
+    .cat-header {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #6b7280;
+        letter-spacing: 0.5px;
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .critico-badge-main {
+        background-color: #fee2e2;
+        color: #ef4444;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: bold;
+    }
+
+    .category-card {
+        background-color: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        overflow: hidden;
+    }
+
+    .category-title-bar {
+        padding: 10px 15px;
+        font-weight: bold;
+        font-size: 0.9rem;
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    /* Colors for categories */
+    .cat-sales { background-color: #f0f9ff; color: #0369a1; border-bottom-color: #bae6fd; }
+    .cat-acidos { background-color: #fff7ed; color: #c2410c; border-bottom-color: #fed7aa; }
+    .cat-medios { background-color: #f0fdf4; color: #15803d; border-bottom-color: #bbf7d0; }
+    .cat-implementos { background-color: #f0fdfa; color: #0f766e; border-bottom-color: #bfdbfe; }
+
+    .table-custom {
+        width: 100%;
+        margin-bottom: 0;
+        font-size: 0.85rem;
+    }
+
+    .table-custom th {
+        color: #6b7280;
+        font-weight: 600;
+        padding: 12px 15px;
+        border-bottom: 1px solid #e5e7eb;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+    }
+
+    .table-custom td {
+        padding: 12px 15px;
+        vertical-align: middle;
+        border-bottom: 1px solid #e5e7eb;
+        color: #374151;
+    }
+
+    .table-custom tr:last-child td {
+        border-bottom: none;
+    }
+
+    .stock-bajo {
+        color: #ef4444;
+        font-weight: bold;
+    }
+    .stock-bajo-text {
+        font-size: 0.7rem;
+        font-weight: normal;
+    }
+
+    .warning-icon {
+        color: #ef4444;
+        margin-right: 5px;
+    }
+
+    .caducidad-warning {
+        color: #d97706;
+        font-weight: bold;
+    }
+</style>
+
+<div class="kardex-header">
+    <div>
+        <h2 class="kardex-title">
+            <a asp-controller="Inventarios" asp-action="Index" class="text-decoration-none text-dark me-2">
+                <i class="bi bi-arrow-left"></i>
+            </a>
+            Inventario de Insumos y Reactivos
+        </h2>
+        <p class="kardex-subtitle">HU-022/023/024/027/034</p>
+    </div>
+    <a asp-action="Create" class="btn-ingreso">
+        <i class="bi bi-plus-lg"></i> Ingreso de Stock
+    </a>
+</div>
+
+<div class="cat-header mt-4">
+    <span>CATÁLOGO OFICIAL DE STOCK POR CATEGORÍA — HU-024</span>
+    @if (totalItemsCriticos > 0)
+    {
+        <span class="critico-badge-main"><i class="bi bi-exclamation-triangle"></i> @totalItemsCriticos ítem(s) con stock crítico</span>
+    }
+</div>
+
+@if (Model != null && Model.Any())
+{
+    var categories = Model.GroupBy(m => m.Categoria).OrderBy(g => g.Key);
+
+    foreach (var group in categories)
+    {
+        var catName = group.Key?.ToUpper() ?? "SIN CATEGORÍA";
+        var catClass = catName.Contains("SAL") ? "cat-sales" :
+                       catName.Contains("ACID") ? "cat-acidos" :
+                       catName.Contains("MEDIO") ? "cat-medios" :
+                       catName.Contains("IMPLEMENTO") ? "cat-implementos" : "bg-light text-dark";
+
+        var criticosEnGrupo = group.Count(r => r.StockActual <= r.StockMinimo);
+
+        <div class="category-card">
+            <div class="category-title-bar @catClass">
+                <span>@catName <span class="fw-normal" style="opacity: 0.8; font-size: 0.8rem;">· @group.Count() ítem(s)</span></span>
+                @if (criticosEnGrupo > 0)
+                {
+                    <span class="text-danger fw-bold" style="font-size: 0.8rem;"><i class="bi bi-exclamation-triangle"></i> @criticosEnGrupo crítico(s)</span>
+                }
+            </div>
+            <table class="table-custom">
+                <thead>
+                    <tr>
+                        <th>NOMBRE DEL INSUMO</th>
+                        <th>STOCK ACTUAL</th>
+                        <th>PUNTO DE REORDEN</th>
+                        <th>UBICACIÓN FÍSICA</th>
+                        <th>LOTE</th>
+                        <th>CADUCIDAD</th>
+                        <th class="text-center">ACCIONES</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in group)
+                    {
+                        var isCritico = item.StockActual <= item.StockMinimo;
+                        <tr>
+                            <td class="fw-bold">
+                                @if(isCritico){ <i class="bi bi-exclamation-triangle warning-icon"></i> }
+                                @item.Nombre
+                            </td>
+                            <td class="@(isCritico ? "stock-bajo" : "")">
+                                @item.StockActual
+                                @if(isCritico){ <span class="stock-bajo-text">¡Stock bajo!</span> }
+                            </td>
+                            <td class="text-muted">@item.StockMinimo</td>
+                            <td class="text-muted">Bodega Central</td> <!-- Placeholder -->
+                            <td class="text-muted">N/A</td> <!-- Placeholder -->
+                            <td class="@((item.FechaCaducidad.HasValue && item.FechaCaducidad.Value < DateTime.Now.AddMonths(3)) ? "caducidad-warning" : "text-muted")">
+                                @if (item.FechaCaducidad.HasValue && item.FechaCaducidad.Value < DateTime.Now.AddMonths(3))
+                                {
+                                    <i class="bi bi-exclamation-triangle"></i>
+                                }
+                                @(item.FechaCaducidad?.ToString("yyyy-MM-dd") ?? "-")
+                            </td>
+                            <td class="text-center">
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-info" title="Detalles">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-primary" title="Editar">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+}
+else
+{
+    <div class="text-center py-5">
+        <i class="bi bi-inbox fs-1 text-muted mb-3 d-block"></i>
+        <p class="text-muted">No hay insumos registrados en el catálogo.</p>
+    </div>
+}

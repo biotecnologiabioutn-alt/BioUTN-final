@@ -1,0 +1,145 @@
+@model BioUTN.Modelos.Documento
+
+@{
+    ViewData["Title"] = "Subir Documento";
+}
+
+@section Styles {
+<style>
+    body { background-color: #f9fafb; font-family: 'Inter', -apple-system, sans-serif; }
+    .figma-container { padding: 40px 20px; max-width: 800px; margin: 0 auto; }
+    .figma-header { margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-end; }
+    .figma-title { font-size: 24px; font-weight: 700; color: #111827; margin-bottom: 0.25rem; }
+    .figma-subtitle { font-size: 14px; color: #6b7280; }
+    
+    .figma-card { background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 2rem; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+    
+    .figma-label { font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 0.5rem; display: block; }
+    .figma-input { width: 100%; border: 1px solid #d1d5db; border-radius: 8px; padding: 0.6rem 1rem; font-size: 15px; transition: border-color 0.2s, box-shadow 0.2s; }
+    .figma-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+    
+    .figma-btn-primary { background-color: #3b82f6; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; font-size: 15px; font-weight: 500; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; text-decoration: none; width: 100%; cursor: pointer; }
+    .figma-btn-primary:hover { background-color: #2563eb; color: white; transform: translateY(-1px); }
+
+    .figma-btn-secondary { background-color: white; color: #374151; border: 1px solid #e5e7eb; padding: 0.5rem 1rem; border-radius: 8px; font-size: 14px; font-weight: 500; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; }
+    .figma-btn-secondary:hover { background-color: #f9fafb; color: #111827; }
+
+    .file-upload-wrapper { border: 2px dashed #d1d5db; border-radius: 12px; padding: 2rem; text-align: center; background-color: #f9fafb; transition: all 0.2s; cursor: pointer; }
+    .file-upload-wrapper:hover, .file-upload-wrapper.dragover { border-color: #3b82f6; background-color: #eff6ff; }
+    .file-upload-icon { font-size: 3rem; color: #9ca3af; margin-bottom: 1rem; }
+    .file-upload-text { font-size: 15px; color: #4b5563; font-weight: 500; }
+    .file-upload-input { display: none; }
+</style>
+}
+
+<div class="figma-container">
+    <div class="figma-header">
+        <div>
+            <h1 class="figma-title">Subir Documento PDF</h1>
+            <p class="figma-subtitle">Agrega un nuevo archivo a la biblioteca</p>
+        </div>
+        <div>
+            <a asp-action="Index" class="figma-btn-secondary">
+                <i class="bi bi-arrow-left"></i> Volver a la Biblioteca
+            </a>
+        </div>
+    </div>
+
+    <div class="figma-card">
+        <form asp-action="Create" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <label asp-for="CategoriaId" class="figma-label">Categoría del Documento *</label>
+                    <select asp-for="CategoriaId" class="figma-input form-select" required>
+                        <option value="">-- Seleccionar Categoría --</option>
+                        @if (ViewBag.Categorias != null)
+                        {
+                            foreach (var cat in ViewBag.Categorias)
+                            {
+                                <option value="@cat.Id">@cat.Nombre</option>
+                            }
+                        }
+                    </select>
+                    <span asp-validation-for="CategoriaId" class="text-danger small mt-1 d-block"></span>
+                </div>
+
+                <div class="col-md-6 mb-4">
+                    <label asp-for="Titulo" class="figma-label">Título del Documento *</label>
+                    <input asp-for="Titulo" class="figma-input" placeholder="Ej: Protocolo de Siembra MS" required />
+                    <span asp-validation-for="Titulo" class="text-danger small mt-1 d-block"></span>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="Descripcion" class="figma-label">Descripción (Opcional)</label>
+                <textarea asp-for="Descripcion" class="figma-input" rows="3" placeholder="Breve descripción del contenido del PDF..."></textarea>
+                <span asp-validation-for="Descripcion" class="text-danger small mt-1 d-block"></span>
+            </div>
+
+            <div class="mb-5">
+                <label class="figma-label">Archivo PDF *</label>
+                <div class="file-upload-wrapper" id="dropZone" onclick="document.getElementById('ArchivoPdf').click()">
+                    <div class="file-upload-icon">
+                        <i class="bi bi-file-earmark-pdf"></i>
+                    </div>
+                    <div class="file-upload-text" id="fileNameText">
+                        Haz clic aquí para seleccionar un PDF o arrástralo y suéltalo
+                    </div>
+                    <div class="text-muted small mt-2">Máximo 30MB</div>
+                </div>
+                <input type="file" name="ArchivoPdf" id="ArchivoPdf" class="file-upload-input" accept=".pdf" required onchange="updateFileName(this)" />
+                <span asp-validation-for="UrlArchivo" class="text-danger small mt-1 d-block"></span>
+            </div>
+
+            <button type="submit" class="figma-btn-primary">
+                <i class="bi bi-cloud-arrow-up"></i> Guardar y Subir Archivo
+            </button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        function updateFileName(input) {
+            const fileNameText = document.getElementById('fileNameText');
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                if (file.type !== "application/pdf") {
+                    alert("Por favor, selecciona un archivo PDF válido.");
+                    input.value = "";
+                    fileNameText.innerText = "Haz clic aquí para seleccionar un PDF o arrástralo y suéltalo";
+                    return;
+                }
+                fileNameText.innerHTML = `<strong>Archivo seleccionado:</strong> ${file.name}`;
+            } else {
+                fileNameText.innerText = "Haz clic aquí para seleccionar un PDF o arrástralo y suéltalo";
+            }
+        }
+
+        // Drag and drop funcitonality
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('ArchivoPdf');
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                updateFileName(fileInput);
+            }
+        });
+    </script>
+}

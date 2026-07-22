@@ -1,0 +1,121 @@
+@model BioUTN.Modelos.Usuario
+
+@{
+    ViewData["Title"] = "Registro de Usuario";
+    Layout = "~/Views/Shared/_Layout.cshtml"; // Or maybe null if it has its own layout like login. Usually Login/Register share a layout or have no layout.
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4>Registro de Nuevo Usuario</h4>
+                </div>
+                <div class="card-body p-4">
+
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger" role="alert">
+                            @ViewBag.Error
+                        </div>
+                    }
+
+                    <form asp-action="Register" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Nombres" class="form-label">Nombres <span class="text-danger">*</span></label>
+                                <input asp-for="Nombres" class="form-control" required />
+                                <span asp-validation-for="Nombres" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Apellidos" class="form-label">Apellidos <span class="text-danger">*</span></label>
+                                <input asp-for="Apellidos" class="form-control" required />
+                                <span asp-validation-for="Apellidos" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="IdTipoIdentificacion" class="form-label">Tipo de Identificación <span class="text-danger">*</span></label>
+                                <select asp-for="IdTipoIdentificacion" class="form-select" required>
+                                    <option value="">-- Seleccione --</option>
+                                    @if (ViewBag.TiposIdentificacion != null)
+                                    {
+                                        foreach (var tipo in ViewBag.TiposIdentificacion)
+                                        {
+                                            <option value="@tipo.Id">@tipo.Nombre</option>
+                                        }
+                                    }
+                                </select>
+                                <span asp-validation-for="IdTipoIdentificacion" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="NumeroIdentificacion" class="form-label">Número de Identificación <span class="text-danger">*</span></label>
+                                <input asp-for="NumeroIdentificacion" class="form-control" required />
+                                <span asp-validation-for="NumeroIdentificacion" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="IdGenero" class="form-label">Género <span class="text-danger">*</span></label>
+                                <select asp-for="IdGenero" class="form-select" required>
+                                    <option value="">-- Seleccione --</option>
+                                    @if (ViewBag.Generos != null)
+                                    {
+                                        foreach (var genero in ViewBag.Generos)
+                                        {
+                                            <option value="@genero.Id">@genero.Nombre</option>
+                                        }
+                                    }
+                                </select>
+                                <span asp-validation-for="IdGenero" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="IdRol" class="form-label">Rol Solicitado <span class="text-danger">*</span></label>
+                                <select asp-for="IdRol" class="form-select" required>
+                                    <option value="">-- Seleccione --</option>
+                                    @if (ViewBag.Roles != null)
+                                    {
+                                        foreach (var rol in ViewBag.Roles)
+                                        {
+                                            <option value="@rol.Id">@rol.NombreRol</option>
+                                        }
+                                    }
+                                </select>
+                                <span asp-validation-for="IdRol" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label">Correo Electrónico <span class="text-danger">*</span></label>
+                            <input asp-for="Email" type="email" class="form-control" required />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="ContrasenaHash" class="form-label">Contraseña <span class="text-danger">*</span></label>
+                            <input asp-for="ContrasenaHash" type="password" class="form-control" required />
+                            <span asp-validation-for="ContrasenaHash" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">Registrarse</button>
+                            <a asp-action="Login" class="btn btn-outline-secondary">Volver al Inicio de Sesión</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

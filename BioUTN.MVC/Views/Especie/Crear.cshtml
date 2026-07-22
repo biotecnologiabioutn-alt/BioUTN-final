@@ -1,0 +1,120 @@
+@{
+    ViewData["Title"] = "Crear Especie";
+}
+
+<div class="container mt-4 pb-5">
+    <form id="createEspecieForm" onsubmit="return handleCreate(event)">
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body">
+                <h6 class="text-uppercase text-muted fw-bold mb-3">Información Taxonómica</h6>
+                
+                <div class="row">
+                    <div class="col-12 col-md-4 mb-3">
+                        <label class="form-label small fw-bold">Código Interno</label>
+                        <input type="text" class="form-control" placeholder="Ej. Stg" required>
+                    </div>
+                    <div class="col-12 col-md-8 mb-3">
+                        <label class="form-label small fw-bold">Nombre Científico (Binominal)</label>
+                        <input type="text" id="nombreCientifico" class="form-control fst-italic" placeholder="Género especie" required oninput="formatBinomial(this)">
+                        <div class="form-text small">La 1ra letra debe ser mayúscula, el resto minúsculas.</div>
+                    </div>
+                    
+                    <div class="col-12 col-md-6 mb-3">
+                        <label class="form-label small fw-bold">Familia</label>
+                        <input type="text" class="form-control" required>
+                    </div>
+                    <div class="col-12 col-md-6 mb-3">
+                        <label class="form-label small fw-bold">Nombre Común</label>
+                        <input type="text" class="form-control" required>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body">
+                <h6 class="text-uppercase text-muted fw-bold mb-3">Características Biológicas</h6>
+                
+                <div class="row">
+                    <div class="col-6 mb-3">
+                        <label class="form-label small fw-bold">Tipo de Planta</label>
+                        <select class="form-select">
+                            <option>Herbácea</option>
+                            <option>Arbustiva</option>
+                            <option>Arbórea</option>
+                            <option>Epífita</option>
+                        </select>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label class="form-label small fw-bold">Ciclo de Vida</label>
+                        <select class="form-select">
+                            <option>Anual</option>
+                            <option>Bienal</option>
+                            <option>Perenne</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-12 mb-3">
+                        <label class="form-label small fw-bold">Categoría Biotecnológica</label>
+                        <select class="form-select">
+                            <option>Ornamental</option>
+                            <option>Alimenticia</option>
+                            <option>Medicinal</option>
+                            <option>Forestal / Maderable</option>
+                            <option>Especie Amenazada</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body">
+                <h6 class="text-uppercase text-muted fw-bold mb-3">Conservación y Origen</h6>
+                
+                <div class="row">
+                    <div class="col-12 mb-3">
+                        <label class="form-label small fw-bold">Estado de Conservación (IUCN)</label>
+                        <select class="form-select">
+                            <option value="NE">No Evaluado (NE)</option>
+                            <option value="LC">Preocupación Menor (LC)</option>
+                            <option value="NT">Casi Amenazada (NT)</option>
+                            <option value="VU">Vulnerable (VU)</option>
+                            <option value="EN">En Peligro (EN)</option>
+                            <option value="CR">Peligro Crítico (CR)</option>
+                        </select>
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label class="form-label small fw-bold">Origen Biogeográfico</label>
+                        <input type="text" class="form-control" placeholder="Ej. Bosque Andino, Zona Tropical...">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary-utn w-100 btn-lg mb-4">Guardar Registro Catastral</button>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        // Validar regla de nomenclatura binominal
+        function formatBinomial(input) {
+            let val = input.value;
+            if(val.length > 0) {
+                // Forzar 1ra mayúscula, el resto minúscula
+                val = val.charAt(0).toUpperCase() + val.slice(1).toLowerCase();
+                input.value = val;
+            }
+        }
+
+        function handleCreate(e) {
+            e.preventDefault();
+            const nombre = document.getElementById('nombreCientifico').value;
+            
+            // Simular guardado
+            alert(`Registro de '${nombre}' guardado exitosamente en el catálogo.`);
+            window.location.href = '/Especie/Index';
+        }
+    </script>
+}

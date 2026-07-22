@@ -1,0 +1,312 @@
+@model IEnumerable<BioUTN.Modelos.PlantaMadre>
+
+@{
+    ViewData["Title"] = "Plantas Madre";
+    
+    // Extract unique species present in the plant list to build the filters
+    var uniqueEspecies = Model
+        .Where(pm => pm.Especie != null)
+        .Select(pm => pm.Especie)
+        .GroupBy(e => e.Id)
+        .Select(g => g.First())
+        .ToList();
+}
+
+<style>
+    /* Custom Figma-like styles */
+    .figma-container {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background-color: #f9fafb;
+        padding: 20px;
+        border-radius: 12px;
+    }
+    .figma-card {
+        background-color: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.75rem;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        padding: 1.25rem;
+        transition: all 0.2s;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    .figma-card:hover {
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        border-color: rgba(16, 185, 129, 0.2);
+    }
+    .filter-btn {
+        background-color: #ffffff;
+        color: #6b7280;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        padding: 0.375rem 0.75rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+    }
+    .filter-btn.active, .filter-btn:hover {
+        background-color: #10b981;
+        color: white;
+        border-color: #10b981;
+    }
+    .btn-custom-primary {
+        background-color: #10b981;
+        color: white;
+        border-radius: 0.5rem;
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+        border: none;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .btn-custom-primary:hover {
+        background-color: #059669;
+        color: white;
+    }
+    .btn-custom-secondary {
+        background-color: #f3f4f6;
+        color: #374151;
+        border-radius: 0.5rem;
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+        border: 1px solid #e5e7eb;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .btn-custom-secondary:hover {
+        background-color: #e5e7eb;
+        color: #111827;
+    }
+    .badge-status {
+        font-size: 0.75rem;
+        font-weight: 500;
+        padding: 0.25rem 0.5rem;
+        border-radius: 9999px;
+        display: inline-block;
+    }
+    .badge-status-sano {
+        background-color: #ecfdf5;
+        color: #047857;
+    }
+    .badge-status-regular {
+        background-color: #fffbeb;
+        color: #b45309;
+    }
+    .badge-status-enfermo {
+        background-color: #fef2f2;
+        color: #b91c1c;
+    }
+    .card-actions {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 1rem;
+        border-top: 1px solid #f3f4f6;
+        padding-top: 0.75rem;
+    }
+    .action-link {
+        font-size: 0.75rem;
+        color: #4b5563;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.375rem;
+        transition: all 0.2s;
+    }
+    .action-link:hover {
+        background-color: #f3f4f6;
+        color: #111827;
+    }
+    .action-link-delete {
+        color: #dc2626;
+    }
+    .action-link-delete:hover {
+        background-color: #fef2f2;
+        color: #991b1b;
+    }
+    .meta-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+        font-size: 11px;
+        margin-top: 1rem;
+        color: #6b7280;
+    }
+    .meta-item p {
+        margin: 0;
+    }
+    .meta-title {
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 600;
+        color: #9ca3af;
+    }
+    .meta-val {
+        font-weight: 500;
+        color: #374151;
+        margin-top: 2px !important;
+    }
+</style>
+
+<div class="container-fluid py-4 figma-container">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <div>
+            <h1 class="h3 mb-1" style="font-weight: 700; color: #111827;">Plantas Madre</h1>
+            <p class="text-muted mb-0" style="font-size: 14px;">Especímenes élite — punto cero de la trazabilidad</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-controller="Cultivos" asp-action="Index" class="btn-custom-secondary">
+                <i class="bi bi-arrow-left"></i> Volver a Cultivos
+            </a>
+            @if (User.IsInRole("Tecnico") || User.IsInRole("Coordinador"))
+            {
+                <a asp-action="Create" class="btn-custom-primary">
+                    <i class="bi bi-plus-lg"></i> Registrar Planta Madre
+                </a>
+            }
+        </div>
+    </div>
+
+    <!-- Filters -->
+    @if (uniqueEspecies.Any())
+    {
+        <div class="d-flex gap-2 flex-wrap mb-4">
+            <button class="filter-btn active" data-filter="all">Todas</button>
+            @foreach (var esp in uniqueEspecies)
+            {
+                <button class="filter-btn" data-filter="@esp.Id">@esp.CodigoEstricto · @esp.NombreComun</button>
+            }
+        </div>
+    }
+
+    <!-- Grid Layout -->
+    <div class="row g-4" id="plantsGrid">
+        @if (Model != null && Model.Any())
+        {
+            foreach (var item in Model)
+            {
+                <div class="col-12 col-md-6 col-lg-4 plant-card-wrapper" data-species-id="@item.IdEspecie">
+                    <div class="figma-card">
+                        <div>
+                            <div class="d-flex justify-content-between align-items-start gap-3">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="w-10 h-10 rounded-3 bg-teal-50 text-teal-600 d-flex align-items-center justify-content-center shrink-0" style="width: 40px; height: 40px;">
+                                        <i class="bi bi-tree" style="font-size: 1.25rem;"></i>
+                                    </div>
+                                    <div>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="font-mono text-sm font-bold text-primary">@item.CodigoAsignado</span>
+                                            <span class="text-xs text-muted italic">· @(item.Especie?.NombreCientifico ?? "Sin Especie")</span>
+                                        </div>
+                                        @if (!string.IsNullOrEmpty(item.UrlFotografia))
+                                        {
+                                            <p class="text-xs text-muted mb-0"><i class="bi bi-image"></i> Fotografía disponible</p>
+                                        }
+                                    </div>
+                                </div>
+                                @{
+                                    var fitosanitarioClass = "badge-status-sano";
+                                    var fito = item.EstadoFitosanitario?.ToLower() ?? "";
+                                    if (fito.Contains("enfermo") || fito.Contains("plaga") || fito.Contains("hongo"))
+                                    {
+                                        fitosanitarioClass = "badge-status-enfermo";
+                                    }
+                                    else if (fito.Contains("regular") || fito.Contains("observacion"))
+                                    {
+                                        fitosanitarioClass = "badge-status-regular";
+                                    }
+                                }
+                                <span class="badge-status @fitosanitarioClass">@item.EstadoFitosanitario</span>
+                            </div>
+
+                            <div class="meta-grid">
+                                <div class="meta-item">
+                                    <p class="meta-title">Introducción</p>
+                                    <p class="meta-val">@item.FechaRecepcion.ToShortDateString()</p>
+                                </div>
+                                <div class="meta-item">
+                                    <p class="meta-title">Proyecto</p>
+                                    <p class="meta-val">@(item.Proyecto?.NombreProyecto ?? "General")</p>
+                                </div>
+                                <div class="meta-item" style="grid-column: span 2;">
+                                    <p class="meta-title">Código completo</p>
+                                    <p class="meta-val font-mono text-primary">
+                                        @((item.Especie != null) ? $"{item.Especie.CodigoEstricto}-{item.CodigoAsignado}" : item.CodigoAsignado)
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-actions">
+                            <a asp-action="Details" asp-route-id="@item.Id" class="action-link">
+                                <i class="bi bi-eye"></i> Detalles
+                            </a>
+                            <a asp-action="Ficha" asp-route-id="@item.Id" target="_blank" class="action-link" style="color: #0d6efd;">
+                                <i class="bi bi-printer"></i> Generar Ficha
+                            </a>
+                            @if (User.IsInRole("Tecnico") || User.IsInRole("Coordinador"))
+                            {
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="action-link">
+                                    <i class="bi bi-pencil"></i> Editar
+                                </a>
+                                <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline ms-auto">
+                                    <button type="submit" class="action-link action-link-delete border-0 bg-transparent" onclick="return confirm('¿Está seguro de eliminar esta planta madre?');">
+                                        <i class="bi bi-trash3"></i> Eliminar
+                                    </button>
+                                </form>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12 text-center py-5">
+                <i class="bi bi-inbox fs-1 text-muted mb-3 d-block"></i>
+                <p class="text-muted">No se encontraron plantas madre registradas.</p>
+            </div>
+        }
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const filterBtns = document.querySelectorAll(".filter-btn");
+        const plantCards = document.querySelectorAll(".plant-card-wrapper");
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener("click", function () {
+                // Remove active class from all buttons
+                filterBtns.forEach(b => b.classList.remove("active"));
+                // Add active class to current button
+                this.classList.add("active");
+
+                const filter = this.getAttribute("data-filter");
+
+                plantCards.forEach(card => {
+                    const speciesId = card.getAttribute("data-species-id");
+                    if (filter === "all" || speciesId === filter) {
+                        card.style.display = "";
+                    } else {
+                        card.style.display = "none";
+                    }
+                });
+            });
+        });
+    });
+</script>
+

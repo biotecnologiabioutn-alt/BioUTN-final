@@ -1,0 +1,45 @@
+@model BioUTN.Modelos.CategoriaDocumento
+
+@{
+    ViewData["Title"] = "Eliminar Categoría";
+}
+
+@section Styles {
+    <style>
+        body { background-color: #f9fafb; font-family: 'Inter', -apple-system, sans-serif; }
+        .figma-container { padding: 40px 20px; max-width: 600px; margin: 0 auto; }
+        .page-title { font-size: 28px; font-weight: 700; color: #111827; margin-bottom: 24px; letter-spacing: -0.5px; }
+        .form-card { background: white; border-radius: 16px; padding: 32px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); border: 1px solid #f3f4f6; text-align: center; }
+        .alert-icon { font-size: 48px; color: #ef4444; margin-bottom: 16px; }
+        .btn-modern { background-color: #ef4444; color: white; padding: 12px 24px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-block; transition: all 0.2s; border: none; box-shadow: 0 4px 6px rgba(239, 68, 68, 0.2); width: 100%; }
+        .btn-modern:hover { background-color: #dc2626; color: white; transform: translateY(-1px); box-shadow: 0 6px 8px rgba(239, 68, 68, 0.3); }
+        .btn-cancel { background-color: white; color: #374151; border: 1px solid #d1d5db; padding: 12px 24px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-block; transition: all 0.2s; width: 100%; }
+        .btn-cancel:hover { background-color: #f3f4f6; color: #111827; }
+        .detail-item { background-color: #f8fafc; padding: 16px; border-radius: 8px; margin-bottom: 24px; text-align: left; border: 1px solid #e2e8f0; }
+    </style>
+}
+
+<div class="figma-container">
+    <div class="form-card">
+        <i class="bi bi-exclamation-triangle alert-icon"></i>
+        <h2 class="mb-3">¿Estás seguro?</h2>
+        <p class="text-muted mb-4">Esta acción no se puede deshacer. Se eliminará permanentemente la categoría de documentos. (Asegúrate de que no tenga documentos asociados).</p>
+        
+        <div class="detail-item">
+            <h5 class="fw-bold mb-1">@Model.Nombre</h5>
+            <div class="text-muted small">@Model.Descripcion</div>
+        </div>
+
+        <form asp-action="Delete">
+            <input type="hidden" asp-for="Id" />
+            <div class="row">
+                <div class="col-6">
+                    <a asp-action="Index" class="btn-cancel">Cancelar</a>
+                </div>
+                <div class="col-6">
+                    <button type="submit" class="btn-modern">Sí, Eliminar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

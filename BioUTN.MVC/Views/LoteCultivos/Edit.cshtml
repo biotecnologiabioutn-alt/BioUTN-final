@@ -1,0 +1,149 @@
+@model BioUTN.Modelos.LoteCultivo
+
+@{
+    ViewData["Title"] = "Editar LoteCultivo";
+}
+
+@section Styles {
+<style>
+    .figma-container { font-family: 'Inter', -apple-system, sans-serif; background-color: #f9fafb; padding: 20px; border-radius: 12px; }
+    .figma-card { background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 0.75rem; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); padding: 1.5rem; }
+    .figma-label { font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 0.5rem; display: block; }
+    .figma-input { width: 100%; padding: 0.625rem 0.75rem; border-radius: 0.5rem; border: 1px solid #e5e7eb; font-size: 14px; color: #111827; outline: none; transition: all 0.2s; background-color: #ffffff; }
+    .figma-input:focus { border-color: rgba(16, 185, 129, 0.6); box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2); }
+    .figma-btn-primary { background-color: #10b981; color: white; border: none; padding: 0.625rem 1.25rem; border-radius: 0.5rem; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+    .figma-btn-primary:hover { background-color: #059669; color: white; }
+    .figma-btn-secondary { background-color: white; color: #374151; border: 1px solid #e5e7eb; padding: 0.625rem 1.25rem; border-radius: 0.5rem; font-size: 14px; font-weight: 500; transition: all 0.2s; text-decoration: none; display: inline-flex; align-items: center; }
+    .figma-btn-secondary:hover { background-color: #f9fafb; color: #111827; }
+</style>
+}
+
+<div class="figma-container">
+    <div class="mb-4">
+        <h3 style="font-weight: 700; color: #111827; font-size: 18px;">Editar Lote de Cultivo — @Model?.CodigoTrazabilidad</h3>
+        <p class="text-muted" style="font-size: 13px;">Actualizar registro de trazabilidad</p>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 col-lg-6">
+            <div class="figma-card">
+                <form asp-action="Edit" class="space-y-4">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3" style="font-size: 13px;"></div>
+                    <input type="hidden" asp-for="Id" />
+
+                    <div class="mb-3">
+                        <label asp-for="IdPlantaMadre" class="figma-label">Planta Madre (ID) *</label>
+                        <select asp-for="IdPlantaMadre" class="figma-input form-select" asp-items="ViewBag.PlantaMadres" required>
+                            <option value="">-- Seleccionar Planta Madre --</option>
+                        </select>
+                        <span asp-validation-for="IdPlantaMadre" class="text-danger small mt-1 d-block"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="IdLotePadre" class="figma-label">Lote Padre (ID - Opcional)</label>
+                        <input asp-for="IdLotePadre" type="number" class="figma-input" />
+                        <span asp-validation-for="IdLotePadre" class="text-danger small mt-1 d-block"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="IdUnidadFrascoOrigen" class="figma-label">Frasco Origen (Opcional)</label>
+                        <select asp-for="IdUnidadFrascoOrigen" class="figma-input form-select" asp-items="ViewBag.FrascosOrigen">
+                            <option value="">-- Seleccionar Frasco --</option>
+                        </select>
+                        <span asp-validation-for="IdUnidadFrascoOrigen" class="text-danger small mt-1 d-block"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="CodigoTrazabilidad" class="figma-label">Código de Trazabilidad *</label>
+                        <input asp-for="CodigoTrazabilidad" type="text" class="figma-input" required />
+                        <span asp-validation-for="CodigoTrazabilidad" class="text-danger small mt-1 d-block"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="NumeroRepique" class="figma-label">Número de Resiembra *</label>
+                        <input asp-for="NumeroRepique" type="number" class="figma-input" required />
+                        <span asp-validation-for="NumeroRepique" class="text-danger small mt-1 d-block"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="FechaSiembra" class="figma-label">Fecha de Siembra *</label>
+                        <input asp-for="FechaSiembra" type="date" class="figma-input" required />
+                        <span asp-validation-for="FechaSiembra" class="text-danger small mt-1 d-block"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label asp-for="TipoExplante" class="figma-label">Tipo de Explante *</label>
+                            <input asp-for="TipoExplante" class="figma-input" required />
+                            <span asp-validation-for="TipoExplante" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label asp-for="ExplantesPorUnidad" class="figma-label">Explantes por Frasco *</label>
+                            <input asp-for="ExplantesPorUnidad" type="number" class="figma-input" min="1" required />
+                            <span asp-validation-for="ExplantesPorUnidad" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label asp-for="IdMedioCultivo" class="figma-label">Medio de Cultivo (ID) *</label>
+                            <select asp-for="IdMedioCultivo" class="figma-input form-select" asp-items="ViewBag.MediosCultivo" required>
+                                <option value="">-- Seleccionar Medio --</option>
+                            </select>
+                            <span asp-validation-for="IdMedioCultivo" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label asp-for="IdFaseCultivo" class="figma-label">Fase de Cultivo (ID) *</label>
+                            <select asp-for="IdFaseCultivo" class="figma-input form-select" asp-items="ViewBag.FasesCultivo" required>
+                                <option value="">-- Seleccionar Fase --</option>
+                            </select>
+                            <span asp-validation-for="IdFaseCultivo" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label asp-for="IdProyecto" class="figma-label">Proyecto Asociado (ID) *</label>
+                            <select asp-for="IdProyecto" class="figma-input form-select" asp-items="ViewBag.Proyectos" required>
+                                <option value="">-- Seleccionar Proyecto --</option>
+                            </select>
+                            <span asp-validation-for="IdProyecto" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label asp-for="IdUbicacionFisica" class="figma-label">Ubicación Física (ID) *</label>
+                            <select asp-for="IdUbicacionFisica" class="figma-input form-select" asp-items="ViewBag.UbicacionesFisicas" required>
+                                <option value="">-- Seleccionar Ubicación --</option>
+                            </select>
+                            <span asp-validation-for="IdUbicacionFisica" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="IdUsuario" class="figma-label">Técnico/Responsable *</label>
+                        <select asp-for="IdUsuario" class="figma-input form-select" asp-items="ViewBag.Usuarios" required>
+                            <option value="">-- Seleccionar Responsable --</option>
+                        </select>
+                        <span asp-validation-for="IdUsuario" class="text-danger small mt-1 d-block"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="IdDocumentoProtocolo" class="figma-label">Protocolo a Seguir (Biblioteca)</label>
+                        <select asp-for="IdDocumentoProtocolo" class="figma-input form-select" asp-items="ViewBag.Documentos">
+                            <option value="">-- Seleccionar Protocolo --</option>
+                        </select>
+                        <span asp-validation-for="IdDocumentoProtocolo" class="text-danger small mt-1 d-block"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 mt-4 pt-3" style="border-top: 1px solid #e5e7eb;">
+                        <a asp-action="Index" class="figma-btn-secondary">Cancelar</a>
+                        <button type="submit" class="figma-btn-primary">Actualizar Lote</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

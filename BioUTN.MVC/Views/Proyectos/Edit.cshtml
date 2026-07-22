@@ -1,0 +1,205 @@
+@model BioUTN.Modelos.Proyecto
+
+@{
+    ViewData["Title"] = "Editar Proyecto";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-header bg-primary text-white rounded-top-4 py-3">
+                    <h4 class="mb-0 fw-bold"><i class="bi bi-pencil-square me-2"></i>Editar Proyecto</h4>
+                </div>
+                <div class="card-body p-4 p-md-5">
+                    <form asp-action="Edit">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                        <input type="hidden" asp-for="Id" />
+                        
+                        <div class="row g-3">
+                            <div class="col-md-12 mb-3">
+                                <label asp-for="NombreProyecto" class="form-label fw-bold text-primary">Nombre del Proyecto</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light text-primary"><i class="bi bi-fonts"></i></span>
+                                    <input asp-for="NombreProyecto" class="form-control form-control-lg" />
+                                </div>
+                                <span asp-validation-for="NombreProyecto" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="TipoProyecto" class="form-label fw-bold">Tipo de Proyecto</label>
+                                <input type="hidden" asp-for="TipoProyecto" />
+                                <input type="text" class="form-control" value="@Model.TipoProyecto" readonly />
+                                <span asp-validation-for="TipoProyecto" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Estado" class="form-label fw-bold">Estado del Proyecto</label>
+                                <select asp-for="Estado" class="form-select">
+                                    <option value="Activo">Activo</option>
+                                    <option value="Finalizado">Finalizado</option>
+                                    <option value="Suspendido">Suspendido</option>
+                                </select>
+                                <span asp-validation-for="Estado" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="IdEspecie" class="form-label fw-bold">Especie Botánica *</label>
+                                <select asp-for="IdEspecie" class="form-select" asp-items="ViewBag.Especies" required>
+                                    <option value="">-- Seleccionar Especie --</option>
+                                </select>
+                                <span asp-validation-for="IdEspecie" class="text-danger small"></span>
+                            </div>
+
+                            <!-- CAMPOS DINÁMICOS PARA FICHAS -->
+                            <div class="col-md-6 mb-3" id="div-director">
+                                <label asp-for="DirectoresNombres" class="form-label fw-bold">@(Model.TipoProyecto == "Tesis" ? "Director(es)" : "Docente(s)")</label>
+                                <input type="hidden" asp-for="DirectoresNombres" id="DirectoresNombresHidden" />
+                                <select id="directores_select" class="form-select select2-multiple" multiple="multiple" asp-items="ViewBag.Directores" style="width: 100%;">
+                                </select>
+                                <div class="form-text text-muted">
+                                    Valor actual: <strong>@Model.DirectoresNombres</strong>. (Si seleccionas nuevos, se sobrescribirá).
+                                </div>
+                                <span asp-validation-for="DirectoresNombres" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3" id="div-tesista" style="display:none;">
+                                <label asp-for="IdTesista" class="form-label fw-bold">Estudiante Tesista</label>
+                                <select asp-for="IdTesista" class="form-select select2-usuarios" asp-items="ViewBag.Tesistas" style="width: 100%;">
+                                    <option value="">-- Seleccione al Tesista --</option>
+                                </select>
+                                <span asp-validation-for="IdTesista" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3" id="div-uso">
+                                <label asp-for="Uso" class="form-label fw-bold">Uso (Ej. Docencia, Investigación)</label>
+                                <input asp-for="Uso" class="form-control" placeholder="Ej. Docencia" />
+                                <span asp-validation-for="Uso" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-12 mb-3" id="div-estudiantes">
+                                <label asp-for="EstudiantesNombres" class="form-label fw-bold">Estudiantes / Asistentes</label>
+                                <input type="hidden" asp-for="EstudiantesNombres" id="EstudiantesNombresHidden" />
+                                <select id="estudiantes_select" class="form-select select2-multiple" multiple="multiple" asp-items="ViewBag.Usuarios" style="width: 100%;">
+                                </select>
+                                <div class="form-text text-muted">
+                                    Valor actual: <strong>@Model.EstudiantesNombres</strong>. (Si seleccionas nuevos estudiantes, este valor se sobrescribirá).
+                                </div>
+                                <span asp-validation-for="EstudiantesNombres" class="text-danger small"></span>
+                            </div>
+                            <!-- FIN CAMPOS DINÁMICOS -->
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="FechaInicio" class="form-label fw-bold">Fecha de Inicio</label>
+                                <input asp-for="FechaInicio" class="form-control" type="date" />
+                                <span asp-validation-for="FechaInicio" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="FechaFin" class="form-label fw-bold">Fecha de Fin (Opcional)</label>
+                                <input asp-for="FechaFin" class="form-control" type="date" />
+                                <span asp-validation-for="FechaFin" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-12 mb-3 d-none">
+                                <label asp-for="IdUsuarioResponsable" class="form-label fw-bold">Usuario Responsable</label>
+                                <select asp-for="IdUsuarioResponsable" class="form-select" asp-items="ViewBag.Usuarios">
+                                </select>
+                            </div>
+
+                            <div class="col-md-12 mb-4">
+                                <label asp-for="Descripcion" class="form-label fw-bold">Descripción / Información Adicional</label>
+                                <textarea asp-for="Descripcion" class="form-control" rows="4"></textarea>
+                                <span asp-validation-for="Descripcion" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                            <a asp-action="Index" class="btn btn-light rounded-pill px-4">Cancelar</a>
+                            <button type="submit" class="btn btn-primary rounded-pill px-4">
+                                <i class="bi bi-save me-1"></i> Guardar Cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <!-- Select2 CSS y JS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Inicializar Select2
+            $('.select2-usuarios').select2({
+                theme: 'bootstrap-5',
+                placeholder: "-- Buscar y seleccionar --",
+                allowClear: true
+            });
+
+            $('.select2-multiple').select2({
+                theme: 'bootstrap-5',
+                placeholder: "-- Buscar y seleccionar estudiantes --",
+                allowClear: true
+            });
+
+            $('#estudiantes_select').on('change', function() {
+                var selectedData = $(this).select2('data');
+                var names = selectedData.map(function(item) { return item.text; });
+                $('#EstudiantesNombresHidden').val(names.join(', '));
+            });
+
+            $('#directores_select').on('change', function() {
+                var selectedData = $(this).select2('data');
+                var names = selectedData.map(function(item) { return item.text; });
+                $('#DirectoresNombresHidden').val(names.join(', '));
+            });
+
+            // Auto-seleccionar valores actuales
+            function preselectSelect2(hiddenId, selectId) {
+                var val = $('#' + hiddenId).val();
+                if(val) {
+                    var names = val.split(',').map(item => item.trim());
+                    var ids = [];
+                    $('#' + selectId + ' option').each(function() {
+                        if(names.includes($(this).text().trim())) {
+                            ids.push($(this).val());
+                        }
+                    });
+                    $('#' + selectId).val(ids).trigger('change');
+                }
+            }
+
+            preselectSelect2('EstudiantesNombresHidden', 'estudiantes_select');
+            preselectSelect2('DirectoresNombresHidden', 'directores_select');
+
+            var tipoSelectValue = '@Model.TipoProyecto';
+            var divTesista = document.getElementById('div-tesista');
+            var divUso = document.getElementById('div-uso');
+            var divEstudiantes = document.getElementById('div-estudiantes');
+
+            function toggleCampos() {
+                if (tipoSelectValue === 'Tesis') {
+                    // Carpeta Verde
+                    divTesista.style.display = 'block';
+                    divUso.style.display = 'none';
+                    divEstudiantes.style.display = 'none';
+                } else {
+                    // Carpeta Azul
+                    divTesista.style.display = 'none';
+                    divUso.style.display = 'block';
+                    divEstudiantes.style.display = 'block';
+                }
+            }
+
+            toggleCampos(); // Initialize on load
+        });
+    </script>
+}

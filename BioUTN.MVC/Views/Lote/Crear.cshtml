@@ -1,0 +1,163 @@
+@{
+    ViewData["Title"] = "Registro de Lote / Siembra";
+}
+
+<div class="container mt-4 pb-5">
+    <form id="loteForm" onsubmit="return handleCreateLote(event)">
+        <!-- Generador Automático (RF-Trazabilidad Estricta) -->
+        <div class="card shadow-sm border-primary mb-4">
+            <div class="card-body bg-light text-center">
+                <h6 class="text-uppercase text-primary fw-bold mb-2"><i class="fas fa-barcode"></i> Código Generado (Lote)</h6>
+                <h3 id="displayCodigo" class="fw-bold font-monospace text-dark mb-0 py-2 border rounded bg-white">C-ESP-PM1-F01-R0-MS0</h3>
+                <small class="text-muted"><i class="fas fa-info-circle"></i> La nomenclatura estricta evita errores. Prohibido texto libre o "caritas felices".</small>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body">
+                <h6 class="text-uppercase text-muted fw-bold mb-3"><i class="fas fa-seedling text-success"></i> Parámetros Genéticos y de Trazabilidad</h6>
+                
+                <div class="row">
+                    <div class="col-12 col-md-4 mb-3">
+                        <label class="form-label small fw-bold">Especie</label>
+                        <select id="selEspecie" class="form-select bg-light border-0" onchange="buildCode()" required>
+                            <option value="">Seleccione Especie...</option>
+                            <option value="C-NUB">Clinopodium nubigenum (C-NUB)</option>
+                            <option value="S-ION">Saintpaulia ionantha (S-ION)</option>
+                            <option value="M-ACU">Musa acuminata (M-ACU)</option>
+                            <option value="C-MOR">Chrysanthemum morifolium (C-MOR)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-6 col-md-4 mb-3">
+                        <label class="form-label small fw-bold">Planta Madre (Origen)</label>
+                        <select id="selPlantaMadre" class="form-select bg-light border-0" onchange="buildCode()" required>
+                            <option value="PM1">Planta Madre 1 (PM1)</option>
+                            <option value="PM2">Planta Madre 2 (PM2)</option>
+                            <option value="PM3">Planta Madre 3 (PM3)</option>
+                        </select>
+                    </div>
+
+                    <div class="col-6 col-md-4 mb-3">
+                        <label class="form-label small fw-bold">Frasco #</label>
+                        <input type="number" id="inpFrasco" class="form-control bg-light border-0" value="20" min="1" max="999" oninput="buildCode()" required>
+                    </div>
+
+                    <div class="col-12 col-md-4 mb-3">
+                        <label class="form-label small fw-bold">Fase de Cultivo / Resiembra</label>
+                        <select id="selResiembra" class="form-select bg-light border-0" onchange="buildCode()" required>
+                            <option value="R0">R0 - Introducción (0 días)</option>
+                            <option value="R1">R1 - Multiplicación (Ciclo 1)</option>
+                            <option value="R2">R2 - Multiplicación (Ciclo 2)</option>
+                            <option value="R3">R3 - Multiplicación (Ciclo 3)</option>
+                            <option value="R4">R4 - Multiplicación (Ciclo 4)</option>
+                            <option value="R5">R5 - Multiplicación (Ciclo 5)</option>
+                            <option value="R6">R6 - Multiplicación (Ciclo 6)</option>
+                            <option value="R7">R7 - Multiplicación (Ciclo 7)</option>
+                            <option value="R8">R8 - Multiplicación (Ciclo 8)</option>
+                            <option value="R9">R9 - Multiplicación (Ciclo 9)</option>
+                            <option value="R10" class="text-danger fw-bold">R10 - Límite Genético (¡Última!)</option>
+                        </select>
+                        <small class="text-danger" style="font-size: 0.70rem;">Límite biológico para evitar variaciones somaclonales.</small>
+                    </div>
+                    
+                    <div class="col-12 col-md-4 mb-3">
+                        <label class="form-label small fw-bold">Medio de Cultivo</label>
+                        <select id="selMedio" class="form-select bg-light border-0" onchange="buildCode()" required>
+                            <option value="">Seleccione Medio...</option>
+                            <option value="MS1">Murashige & Skoog Básico (MS1)</option>
+                            <option value="MS5">MS + Hormonas Crecimiento (MS5)</option>
+                            <option value="ENR">Medio de Enraizamiento (ENR)</option>
+                            <option value="CON">Medio de Conservación (CON)</option>
+                            <option value="CAL">Inducción de Callos (CAL)</option>
+                        </select>
+                    </div>
+
+                    <div class="col-12 col-md-4 mb-3">
+                        <label class="form-label small fw-bold">Investigador (Responsable)</label>
+                        <select id="selInvestigador" class="form-select bg-light border-0" onchange="buildCode()" required>
+                            <option value="">Seleccione...</option>
+                            <option value="CE">Cristina Echeverría (CE)</option>
+                            <option value="FR">Fernanda Revelo (FR)</option>
+                            <option value="JS">Jordan Salcedo (JS)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mapa de Laboratorio (16 Anaqueles x 4 Pisos) -->
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body">
+                <h6 class="text-uppercase text-muted fw-bold mb-3"><i class="fas fa-map-marker-alt text-danger"></i> Mapeo Espacial Físico</h6>
+                <div class="row">
+                    <div class="col-6">
+                        <label class="form-label small fw-bold">Anaquel Asignado (L1-L16)</label>
+                        <select class="form-select bg-light border-0" required>
+                            @for(int i = 1; i <= 16; i++)
+                            {
+                                <option value="L@(i)">Anaquel L@(i)</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label small fw-bold">Nivel / Piso</label>
+                        <select class="form-select bg-light border-0" required>
+                            <option value="P1">Piso 1 (Inferior)</option>
+                            <option value="P2">Piso 2</option>
+                            <option value="P3">Piso 3</option>
+                            <option value="P4">Piso 4 (Superior)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary-utn w-100 btn-lg mb-4 shadow"><i class="fas fa-check-circle"></i> Registrar Siembra y Generar QR</button>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            buildCode();
+        });
+
+        // Ensamblador de Código RF-Trazabilidad Estricta
+        // Formato: Especie-PM-Frasco-Resiembra-Medio (Ej. C-NUB-PM1-F20-R2-MS1)
+        function buildCode() {
+            const esp = document.getElementById('selEspecie').value || "C-ESP";
+            const pm = document.getElementById('selPlantaMadre').value || "PM1";
+            const frascoNum = document.getElementById('inpFrasco').value || "01";
+            const f = `F${frascoNum}`;
+            const r = document.getElementById('selResiembra').value || "R0";
+            const ms = document.getElementById('selMedio').value || "MS0";
+            
+            // Inv (opcional visualmente para reporte, pero el código de frasco principal usa el formato base)
+            const inv = document.getElementById('selInvestigador').value || "XX";
+            
+            const finalCode = `${esp}-${pm}-${f}-${r}-${ms}`;
+            document.getElementById('displayCodigo').innerText = finalCode;
+
+            // Alerta visual de límite genético
+            if(r === "R10") {
+                document.getElementById('displayCodigo').classList.replace('text-dark', 'text-danger');
+            } else {
+                document.getElementById('displayCodigo').classList.replace('text-danger', 'text-dark');
+            }
+        }
+
+        function handleCreateLote(e) {
+            e.preventDefault();
+            const code = document.getElementById('displayCodigo').innerText;
+            const resiembra = document.getElementById('selResiembra').value;
+            
+            if(resiembra === "R10") {
+                alert(`¡ADVERTENCIA! El lote "${code}" ha alcanzado su Límite Genético (R10). El sistema no permitirá futuras resiembras de esta línea.`);
+            }
+            
+            alert(`Siembra validada. El Lote "${code}" ha sido registrado en la estantería seleccionada.`);
+            window.location.href = '/Cultivo/BandejaDigital';
+        }
+    </script>
+}

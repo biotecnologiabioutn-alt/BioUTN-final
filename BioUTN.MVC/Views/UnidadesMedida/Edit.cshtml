@@ -1,0 +1,64 @@
+@model BioUTN.Modelos.UnidadMedida
+@{
+    ViewData["Title"] = "Editar Unidad de Medida";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="bioutn-title mb-0">Editar Unidad de Medida</h2>
+    </div>
+    <a asp-action="Index" class="btn bioutn-btn bioutn-btn-secondary">
+        <i class="bi bi-arrow-left me-1"></i> Volver al Catálogo
+    </a>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="bioutn-card">
+            <div class="bioutn-card-header">
+                <h5><i class="bi bi-pencil-square me-2"></i> Formulario de Edición</h5>
+            </div>
+            <div class="bioutn-card-body">
+                <form asp-action="Edit">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <input type="hidden" asp-for="Id" />
+
+                    <div class="mb-3">
+                        <label asp-for="Nombre" class="control-label fw-bold small text-muted">Nombre de la Unidad *</label>
+                        <input asp-for="Nombre" type="text" class="form-control" placeholder="Ej: Caja de 500g" required />
+                        <span asp-validation-for="Nombre" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Abreviatura" class="control-label fw-bold small text-muted">Abreviatura *</label>
+                        <input asp-for="Abreviatura" type="text" class="form-control" placeholder="Ej: caja-500g" required />
+                        <span asp-validation-for="Abreviatura" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="UnidadBase" class="control-label fw-bold small text-muted">Unidad Base Interna *</label>
+                        <input asp-for="UnidadBase" type="text" class="form-control" placeholder="Ej: gramos" required />
+                        <span asp-validation-for="UnidadBase" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="FactorConversion" class="control-label fw-bold small text-muted">Factor de Conversión *</label>
+                        <input asp-for="FactorConversion" type="number" step="0.01" class="form-control" required />
+                        <div class="form-text">Si la unidad base son "gramos" y esta unidad es una "Caja de 500g", el factor es 500.</div>
+                        <span asp-validation-for="FactorConversion" class="text-danger small"></span>
+                    </div>
+
+                    <div class="text-end mt-4 pt-3 border-top">
+                        <button type="submit" class="btn bioutn-btn bioutn-btn-primary px-4 shadow-sm">
+                            <i class="bi bi-save me-1"></i> Actualizar Unidad
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

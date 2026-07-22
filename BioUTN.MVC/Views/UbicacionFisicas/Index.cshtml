@@ -1,0 +1,146 @@
+@model IEnumerable<BioUTN.Modelos.UbicacionFisica>
+
+@{
+    ViewData["Title"] = "Gestión de Anaqueles";
+}
+
+@section Styles {
+<style>
+    body { background-color: #f9fafb; font-family: 'Inter', -apple-system, sans-serif; }
+    .figma-container { padding: 40px 20px; max-width: 1000px; margin: 0 auto; }
+    .figma-header { margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-end; }
+    .figma-title { font-size: 24px; font-weight: 700; color: #111827; margin-bottom: 0.25rem; }
+    .figma-subtitle { font-size: 14px; color: #6b7280; }
+    
+    .figma-btn-primary { background-color: #10b981; color: white; border: none; padding: 0.5rem 1rem; border-radius: 8px; font-size: 14px; font-weight: 500; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; }
+    .figma-btn-primary:hover { background-color: #059669; color: white; transform: translateY(-1px); }
+    
+    .figma-table-card { background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+    .figma-table { width: 100%; margin: 0; border-collapse: separate; border-spacing: 0; }
+    .figma-table th { background-color: #f9fafb; padding: 12px 16px; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #e5e7eb; text-align: left; }
+    .figma-table td { padding: 16px; font-size: 14px; color: #111827; border-bottom: 1px solid #e5e7eb; vertical-align: middle; }
+    .figma-table tr:last-child td { border-bottom: none; }
+    .figma-table tbody tr:hover { background-color: #f9fafb; }
+    
+    .figma-badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 9999px; font-size: 12px; font-weight: 500; }
+    .badge-available { background-color: #d1fae5; color: #065f46; }
+    .badge-full { background-color: #fee2e2; color: #991b1b; }
+    
+    .figma-action-btn { background: none; border: none; padding: 6px; border-radius: 6px; color: #6b7280; transition: all 0.2s; display: inline-flex; }
+    .figma-action-btn:hover { background-color: #f3f4f6; color: #111827; }
+    .figma-action-btn.delete:hover { background-color: #fee2e2; color: #dc2626; }
+</style>
+}
+
+<div class="figma-container">
+    <div class="figma-header">
+        <div>
+            <h1 class="figma-title">Anaqueles y Estantes</h1>
+            <p class="figma-subtitle">Configuración del mapa físico del laboratorio (8 anaqueles de 4 pisos)</p>
+        </div>
+        <div>
+            @if (User.IsInRole("Coordinador") || User.IsInRole("Tecnico"))
+            {
+                <a asp-action="Create" class="figma-btn-primary">
+                    <i class="bi bi-plus-lg"></i> Agregar Anaquel
+                </a>
+            }
+        </div>
+    </div>
+
+    <div class="figma-table-card">
+        <table class="figma-table">
+            <thead>
+                <tr>
+                    <th>Cód. Anaquel</th>
+                    <th>Sección / Cuerpo</th>
+                    <th>Nivel / Piso</th>
+                    <th>Límite Frascos</th>
+                    <th>Estado de Capacidad</th>
+                    @if (User.IsInRole("Coordinador") || User.IsInRole("Tecnico"))
+                    {
+                        <th class="text-end">Acciones</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.OrderBy(x => x.CodigoAnaquel).ThenBy(x => x.NumeroPiso))
+                {
+                    <tr>
+                        <td style="font-weight: 600; color: #4f46e5;">@item.CodigoAnaquel</td>
+                        <td>
+                            <div style="font-weight: 500;">@item.NombreCuerpo</div>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="bi bi-layers text-muted"></i>
+                                Piso @item.NumeroPiso
+                            </div>
+                        </td>
+                        <td>
+                            <div style="font-weight: 500;">@item.LimiteFrascos</div>
+                        </td>
+                        <td>
+                            @if(item.EstadoUbicacion == "Disponible")
+                            {
+                                <span class="figma-badge badge-available"><i class="bi bi-check-circle-fill me-1"></i> @item.EstadoUbicacion</span>
+                            }
+                            else
+                            {
+                                <span class="figma-badge badge-full"><i class="bi bi-x-circle-fill me-1"></i> @item.EstadoUbicacion</span>
+                            }
+                        </td>
+                        @if (User.IsInRole("Coordinador") || User.IsInRole("Tecnico"))
+                        {
+                            <td class="text-end">
+                                <a asp-action="Details" asp-route-id="@item.Id" class="figma-action-btn" title="Detalles">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="figma-action-btn" title="Editar">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <button type="button" class="figma-action-btn delete" onclick="confirmDelete(@item.Id)" title="Eliminar">
+                                    <i class="bi bi-trash3"></i>
+                                </button>
+                                <form id="delete-form-@item.Id" asp-action="Delete" asp-route-id="@item.Id" method="post" style="display: none;"></form>
+                            </td>
+                        }
+                    </tr>
+                }
+                
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="6" class="text-center py-5">
+                            <i class="bi bi-box-seam text-muted fs-2 mb-2 d-block"></i>
+                            <p class="text-muted mb-0">No hay anaqueles registrados. Configura el mapa físico.</p>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function confirmDelete(id) {
+            Swal.fire({
+                title: '¿Eliminar Anaquel?',
+                text: "Esta acción no se puede deshacer.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('delete-form-' + id).submit();
+                }
+            });
+        }
+    </script>
+}

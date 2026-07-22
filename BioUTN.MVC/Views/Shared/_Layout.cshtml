@@ -1,0 +1,149 @@
+@{
+    bool hideSidebar = ViewData["HideSidebar"] as bool? ?? false;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - BioUTN</title>
+
+    @* Estilos Base *@
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/bioutn.css" asp-append-version="true" />
+
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body class="@(hideSidebar ? "layout-no-sidebar" : "layout-with-sidebar")">
+
+    @if (!hideSidebar)
+    {
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-leaf"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>BioUTN</h1>
+                    <p>Cultivo In Vitro</p>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a asp-controller="Home" asp-action="Index"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" ? "active" : "")">
+                    <i class="fa-solid fa-gauge"></i> Dashboard
+                </a>
+
+                <div class="nav-category">GESTIÓN DE LABORATORIO</div>
+                
+                <a asp-controller="ZonaTrabajo" asp-action="Index" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "ZonaTrabajo" ? "active" : "")">
+                    <i class="fa-solid fa-desktop"></i> Zona de Trabajo
+                </a>
+                
+                <a asp-controller="Cultivos" asp-action="Index" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Cultivos" ? "active" : "")">
+                    <i class="fa-solid fa-seedling"></i> Gestión de Cultivos
+                </a>
+
+                <a asp-controller="Inventarios" asp-action="Index" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Inventarios" ? "active" : "")">
+                    <i class="fa-solid fa-boxes-stacked"></i> Gestión de Inventario
+                </a>
+
+                @if (User?.Identity?.IsAuthenticated == true && (User.IsInRole("Coordinador") || User.IsInRole("Tecnico")))
+                {
+                    <div class="nav-category">ADMINISTRACIÓN</div>
+                    
+                    <!-- Enlace Configuración Biológica removido por solicitud -->
+                    
+                    <a asp-controller="TalentoHumano" asp-action="Index" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "TalentoHumano" ? "active" : "")">
+                        <i class="fa-solid fa-users"></i> Talento Humano
+                    </a>
+                }
+            </nav>
+        </aside>
+        <div class="sidebar-overlay" onclick="document.body.classList.remove('sidebar-open')"></div>
+    }
+
+    <div id="content-wrapper" class="d-flex flex-column min-vh-100 @(hideSidebar ? "no-sidebar" : "")">
+        <header>
+            <nav class="navbar navbar-expand-lg navbar-light fixed-top navbar-custom-offset shadow-sm @(hideSidebar ? "no-sidebar" : "")">
+                <div class="container-fluid px-3">
+                    <a class="navbar-brand fw-bold" asp-controller="Home" asp-action="Index">
+                        <i class="bi bi-droplet-half text-success"></i> BioUTN
+                    </a>
+
+                    <button class="navbar-toggler border-0" type="button" onclick="document.body.classList.toggle('sidebar-open')">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <ul class="navbar-nav flex-grow-1 d-none d-md-flex">
+                        </ul>
+
+                        <ul class="navbar-nav ms-auto">
+                            @if (User?.Identity?.IsAuthenticated != true)
+                            {
+                                <li class="nav-item">
+                                    <a class="btn btn-primary btn-sm rounded-pill px-4 shadow-sm" asp-controller="Account" asp-action="Login">
+                                        <i class="bi bi-box-arrow-in-right me-1"></i> Entrar
+                                    </a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle btn btn-sm px-3 ms-2" href="#" role="button" data-bs-toggle="dropdown" style="border: 1px solid #198754; color: #198754; background-color: #f8f9fa; font-weight: 600; border-radius: 4px;">
+                                        <i class="bi bi-person-circle me-1"></i> @User.Identity.Name
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2" style="border-radius: 8px;">
+                                        <li>
+                                            <a class="dropdown-item py-2" href="#" style="color: #198754;">Mi Cuenta</a>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <a class="dropdown-item text-danger fw-bold py-2" asp-controller="Account" asp-action="Logout">
+                                                <i class="bi bi-power me-2"></i> Cerrar Sesión
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <div class="container-fluid px-4 global-alert-wrapper">
+            @await Html.PartialAsync("_AlertMessages")
+        </div>
+
+        <main role="main" class="flex-grow-1 pb-5">
+            @if (hideSidebar)
+            {
+                @RenderBody()
+            }
+            else
+            {
+                <div class="container-fluid pt-4 px-4 bioutn-page">
+                    @RenderBody()
+                </div>
+            }
+        </main>
+
+        <footer class="mt-auto py-3 text-center bioutn-subtitle small border-top bg-light w-100">
+            © 2026 - Universidad Técnica del Norte (BioUTN)
+        </footer>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+
+</body>
+</html>

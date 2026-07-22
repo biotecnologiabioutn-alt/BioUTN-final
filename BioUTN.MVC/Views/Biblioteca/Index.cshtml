@@ -1,0 +1,122 @@
+@model IEnumerable<BioUTN.Modelos.Documento>
+
+@{
+    ViewData["Title"] = "Biblioteca Virtual";
+    var categorias = ViewBag.CategoriasDinámicas as List<BioUTN.Modelos.CategoriaDocumento> ?? new List<BioUTN.Modelos.CategoriaDocumento>();
+    var categoriaFiltro = ViewBag.CategoriaFiltro as string ?? "";
+}
+
+@section Styles {
+<style>
+    body { background-color: #f9fafb; font-family: 'Inter', -apple-system, sans-serif; }
+    .figma-container { padding: 40px 20px; max-width: 1200px; margin: 0 auto; }
+    .figma-header { margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-end; }
+    .figma-title { font-size: 28px; font-weight: 700; color: #111827; margin-bottom: 0.25rem; }
+    .figma-subtitle { font-size: 15px; color: #6b7280; }
+    
+    .figma-btn-primary { background-color: #3b82f6; color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 8px; font-size: 14px; font-weight: 500; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; }
+    .figma-btn-primary:hover { background-color: #2563eb; color: white; transform: translateY(-1px); }
+
+    .category-tabs { display: flex; gap: 1rem; margin-bottom: 2rem; border-bottom: 1px solid #e5e7eb; padding-bottom: 1rem; overflow-x: auto; }
+    .category-tab { padding: 0.5rem 1rem; border-radius: 9999px; font-size: 14px; font-weight: 500; text-decoration: none; color: #4b5563; background-color: #f3f4f6; transition: all 0.2s; white-space: nowrap; }
+    .category-tab:hover { background-color: #e5e7eb; color: #111827; }
+    .category-tab.active { background-color: #3b82f6; color: white; }
+
+    .doc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
+    .doc-card { background-color: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 1.5rem; transition: all 0.2s; display: flex; flex-direction: column; height: 100%; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+    .doc-card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); border-color: #d1d5db; }
+    
+    .doc-icon { width: 48px; height: 48px; background-color: #fee2e2; color: #ef4444; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 1rem; }
+    .doc-title { font-size: 16px; font-weight: 600; color: #111827; margin-bottom: 0.5rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .doc-desc { font-size: 13px; color: #6b7280; margin-bottom: 1rem; flex-grow: 1; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    
+    .doc-meta { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #9ca3af; margin-bottom: 1rem; padding-top: 1rem; border-top: 1px solid #f3f4f6; }
+    
+    .doc-actions { display: flex; gap: 0.5rem; margin-top: auto; }
+    .btn-view { flex: 1; background-color: #f3f4f6; color: #374151; text-align: center; padding: 0.5rem; border-radius: 6px; font-size: 13px; font-weight: 500; text-decoration: none; transition: background-color 0.2s; }
+    .btn-view:hover { background-color: #e5e7eb; color: #111827; }
+    .btn-edit { background-color: white; color: #3b82f6; border: 1px solid #bfdbfe; padding: 0.5rem; border-radius: 6px; transition: all 0.2s; display: flex; align-items: center; justify-content: center; text-decoration: none; }
+    .btn-edit:hover { background-color: #eff6ff; }
+    
+    .btn-delete { background-color: white; color: #ef4444; border: 1px solid #fee2e2; padding: 0.5rem; border-radius: 6px; transition: all 0.2s; display: flex; align-items: center; justify-content: center; text-decoration: none; }
+    .btn-delete:hover { background-color: #fee2e2; }
+</style>
+}
+
+<div class="figma-container">
+    <div class="figma-header">
+        <div>
+            <h1 class="figma-title">Biblioteca de Documentos</h1>
+            <p class="figma-subtitle">Gestiona protocolos, permisos, bitácoras y referencias del laboratorio.</p>
+        </div>
+        <div class="d-flex gap-2">
+            @if (User.IsInRole("Coordinador") || User.IsInRole("Tecnico") || User.IsInRole("Administrador"))
+            {
+                <a asp-controller="CategoriasDocumento" asp-action="Index" class="figma-btn-secondary">
+                    <i class="bi bi-tags"></i> Gestionar Categorías
+                </a>
+            }
+            <a asp-action="Create" class="figma-btn-primary">
+                <i class="bi bi-cloud-arrow-up"></i> Subir Documento
+            </a>
+        </div>
+    </div>
+
+    <!-- Filtros por Categoría -->
+    <div class="category-tabs">
+        <a asp-action="Index" asp-route-categoria="" class="category-tab @(string.IsNullOrEmpty(categoriaFiltro) ? "active" : "")">
+            Todas las Categorías
+        </a>
+        @foreach (var cat in categorias)
+        {
+            <a asp-action="Index" asp-route-categoria="@cat.Nombre" class="category-tab @(categoriaFiltro == cat.Nombre ? "active" : "")">
+                @cat.Nombre
+            </a>
+        }
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5" style="background: white; border-radius: 12px; border: 1px dashed #d1d5db;">
+            <i class="bi bi-folder2-open text-muted" style="font-size: 3rem;"></i>
+            <h3 class="mt-3 text-muted" style="font-size: 1.25rem;">No hay documentos</h3>
+            <p class="text-muted">Aún no se han subido archivos @(string.IsNullOrEmpty(categoriaFiltro) ? "" : "en esta categoría").</p>
+        </div>
+    }
+    else
+    {
+        <div class="doc-grid">
+            @foreach (var item in Model)
+            {
+                <div class="doc-card">
+                    <div class="doc-icon">
+                        <i class="bi bi-file-earmark-pdf-fill"></i>
+                    </div>
+                    <div class="doc-title" title="@item.Titulo">@item.Titulo</div>
+                    <div class="doc-desc">@(string.IsNullOrEmpty(item.Descripcion) ? "Sin descripción" : item.Descripcion)</div>
+                    
+                    <div class="doc-meta">
+                        <span><i class="bi bi-calendar3"></i> @item.FechaSubida.ToString("dd MMM yyyy")</span>
+                        <span class="badge bg-light text-dark" style="font-weight: 500;">@(item.Categoria?.Nombre ?? "Sin categoría")</span>
+                    </div>
+
+                    <div class="doc-actions">
+                        <a href="@item.UrlArchivo" target="_blank" class="btn-view">
+                            <i class="bi bi-eye"></i> Ver PDF
+                        </a>
+                        
+                        @if (User.IsInRole("Coordinador") || User.IsInRole("Tecnico") || User.IsInRole("Administrador"))
+                        {
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn-edit" title="Editar">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn-delete" title="Eliminar">
+                                <i class="bi bi-trash3"></i>
+                            </a>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

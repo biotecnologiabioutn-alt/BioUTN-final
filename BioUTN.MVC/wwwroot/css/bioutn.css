@@ -1,0 +1,105 @@
+/* bioutn.css - Adaptado para Light Mode (Atomic Design) */
+
+.bioutn-page {
+    padding-top: 72px;
+}
+
+.bioutn-title {
+    font-weight: 800;
+    letter-spacing: .2px;
+}
+
+.bioutn-subtitle {
+    font-weight: 500;
+}
+
+.bioutn-card-body {
+    padding: 1.5rem;
+}
+
+.bioutn-section-title {
+    color: var(--brand-primary);
+    font-weight: 700;
+    margin-bottom: 6px;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+}
+
+.bioutn-hr {
+    border-color: var(--border-color);
+    opacity: 1;
+}
+
+/* Tabla estilo dashboard */
+.bioutn-table-wrap {
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    background-color: var(--surface);
+}
+
+.bioutn-table {
+    margin: 0;
+    width: 100%;
+}
+
+.bioutn-table thead th {
+    background-color: #F8FAFC;
+    color: var(--text-main);
+    font-weight: 700;
+    padding: 12px 15px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.bioutn-table tbody td {
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: middle;
+    padding: 12px 15px;
+    color: var(--text-main);
+}
+
+.bioutn-table tbody tr {
+    transition: background 0.2s ease;
+}
+
+.bioutn-table tbody tr:hover {
+    background: #F1F5F9;
+}
+
+/* Modal */
+.bioutn-page .modal-content {
+    background-color: var(--surface);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    border-radius: 16px;
+    box-shadow: var(--shadow-md);
+}
+
+.bioutn-page .modal-header {
+    border-bottom: 1px solid var(--border-color);
+}
+
+.bioutn-page .modal-footer {
+    border-top: 1px solid var(--border-color);
+}
+
+/* Wrapper del mensaje global debajo del navbar */
+.global-alert-wrapper {
+    margin-top: 72px;
+    position: relative;
+    z-index: 1050;
+}
+
+/* Sidebar submenu styles */
+.sidebar-submenu { padding-left: 1rem; background-color: rgba(0,0,0,0.02); }
+.nav-item-sidebar-sub {
+    display: flex; align-items: center; padding: 0.6rem 1rem;
+    color: var(--text-main); text-decoration: none; border-radius: 8px;
+    margin-bottom: 0.25rem; font-size: 0.85rem; transition: all 0.3s ease;
+}
+.nav-item-sidebar-sub:hover {
+    color: var(--brand-primary); background-color: rgba(46,125,50,0.05);
+}
+.nav-item-sidebar[aria-expanded="true"] .bi-chevron-down { transform: rotate(180deg); }
+.nav-item-sidebar .bi-chevron-down { transition: transform 0.3s ease; }

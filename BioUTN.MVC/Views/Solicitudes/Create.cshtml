@@ -1,0 +1,393 @@
+@model BioUTN.Modelos.SolicitudLab
+@{
+    ViewData["Title"] = "Nueva Solicitud";
+    var proyectos = ViewBag.Proyectos as List<BioUTN.Modelos.Proyecto> ?? new();
+    var reactivos = ViewBag.Reactivos as List<BioUTN.Modelos.Reactivo> ?? new();
+    var equipos = ViewBag.Equipos as List<BioUTN.Modelos.Equipo> ?? new();
+}
+
+@section Styles {
+<style>
+    .section-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    .section-title {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid #f3f4f6;
+        padding-bottom: 10px;
+        margin-bottom: 16px;
+    }
+    .linea-material {
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 12px;
+        margin-bottom: 8px;
+        position: relative;
+    }
+    .btn-add-linea {
+        background: #e0f2fe;
+        color: #0369a1;
+        border: 1px dashed #7dd3fc;
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        cursor: pointer;
+        width: 100%;
+        text-align: center;
+        transition: all 0.2s;
+    }
+    .btn-add-linea:hover { background: #bae6fd; }
+    .btn-remove-linea {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: #fee2e2;
+        color: #dc2626;
+        border: none;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        font-size: 12px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .tipo-btn {
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 12px 16px;
+        cursor: pointer;
+        text-align: center;
+        transition: all 0.2s;
+        flex: 1;
+    }
+    .tipo-btn:hover { border-color: #a3e635; background: #f7fee7; }
+    .tipo-btn.selected { border-color: #16a34a; background: #dcfce7; color: #166534; }
+    .tipo-btn i { font-size: 1.5rem; display: block; margin-bottom: 4px; }
+</style>
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="bioutn-title mb-0">Nueva Solicitud</h2>
+        <p class="text-muted mb-0 mt-1">Solicita materiales y/o reserva de equipos para tu proyecto.</p>
+    </div>
+    @if (User.IsInRole("Tecnico") || User.IsInRole("Coordinador"))
+    {
+        <a asp-action="Index" class="btn bioutn-btn bioutn-btn-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Volver
+        </a>
+    }
+</div>
+
+<form asp-action="Create" method="post" id="formSolicitud">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger" style="display:none;"></div>
+
+    <!-- 1. Información General -->
+    <div class="section-card">
+        <div class="section-title"><i class="bi bi-info-circle me-2"></i>1. Información General</div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label asp-for="IdProyecto" class="fw-bold small text-muted">Proyecto *</label>
+                <select asp-for="IdProyecto" class="form-select" required>
+                    <option value="">-- Seleccionar Proyecto --</option>
+                    @foreach (var p in proyectos)
+                    {
+                        <option value="@p.Id">@p.NombreProyecto</option>
+                    }
+                </select>
+                <span asp-validation-for="IdProyecto" class="text-danger small"></span>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label asp-for="Observaciones" class="fw-bold small text-muted">Observaciones</label>
+                <input asp-for="Observaciones" class="form-control" placeholder="Ej: Para el experimento del martes" />
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Tipo de Solicitud -->
+    <div class="section-card">
+        <div class="section-title"><i class="bi bi-grid me-2"></i>2. ¿Qué necesitas reservar/solicitar?</div>
+        <input type="hidden" asp-for="TipoSolicitud" id="hiddenTipo" value="Mixta" />
+        <div class="alert alert-light border small text-muted mb-3">
+            <i class="bi bi-info-circle me-1"></i> Selecciona una o más categorías para agregar ítems a tu solicitud.
+        </div>
+        <div class="d-flex flex-wrap gap-3 mb-3">
+            <div class="tipo-btn selected" id="btnReactivos" onclick="toggleSeccion('Reactivos')">
+                <i class="bi bi-droplet-half"></i>
+                Reactivos
+            </div>
+            <div class="tipo-btn selected" id="btnImplementos" onclick="toggleSeccion('Implementos')">
+                <i class="bi bi-tools"></i>
+                Implementos
+            </div>
+            <div class="tipo-btn selected" id="btnEquipos" onclick="toggleSeccion('Equipos')">
+                <i class="bi bi-cpu"></i>
+                Equipos
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Sección Reactivos -->
+    <div class="section-card" id="seccionReactivos">
+        <div class="section-title"><i class="bi bi-droplet-half me-2"></i>3. Reactivos Solicitados</div>
+        
+        <div class="row mb-3 pb-3 border-bottom border-light">
+            <div class="col-md-4">
+                <label asp-for="PrioridadReactivos" class="fw-bold small text-muted">Prioridad Reactivos</label>
+                <select asp-for="PrioridadReactivos" class="form-select" onchange="toggleFechasPrioridad('Reactivos')">
+                    <option value="Urgente">🚨 Urgente (Ahora)</option>
+                    <option value="Planificada">📋 Planificada (Elegir fecha)</option>
+                </select>
+            </div>
+            <div class="col-md-4 fechas-Reactivos" style="display:none;">
+                <label asp-for="FechaReactivos" class="fw-bold small text-muted">Fecha *</label>
+                <input asp-for="FechaReactivos" type="date" class="form-control" />
+            </div>
+            <div class="col-md-4 fechas-Reactivos" style="display:none;">
+                <label asp-for="HoraReactivos" class="fw-bold small text-muted">Hora</label>
+                <select asp-for="HoraReactivos" class="form-select">
+                    @for (int i = 7; i <= 20; i++)
+                    {
+                        var horaStr = i.ToString("D2") + ":00";
+                        if (horaStr == "08:00") { <option value="@horaStr" selected>@horaStr</option> }
+                        else { <option value="@horaStr">@horaStr</option> }
+                    }
+                </select>
+            </div>
+        </div>
+
+        <div id="lineasReactivosContainer">
+            <!-- Se agregarán líneas aquí -->
+        </div>
+        <button type="button" class="btn-add-linea mt-2 mb-3" onclick="agregarLinea('Reactivos')">
+            <i class="bi bi-plus-lg me-1"></i> Agregar Reactivo
+        </button>
+
+        <div class="alert alert-info small mb-0 mt-2">
+            <i class="bi bi-info-circle me-1"></i> 
+            La reserva de los <strong>reactivos</strong> se confirmará automáticamente al ser aprobada por el técnico.
+        </div>
+    </div>
+
+    <!-- 4. Sección Implementos -->
+    <div class="section-card" id="seccionImplementos">
+        <div class="section-title"><i class="bi bi-tools me-2"></i>4. Implementos Solicitados</div>
+        
+        <div class="row mb-3 pb-3 border-bottom border-light">
+            <div class="col-md-4">
+                <label asp-for="PrioridadImplementos" class="fw-bold small text-muted">Prioridad Implementos</label>
+                <select asp-for="PrioridadImplementos" class="form-select" onchange="toggleFechasPrioridad('Implementos')">
+                    <option value="Urgente">🚨 Urgente (Ahora)</option>
+                    <option value="Planificada">📋 Planificada (Elegir fecha)</option>
+                </select>
+            </div>
+            <div class="col-md-4 fechas-Implementos" style="display:none;">
+                <label asp-for="FechaImplementos" class="fw-bold small text-muted">Fecha *</label>
+                <input asp-for="FechaImplementos" type="date" class="form-control" />
+            </div>
+            <div class="col-md-4 fechas-Implementos" style="display:none;">
+                <label asp-for="HoraImplementos" class="fw-bold small text-muted">Hora</label>
+                <select asp-for="HoraImplementos" class="form-select">
+                    @for (int i = 7; i <= 20; i++)
+                    {
+                        var horaStr = i.ToString("D2") + ":00";
+                        if (horaStr == "08:00") { <option value="@horaStr" selected>@horaStr</option> }
+                        else { <option value="@horaStr">@horaStr</option> }
+                    }
+                </select>
+            </div>
+        </div>
+
+        <div id="lineasImplementosContainer">
+            <!-- Se agregarán líneas aquí -->
+        </div>
+        <button type="button" class="btn-add-linea mt-2 mb-3" onclick="agregarLinea('Implementos')">
+            <i class="bi bi-plus-lg me-1"></i> Agregar Implemento
+        </button>
+
+        <div class="alert alert-info small mb-0 mt-2">
+            <i class="bi bi-info-circle me-1"></i> 
+            La reserva de los <strong>implementos</strong> se confirmará automáticamente al ser aprobada por el técnico.
+        </div>
+    </div>
+
+    <!-- 5. Sección Equipo -->
+    <div class="section-card" id="seccionEquipos">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="section-title mb-0"><i class="bi bi-cpu me-2"></i>5. Reserva de Equipo</div>
+            <a asp-controller="ReservaEquipos" asp-action="Calendario" target="_blank" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-calendar-week me-1"></i> Ver Calendario de Disponibilidad
+            </a>
+        </div>
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label asp-for="IdEquipo" class="fw-bold small text-muted">Equipo *</label>
+                <select asp-for="IdEquipo" class="form-select">
+                    <option value="">-- Seleccionar Equipo --</option>
+                    @foreach (var e in equipos)
+                    {
+                        <option value="@e.Id">@e.Nombre — @e.Marca (@e.Estado)</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label asp-for="FechaReservaEquipo" class="fw-bold small text-muted">Fecha de Uso *</label>
+                <input asp-for="FechaReservaEquipo" type="date" class="form-control" />
+            </div>
+            <div class="col-md-2 mb-3">
+                <label asp-for="HoraInicioEquipo" class="fw-bold small text-muted">Hora Inicio</label>
+                <select asp-for="HoraInicioEquipo" class="form-select">
+                    @for (int i = 7; i <= 20; i++)
+                    {
+                        var horaStr = i.ToString("D2") + ":00";
+                        if (horaStr == "08:00") { <option value="@horaStr" selected>@horaStr</option> }
+                        else { <option value="@horaStr">@horaStr</option> }
+                    }
+                </select>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label asp-for="HoraFinEquipo" class="fw-bold small text-muted">Hora Fin</label>
+                <select asp-for="HoraFinEquipo" class="form-select">
+                    @for (int i = 7; i <= 20; i++)
+                    {
+                        var horaStr = i.ToString("D2") + ":00";
+                        if (horaStr == "10:00") { <option value="@horaStr" selected>@horaStr</option> }
+                        else { <option value="@horaStr">@horaStr</option> }
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="alert alert-info small mb-0">
+            <i class="bi bi-info-circle me-1"></i> 
+            La reserva del equipo se confirmará automáticamente al ser <strong>aprobada</strong> por el técnico.
+        </div>
+    </div>
+
+    <!-- Botones -->
+    <div class="text-end">
+        <a asp-action="Index" class="btn btn-secondary me-2">Cancelar</a>
+        <button type="submit" class="btn btn-success px-4" onclick="return validarFormulario()">
+            <i class="bi bi-send me-1"></i> Enviar Solicitud
+        </button>
+    </div>
+</form>
+
+@section Scripts {
+<script>
+    // ── TIPO DE SOLICITUD (TOGGLE SECTIONS) ──────────────────────────────────────
+    const state = { Reactivos: true, Implementos: true, Equipos: true };
+
+    function toggleSeccion(seccion) {
+        state[seccion] = !state[seccion];
+        const btn = document.getElementById('btn' + seccion);
+        btn.classList.toggle('selected', state[seccion]);
+        document.getElementById('seccion' + seccion).style.display = state[seccion] ? 'block' : 'none';
+        
+        // Si apaga equipo, limpiar el select de equipo
+        if(!state.Equipos) {
+            document.querySelector('[name="IdEquipo"]').value = '';
+        }
+    }
+
+    function toggleFechasPrioridad(seccion) {
+        const prioridad = document.getElementById('Prioridad' + seccion).value;
+        const divsFechas = document.querySelectorAll('.fechas-' + seccion);
+        divsFechas.forEach(div => {
+            div.style.display = prioridad === 'Planificada' ? 'block' : 'none';
+        });
+        
+        // Si cambia a Urgente, limpiar los campos
+        if (prioridad === 'Urgente') {
+            document.getElementById('Fecha' + seccion).value = '';
+            document.getElementById('Hora' + seccion).value = '08:00';
+        }
+    }
+
+    // ── LÍNEAS DINÁMICAS DE MATERIALES ───────────────────────
+    let lineaCount = 1;
+    const reactivosOptions = `@Html.Raw(string.Join("", reactivos.Where(r => r.Categoria == "Reactivos").Select(r => $"<option value='{r.Id}'>{r.Nombre} — Stock: {r.StockActual}</option>")))`;
+    const implementosOptions = `@Html.Raw(string.Join("", reactivos.Where(r => r.Categoria == "Implementos").Select(r => $"<option value='{r.Id}'>{r.Nombre} — Stock: {r.StockActual}</option>")))`;
+
+    function agregarLinea(tipo) {
+        const container = document.getElementById('lineas' + tipo + 'Container');
+        const id = lineaCount++;
+        const div = document.createElement('div');
+        div.className = 'linea-material';
+        div.id = 'linea-' + id;
+        
+        const options = tipo === 'Reactivos' ? reactivosOptions : implementosOptions;
+        const label = tipo === 'Reactivos' ? 'Reactivo' : 'Implemento';
+
+        div.innerHTML = `
+            <button type="button" class="btn-remove-linea" onclick="eliminarLinea(${id})">✕</button>
+            <div class="row align-items-center">
+                <div class="col-md-6 mb-2">
+                    <label class="fw-bold small text-muted">${label}</label>
+                    <select name="reactivoIds" class="form-select">
+                        <option value="0">-- Seleccionar --</option>
+                        ${options}
+                    </select>
+                </div>
+                <div class="col-md-3 mb-2">
+                    <label class="fw-bold small text-muted">Cantidad</label>
+                    <input type="number" name="cantidades" step="0.01" min="0" class="form-control" value="1" />
+                </div>
+                <div class="col-md-3 mb-2">
+                    <label class="fw-bold small text-muted">Observación</label>
+                    <input type="text" name="observacionesLinea" class="form-control" placeholder="Opcional" />
+                </div>
+            </div>`;
+        container.appendChild(div);
+    }
+
+    function eliminarLinea(id) {
+        const el = document.getElementById('linea-' + id);
+        if (el) el.remove();
+    }
+
+    function validarFormulario() {
+        // Asegurarse de enviar un TipoSolicitud coherente
+        const tReactivos = state.Reactivos && document.getElementById('lineasReactivosContainer').children.length > 0;
+        const tImplementos = state.Implementos && document.getElementById('lineasImplementosContainer').children.length > 0;
+        const tEquipos = state.Equipos && document.querySelector('[name="IdEquipo"]').value !== '';
+
+        if (!tReactivos && !tImplementos && !tEquipos) {
+            alert('Debe agregar al menos un reactivo, implemento o equipo.');
+            return false;
+        }
+
+        if (tEquipos && (tReactivos || tImplementos)) {
+            document.getElementById('hiddenTipo').value = 'Mixta';
+        } else if (tEquipos) {
+            document.getElementById('hiddenTipo').value = 'Equipo';
+        } else {
+            document.getElementById('hiddenTipo').value = 'Materiales';
+        }
+
+        // Remover lineas invisibles o que no tengan selección
+        if(!state.Reactivos) document.getElementById('lineasReactivosContainer').innerHTML = '';
+        if(!state.Implementos) document.getElementById('lineasImplementosContainer').innerHTML = '';
+        
+        return true;
+    }
+
+    // Inicializar con una línea de cada uno para que no esté vacío
+    window.onload = function() {
+        agregarLinea('Reactivos');
+        agregarLinea('Implementos');
+    }
+</script>
+}

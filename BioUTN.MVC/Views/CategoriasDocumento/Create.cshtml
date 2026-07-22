@@ -1,0 +1,57 @@
+@model BioUTN.Modelos.CategoriaDocumento
+
+@{
+    ViewData["Title"] = "Nueva Categoría";
+}
+
+@section Styles {
+    <style>
+        body { background-color: #f9fafb; font-family: 'Inter', -apple-system, sans-serif; }
+        .figma-container { padding: 40px 20px; max-width: 800px; margin: 0 auto; }
+        .page-title { font-size: 28px; font-weight: 700; color: #111827; margin-bottom: 24px; letter-spacing: -0.5px; }
+        .form-card { background: white; border-radius: 16px; padding: 32px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); border: 1px solid #f3f4f6; }
+        .form-label { font-weight: 600; color: #374151; margin-bottom: 8px; font-size: 14px; }
+        .form-control { border-radius: 8px; border: 1px solid #d1d5db; padding: 12px 16px; transition: all 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .form-control:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); outline: none; }
+        .btn-modern { background-color: #10b981; color: white; padding: 12px 24px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-block; transition: all 0.2s; border: none; box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2); }
+        .btn-modern:hover { background-color: #059669; color: white; transform: translateY(-1px); box-shadow: 0 6px 8px rgba(16, 185, 129, 0.3); }
+        .form-check-input:checked { background-color: #10b981; border-color: #10b981; }
+    </style>
+}
+
+<div class="figma-container">
+    <div class="d-flex align-items-center mb-4">
+        <a asp-action="Index" class="btn btn-link text-decoration-none text-muted p-0 me-3">
+            <i class="bi bi-arrow-left fs-4"></i>
+        </a>
+        <h1 class="page-title mb-0">Crear Categoría</h1>
+    </div>
+
+    <div class="form-card">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+            
+            <div class="mb-4">
+                <label asp-for="Nombre" class="form-label">Nombre de la Categoría</label>
+                <input asp-for="Nombre" class="form-control" placeholder="Ej. Protocolos de Laboratorio" />
+                <span asp-validation-for="Nombre" class="text-danger fs-7 mt-1 d-block"></span>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="Descripcion" class="form-label">Descripción (Opcional)</label>
+                <textarea asp-for="Descripcion" class="form-control" rows="3" placeholder="Breve descripción del tipo de documentos..."></textarea>
+                <span asp-validation-for="Descripcion" class="text-danger fs-7 mt-1 d-block"></span>
+            </div>
+
+            <div class="d-grid mt-5">
+                <button type="submit" class="btn-modern">
+                    <i class="bi bi-save me-2"></i>Guardar Categoría
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

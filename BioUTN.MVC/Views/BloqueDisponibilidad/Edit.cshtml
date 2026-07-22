@@ -1,0 +1,90 @@
+@model BioUTN.Modelos.BloqueDisponibilidad
+
+@{
+    ViewData["Title"] = "Editar Horario";
+}
+
+@section Styles {
+<style>
+    .figma-container { font-family: 'Inter', -apple-system, sans-serif; background-color: #f9fafb; padding: 20px; border-radius: 12px; }
+    .figma-card { background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 0.75rem; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); padding: 1.5rem; }
+    .figma-label { font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 0.5rem; display: block; }
+    .figma-input { width: 100%; padding: 0.625rem 0.75rem; border-radius: 0.5rem; border: 1px solid #e5e7eb; font-size: 14px; color: #111827; outline: none; transition: all 0.2s; background-color: #ffffff; }
+    .figma-input:focus { border-color: rgba(59, 130, 246, 0.6); box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2); }
+    .figma-btn-primary { background-color: #3b82f6; color: white; border: none; padding: 0.625rem 1.25rem; border-radius: 0.5rem; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+    .figma-btn-primary:hover { background-color: #2563eb; color: white; }
+    .figma-btn-secondary { background-color: white; color: #374151; border: 1px solid #e5e7eb; padding: 0.625rem 1.25rem; border-radius: 0.5rem; font-size: 14px; font-weight: 500; transition: all 0.2s; text-decoration: none; display: inline-flex; align-items: center; }
+    .figma-btn-secondary:hover { background-color: #f9fafb; color: #111827; }
+</style>
+}
+
+<div class="figma-container">
+    <div class="mb-4">
+        <h3 style="font-weight: 700; color: #111827; font-size: 18px;">Editar Horario</h3>
+        <p class="text-muted" style="font-size: 13px;">Modifica los horarios de disponibilidad del equipo.</p>
+    </div>
+
+    <div class="row">
+        <div class="col-md-10 col-lg-8">
+            <div class="figma-card">
+                <form asp-action="Edit" class="space-y-4">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3" style="font-size: 13px;"></div>
+                    <input type="hidden" asp-for="Id" />
+
+                    <div class="mb-3">
+                        <label asp-for="IdEquipo" class="figma-label">Equipo *</label>
+                        <select asp-for="IdEquipo" class="figma-input form-select" asp-items="ViewBag.IdEquipo" required>
+                            <option value="">-- Seleccionar Equipo --</option>
+                        </select>
+                        <span asp-validation-for="IdEquipo" class="text-danger small mt-1 d-block"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="DiaSemana" class="figma-label">Día de la Semana *</label>
+                            <select asp-for="DiaSemana" class="figma-input form-select" required>
+                                <option value="Lunes">Lunes</option>
+                                <option value="Martes">Martes</option>
+                                <option value="Miercoles">Miércoles</option>
+                                <option value="Jueves">Jueves</option>
+                                <option value="Viernes">Viernes</option>
+                            </select>
+                            <span asp-validation-for="DiaSemana" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="TipoReserva" class="figma-label">Tipo *</label>
+                            <select asp-for="TipoReserva" class="figma-input form-select" required>
+                                <option value="Investigación">Investigación</option>
+                                <option value="Mantenimiento">Mantenimiento</option>
+                                <option value="Docencia">Docencia</option>
+                            </select>
+                            <span asp-validation-for="TipoReserva" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="HoraInicio" class="figma-label">Hora Inicio *</label>
+                            <input asp-for="HoraInicio" type="time" class="figma-input" required />
+                            <span asp-validation-for="HoraInicio" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="HoraFin" class="figma-label">Hora Fin *</label>
+                            <input asp-for="HoraFin" type="time" class="figma-input" required />
+                            <span asp-validation-for="HoraFin" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 mt-4 pt-3" style="border-top: 1px solid #e5e7eb;">
+                        <a asp-action="Index" class="figma-btn-secondary">Cancelar</a>
+                        <button type="submit" class="figma-btn-primary">Guardar Cambios</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

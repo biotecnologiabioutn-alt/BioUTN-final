@@ -1,0 +1,218 @@
+@model IEnumerable<BioUTN.Modelos.Taxonomia>
+
+@{
+    ViewData["Title"] = "Taxonomías";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+    <div>
+        <h2 class="bioutn-title mb-1">Taxonomía</h2>
+        <p class="text-muted small mb-0">Árbol evolutivo completo · Dominio → Reino → Filo → Clase → Orden → Familia → Género → Especie</p>
+    </div>
+    <div class="d-flex gap-2">
+        @if (User.IsInRole("Tecnico"))
+        {
+            <a asp-action="Create" class="btn bioutn-btn bioutn-btn-primary">
+                <i class="bi bi-plus-lg me-1"></i> Nueva Clasificación
+            </a>
+        }
+    </div>
+</div>
+
+<!-- Leyenda de niveles -->
+<div class="bioutn-card p-4 mb-4 shadow-sm">
+    <p class="text-muted text-uppercase fw-bold mb-3" style="font-size: 0.75rem; letter-spacing: 1px;">Jerarquía taxonómica</p>
+    <div class="d-flex flex-wrap gap-2">
+        <span class="badge rounded-pill bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-3 py-2">Dominio</span>
+        <span class="badge rounded-pill bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 px-3 py-2">Reino</span>
+        <span class="badge rounded-pill bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2">Filo/División</span>
+        <span class="badge rounded-pill bg-info bg-opacity-10 text-info border border-info border-opacity-25 px-3 py-2">Clase</span>
+        <span class="badge rounded-pill bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-3 py-2">Orden</span>
+        <span class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 px-3 py-2">Familia</span>
+        <span class="badge rounded-pill bg-dark bg-opacity-10 text-dark border border-dark border-opacity-25 px-3 py-2">Género</span>
+        <span class="badge rounded-pill bg-purple bg-opacity-10 text-purple border border-purple border-opacity-25 px-3 py-2" style="background-color: rgba(111, 66, 193, 0.1); color: #6f42c1; border-color: rgba(111, 66, 193, 0.25);">Especie</span>
+    </div>
+</div>
+
+<div class="taxonomia-list space-y-3">
+    @if (Model != null && Model.Any())
+    {
+        foreach (var item in Model)
+        {
+            <div class="bioutn-card mb-3 shadow-sm border-0 taxon-card">
+                <!-- Cabecera colapsable -->
+                <a class="text-decoration-none text-dark d-flex align-items-center justify-content-between p-3 taxon-header" 
+                   data-bs-toggle="collapse" href="#collapseTaxon_@item.Id" role="button" aria-expanded="false" aria-controls="collapseTaxon_@item.Id">
+                    
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="d-flex align-items-center justify-content-center rounded-3 bg-purple bg-opacity-10 text-purple" style="width: 40px; height: 40px; background-color: rgba(111, 66, 193, 0.1); color: #6f42c1;">
+                            <i class="bi bi-diagram-3 fs-5"></i>
+                        </div>
+                        <div>
+                            <p class="mb-0 fw-bold fst-italic">@item.Especie</p>
+                            <p class="mb-0 text-muted small">@item.Familia · @item.Orden</p>
+                        </div>
+                    </div>
+                    <i class="bi bi-chevron-right text-muted taxon-chevron transition-transform"></i>
+                </a>
+
+                <!-- Árbol expandido -->
+                <div class="collapse border-top" id="collapseTaxon_@item.Id">
+                    <div class="p-4 bg-light">
+                        <div class="d-flex flex-column gap-2 taxon-tree-view">
+                            
+                            @if (!string.IsNullOrEmpty(item.Dominio))
+                            {
+                                <div class="d-flex align-items-center gap-2" style="padding-left: 0px;">
+                                    <span class="badge rounded-pill bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-3 py-2 fw-normal"><span class="opacity-75 me-2">Dominio</span> <strong class="fw-bold">@item.Dominio</strong></span>
+                                </div>
+                            }
+
+                            @if (!string.IsNullOrEmpty(item.Reino))
+                            {
+                                <div class="d-flex align-items-center gap-2" style="padding-left: 18px;">
+                                    <div class="tree-line"></div>
+                                    <span class="badge rounded-pill bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 px-3 py-2 fw-normal"><span class="opacity-75 me-2">Reino</span> <strong class="fw-bold">@item.Reino</strong></span>
+                                </div>
+                            }
+                            
+                            @if (!string.IsNullOrEmpty(item.SubReino))
+                            {
+                                <div class="d-flex align-items-center gap-2" style="padding-left: 36px;">
+                                    <div class="tree-line"></div>
+                                    <span class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 px-3 py-2 fw-normal"><span class="opacity-75 me-2">Sub-Reino</span> <strong class="fw-bold">@item.SubReino</strong></span>
+                                </div>
+                            }
+
+                            @if (!string.IsNullOrEmpty(item.FiloDivision))
+                            {
+                                <div class="d-flex align-items-center gap-2" style="padding-left: 54px;">
+                                    <div class="tree-line"></div>
+                                    <span class="badge rounded-pill bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2 fw-normal"><span class="opacity-75 me-2">Filo/División</span> <strong class="fw-bold">@item.FiloDivision</strong></span>
+                                </div>
+                            }
+
+                            @if (!string.IsNullOrEmpty(item.Clase))
+                            {
+                                <div class="d-flex align-items-center gap-2" style="padding-left: 72px;">
+                                    <div class="tree-line"></div>
+                                    <span class="badge rounded-pill bg-info bg-opacity-10 text-info border border-info border-opacity-25 px-3 py-2 fw-normal"><span class="opacity-75 me-2">Clase</span> <strong class="fw-bold">@item.Clase</strong></span>
+                                </div>
+                            }
+
+                            @if (!string.IsNullOrEmpty(item.Orden))
+                            {
+                                <div class="d-flex align-items-center gap-2" style="padding-left: 90px;">
+                                    <div class="tree-line"></div>
+                                    <span class="badge rounded-pill bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-3 py-2 fw-normal"><span class="opacity-75 me-2">Orden</span> <strong class="fw-bold">@item.Orden</strong></span>
+                                </div>
+                            }
+
+                            @if (!string.IsNullOrEmpty(item.Familia))
+                            {
+                                <div class="d-flex align-items-center gap-2" style="padding-left: 108px;">
+                                    <div class="tree-line"></div>
+                                    <span class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 px-3 py-2 fw-normal"><span class="opacity-75 me-2">Familia</span> <strong class="fw-bold">@item.Familia</strong></span>
+                                </div>
+                            }
+                            
+                            @if (!string.IsNullOrEmpty(item.SubFamilia))
+                            {
+                                <div class="d-flex align-items-center gap-2" style="padding-left: 126px;">
+                                    <div class="tree-line"></div>
+                                    <span class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 px-3 py-2 fw-normal"><span class="opacity-75 me-2">Sub-Familia</span> <strong class="fw-bold">@item.SubFamilia</strong></span>
+                                </div>
+                            }
+
+                            @if (!string.IsNullOrEmpty(item.Tribu))
+                            {
+                                <div class="d-flex align-items-center gap-2" style="padding-left: 144px;">
+                                    <div class="tree-line"></div>
+                                    <span class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 px-3 py-2 fw-normal"><span class="opacity-75 me-2">Tribu</span> <strong class="fw-bold">@item.Tribu</strong></span>
+                                </div>
+                            }
+
+                            @if (!string.IsNullOrEmpty(item.SubTribu))
+                            {
+                                <div class="d-flex align-items-center gap-2" style="padding-left: 162px;">
+                                    <div class="tree-line"></div>
+                                    <span class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 px-3 py-2 fw-normal"><span class="opacity-75 me-2">Sub-Tribu</span> <strong class="fw-bold">@item.SubTribu</strong></span>
+                                </div>
+                            }
+
+                            @if (!string.IsNullOrEmpty(item.Genero))
+                            {
+                                <div class="d-flex align-items-center gap-2" style="padding-left: 180px;">
+                                    <div class="tree-line"></div>
+                                    <span class="badge rounded-pill bg-dark bg-opacity-10 text-dark border border-dark border-opacity-25 px-3 py-2 fw-normal"><span class="opacity-75 me-2">Género</span> <strong class="fw-bold">@item.Genero</strong></span>
+                                </div>
+                            }
+
+                            @if (!string.IsNullOrEmpty(item.Especie))
+                            {
+                                <div class="d-flex align-items-center gap-2" style="padding-left: 198px;">
+                                    <div class="tree-line"></div>
+                                    <span class="badge rounded-pill bg-purple bg-opacity-10 text-purple border border-purple border-opacity-25 px-3 py-2 fw-normal" style="background-color: rgba(111, 66, 193, 0.1); color: #6f42c1; border-color: rgba(111, 66, 193, 0.25);"><span class="opacity-75 me-2">Especie</span> <strong class="fw-bold">@item.Especie</strong></span>
+                                </div>
+                            }
+
+                        </div>
+                        
+                        @if (User.IsInRole("Tecnico"))
+                        {
+                            <div class="mt-4 pt-3 border-top d-flex gap-2">
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary shadow-sm rounded-pill px-3">
+                                    <i class="bi bi-pencil me-1"></i> Editar
+                                </a>
+                                <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline" onsubmit="return confirm('¿Está seguro de eliminar esta clasificación?');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger shadow-sm rounded-pill px-3">
+                                        <i class="bi bi-trash me-1"></i> Eliminar
+                                    </button>
+                                </form>
+                            </div>
+                        }
+
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <i class="bi bi-diagram-3 fs-1 text-muted opacity-50 mb-3 d-block" style="font-size: 3rem;"></i>
+            <p class="text-muted">No hay clasificaciones taxonómicas registradas.</p>
+        </div>
+    }
+</div>
+
+@section Styles {
+    <style>
+        .taxon-card {
+            transition: all 0.2s ease;
+            border: 1px solid var(--border-color) !important;
+        }
+        .taxon-card:hover {
+            border-color: rgba(111, 66, 193, 0.5) !important;
+        }
+        .taxon-header:hover {
+            background-color: rgba(0,0,0,0.02);
+        }
+        .taxon-chevron {
+            transition: transform 0.3s ease;
+        }
+        .taxon-header[aria-expanded="true"] .taxon-chevron {
+            transform: rotate(90deg);
+            color: #6f42c1 !important;
+        }
+        .tree-line {
+            width: 12px;
+            height: 1px;
+            background-color: #dee2e6;
+            flex-shrink: 0;
+        }
+        .taxon-tree-view .badge {
+            font-size: 0.8rem;
+        }
+    </style>
+}

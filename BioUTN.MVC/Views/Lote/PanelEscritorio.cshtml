@@ -1,0 +1,99 @@
+@{
+    ViewData["Title"] = "Panel de Escritorio - Etiquetas QR";
+}
+
+<!-- Simulación de interfaz Desktop (más ancha) -->
+<div class="container-fluid mt-4 px-4 pb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="text-dark"><i class="fas fa-desktop text-muted"></i> Panel Técnico de Impresión</h4>
+        <span class="badge bg-secondary fs-6">Vista Escritorio</span>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <h6 class="text-uppercase text-muted fw-bold mb-4">Lotes Activos para Etiquetado Maestro</h6>
+            
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Código Maestro (Lote)</th>
+                            <th>Especie</th>
+                            <th>Fase</th>
+                            <th>Unidades</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="fw-bold font-monospace">Chry-MIC-04-R0-28042026-FR</td>
+                            <td>Chrysanthemum morifolium</td>
+                            <td>R0</td>
+                            <td>6 frascos</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary" onclick="simularImpresion('Chry-MIC-04-R0-28042026-FR', 'Chrysanthemum morifolium')">
+                                    <i class="fas fa-qrcode"></i> Exportar QR
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold font-monospace">Sion-CAL-01-R2-11072026-CE</td>
+                            <td>Saintpaulia ionantha</td>
+                            <td>R2</td>
+                            <td>51 frascos</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary" onclick="simularImpresion('Sion-CAL-01-R2-11072026-CE', 'Saintpaulia ionantha')">
+                                    <i class="fas fa-qrcode"></i> Exportar QR
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Simulación PDF (RF-10) -->
+<div class="modal fade" id="qrModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-center">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title"><i class="fas fa-file-pdf text-danger"></i> PDF Maestro Generado</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-4 bg-white">
+                <div class="border border-2 border-dark d-inline-block p-4 mx-auto bg-white" style="width: 300px; box-shadow: 2px 2px 5px rgba(0,0,0,0.2);">
+                    <h6 class="fw-bold mb-1" id="lblEspecie">Especie</h6>
+                    <p class="font-monospace small mb-2" id="lblLote">Lote</p>
+                    <!-- Placeholder QR (usando FontAwesome gigante) -->
+                    <i class="fas fa-qrcode" style="font-size: 150px;"></i>
+                    <p class="small text-muted mt-2 mb-0">URI Encriptada para Escáner UTN</p>
+                </div>
+                <div class="mt-4">
+                    <button class="btn btn-success" onclick="cerrarPrint()"><i class="fas fa-print"></i> Enviar a Impresora de Etiquetas</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let qrModalInstance;
+        document.addEventListener('DOMContentLoaded', () => {
+            qrModalInstance = new bootstrap.Modal(document.getElementById('qrModal'));
+        });
+
+        function simularImpresion(lote, especie) {
+            document.getElementById('lblLote').innerText = lote;
+            document.getElementById('lblEspecie').innerText = especie;
+            qrModalInstance.show();
+        }
+
+        function cerrarPrint() {
+            alert("Etiqueta Maestra enviada a la impresora correctamente. No pegar etiquetas individuales en los frascos.");
+            qrModalInstance.hide();
+        }
+    </script>
+}

@@ -1,0 +1,239 @@
+@model IEnumerable<BioUTN.Modelos.SolicitudLab>
+@{
+    ViewData["Title"] = "Solicitudes de Laboratorio";
+    bool esTecnico = ViewBag.EsTecnico ?? false;
+    var reactivos = ViewBag.Reactivos as List<BioUTN.Modelos.Reactivo> ?? new();
+    var equipos = ViewBag.Equipos as List<BioUTN.Modelos.Equipo> ?? new();
+    var proyectos = ViewBag.Proyectos as List<BioUTN.Modelos.Proyecto> ?? new();
+    var usuarios = ViewBag.Usuarios as List<BioUTN.Modelos.Usuario> ?? new();
+}
+
+<style>
+    .solicitud-badge {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    .badge-pendiente { background: #fef9c3; color: #854d0e; }
+    .badge-aprobada { background: #dcfce7; color: #166534; }
+    .badge-rechazada { background: #fee2e2; color: #991b1b; }
+    .badge-urgente { background: #ffe4e6; color: #9f1239; }
+    .badge-planificada { background: #e0f2fe; color: #075985; }
+    .badge-equipo { background: #f3e8ff; color: #6b21a8; }
+    .badge-materiales { background: #f0fdf4; color: #166534; }
+    .badge-mixta { background: #fff7ed; color: #9a3412; }
+
+    .action-btn-aprobar {
+        background: #dcfce7;
+        color: #166534;
+        border: 1px solid #86efac;
+        border-radius: 6px;
+        padding: 5px 12px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .action-btn-aprobar:hover { background: #16a34a; color: white; }
+
+    .action-btn-rechazar {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fca5a5;
+        border-radius: 6px;
+        padding: 5px 12px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .action-btn-rechazar:hover { background: #dc2626; color: white; }
+
+    .modal-rechazo { display: none; }
+</style>
+
+<!-- Encabezado -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="bioutn-title mb-0">
+            @if (esTecnico)
+            {
+                <text>Bandeja de Solicitudes</text>
+            }
+            else
+            {
+                <text>Mis Solicitudes</text>
+            }
+        </h2>
+        <p class="text-muted mb-0 mt-1">
+            @if (esTecnico)
+            {
+                <text>Gestiona las solicitudes de materiales y equipos de los proyectos.</text>
+            }
+            else
+            {
+                <text>Solicita materiales e implementos para tu proyecto de investigación.</text>
+            }
+        </p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-controller="Inventarios" asp-action="Index" class="btn bioutn-btn bioutn-btn-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Volver
+        </a>
+        @if (!esTecnico)
+        {
+            <a asp-action="Create" class="btn bioutn-btn bioutn-btn-primary shadow-sm">
+                <i class="bi bi-plus-circle me-1"></i> Nueva Solicitud
+            </a>
+        }
+    </div>
+</div>
+
+<!-- Estadísticas rápidas (solo técnico) -->
+@if (esTecnico)
+{
+    var pendientes = Model.Count(s => s.Estado == "Pendiente");
+    var aprobadas = Model.Count(s => s.Estado == "Aprobada");
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="bioutn-card text-center py-3">
+                <div class="fs-2 fw-bold text-warning">@pendientes</div>
+                <div class="text-muted small">Pendientes</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="bioutn-card text-center py-3">
+                <div class="fs-2 fw-bold text-success">@aprobadas</div>
+                <div class="text-muted small">Aprobadas hoy</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="bioutn-card text-center py-3">
+                <div class="fs-2 fw-bold text-dark">@Model.Count()</div>
+                <div class="text-muted small">Total</div>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Tabla principal -->
+<div class="bioutn-card">
+    <div class="bioutn-card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0 bioutn-table">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">#</th>
+                        <th>PROYECTO</th>
+                        <th>TIPO</th>
+                        <th>PRIORIDAD</th>
+                        <th>SOLICITANTE</th>
+                        <th>FECHA</th>
+                        <th>ESTADO</th>
+                        <th class="text-center pe-4">ACCIONES</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var s in Model)
+                    {
+                        var proyecto = proyectos.FirstOrDefault(p => p.Id == s.IdProyecto);
+                        var solicitante = usuarios.FirstOrDefault(u => u.Id == s.IdSolicitante);
+                        <tr>
+                            <td class="ps-4 text-muted small">SOL-@s.Id.ToString("D4")</td>
+                            <td class="fw-medium">@(proyecto?.NombreProyecto ?? "—")</td>
+                            <td>
+                                <span class="solicitud-badge badge-@(s.TipoSolicitud?.ToLower() ?? "materiales")">
+                                    @s.TipoSolicitud
+                                </span>
+                            </td>
+                            <td>
+                                <span class="solicitud-badge badge-@(s.Prioridad?.ToLower() ?? "planificada")">
+                                    @s.Prioridad
+                                </span>
+                            </td>
+                            <td>@(solicitante != null ? $"{solicitante.Nombres} {solicitante.Apellidos}" : "—")</td>
+                            <td class="text-muted small">@s.FechaSolicitud.ToString("dd/MM/yyyy")</td>
+                            <td>
+                                <span class="solicitud-badge badge-@(s.Estado?.ToLower() ?? "pendiente")">
+                                    @s.Estado
+                                </span>
+                            </td>
+                            <td class="text-center pe-4">
+                                <div class="d-flex gap-1 justify-content-center">
+                                    <a asp-action="Details" asp-route-id="@s.Id" class="btn btn-sm btn-outline-info" title="Ver detalles">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    @if (esTecnico && s.Estado == "Pendiente")
+                                    {
+                                        <!-- Aprobar -->
+                                        <form asp-action="Aprobar" asp-route-id="@s.Id" method="post" style="display:inline;">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="action-btn-aprobar" 
+                                                    onclick="return confirm('¿Aprobar la solicitud SOL-@s.Id.ToString("D4")? Se descontará el stock y se creará la reserva.')">
+                                                <i class="bi bi-check-lg"></i> Aprobar
+                                            </button>
+                                        </form>
+                                        <!-- Rechazar (abre modal) -->
+                                        <button class="action-btn-rechazar" 
+                                                onclick="abrirModalRechazo(@s.Id, 'SOL-@s.Id.ToString("D4")')">
+                                            <i class="bi bi-x-lg"></i> Rechazar
+                                        </button>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="8" class="text-center py-5 text-muted">
+                                <i class="bi bi-inbox fs-2 d-block mb-2 text-black-50"></i>
+                                No hay solicitudes registradas.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Rechazo -->
+<div class="modal fade" id="modalRechazo" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="bi bi-x-circle me-2"></i> Rechazar Solicitud</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formRechazo" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <p class="text-muted mb-3">Solicitud: <strong id="lblSolicitudId"></strong></p>
+                    <label class="fw-bold small text-muted mb-1">Motivo del Rechazo *</label>
+                    <textarea name="motivoRechazo" class="form-control" rows="3" 
+                              placeholder="Ej: Stock insuficiente, equipo en mantenimiento..." required></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-x-lg me-1"></i> Confirmar Rechazo
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function abrirModalRechazo(id, codigo) {
+            document.getElementById('lblSolicitudId').textContent = codigo;
+            document.getElementById('formRechazo').action = '/Solicitudes/Rechazar/' + id;
+            var modal = new bootstrap.Modal(document.getElementById('modalRechazo'));
+            modal.show();
+        }
+    </script>
+}

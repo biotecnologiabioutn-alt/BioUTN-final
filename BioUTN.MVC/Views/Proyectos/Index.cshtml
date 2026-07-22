@@ -1,0 +1,116 @@
+@model IEnumerable<BioUTN.Modelos.Proyecto>
+
+@{
+    ViewData["Title"] = "Proyectos";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-success fw-bold m-0"><i class="bi bi-folder2-open me-2"></i>Galería de Proyectos / Carpetas</h2>
+        @if (User.IsInRole("Tecnico") || User.IsInRole("Coordinador"))
+        {
+            <div class="d-flex gap-2">
+                <a asp-action="Create" asp-route-tipo="Tesis" class="btn btn-success shadow-sm rounded-pill px-4">
+                    Nuevo proyecto Tesis
+                </a>
+                <a asp-action="Create" asp-route-tipo="Investigacion" class="btn shadow-sm rounded-pill px-4" style="background-color: #0d6efd; border-color: #0d6efd; color: white;">
+                    Nuevo proyecto Investigación
+                </a>
+            </div>
+        }
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>@TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+        @foreach (var item in Model)
+        {
+            var isTesis = item.TipoProyecto == "Tesis";
+            var cardBorderClass = isTesis ? "border-success" : "border-primary";
+            var textClass = isTesis ? "text-success" : "text-primary";
+            var iconClass = isTesis ? "bi-folder-fill" : "bi-folder-symlink-fill";
+            var bgClass = isTesis ? "bg-success" : "bg-primary";
+
+            <div class="col">
+                <div class="card h-100 shadow-sm rounded-4 border-top-0 border-end-0 border-bottom-0 border-4 @cardBorderClass hover-elevate transition-all" style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;">
+                    <div class="card-body p-4 position-relative">
+                        <!-- Icono y título -->
+                        <div class="d-flex align-items-start mb-3">
+                            <i class="bi @iconClass @textClass fs-1 me-3"></i>
+                            <div>
+                                <h5 class="card-title fw-bold mb-1">@item.NombreProyecto</h5>
+                                <span class="badge @bgClass bg-opacity-10 @textClass rounded-pill">@item.TipoProyecto</span>
+                            </div>
+                        </div>
+
+                        <!-- Info -->
+                        <p class="card-text text-muted small mb-3" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                            @item.Descripcion
+                        </p>
+
+                        <div class="mb-3 small">
+                            <div class="d-flex align-items-center mb-1">
+                                <i class="bi bi-calendar-check me-2 text-muted"></i>
+                                <span><strong>Inicio:</strong> @item.FechaInicio.ToString("dd MMM yyyy")</span>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-calendar-x me-2 text-muted"></i>
+                                <span><strong>Fin:</strong> @(item.FechaFin.HasValue ? item.FechaFin.Value.ToString("dd MMM yyyy") : "En curso")</span>
+                            </div>
+                        </div>
+
+                        <!-- Estado -->
+                        <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top">
+                            <div>
+                                @{ var isActivo = item.Estado == "Activo"; }
+                                @if (isActivo)
+                                {
+                                    <span class="badge bg-success"><i class="bi bi-record-circle me-1"></i>Activo</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary"><i class="bi bi-archive me-1"></i>@item.Estado</span>
+                                }
+                            </div>
+                            <!-- Acciones (Ocultas hasta hover o click) -->
+                            <div class="btn-group">
+                                @if (User.IsInRole("Tecnico") || User.IsInRole("Coordinador"))
+                                {
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary rounded-start-pill" title="Detalles">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary" title="Editar">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-outline-danger rounded-end-pill" title="Eliminar" onclick="confirmDelete(@item.Id, '@item.NombreProyecto')">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary rounded-pill px-3" title="Detalles">
+                                        <i class="bi bi-eye me-1"></i> Ver Detalles
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .hover-elevate:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+    }
+</style>

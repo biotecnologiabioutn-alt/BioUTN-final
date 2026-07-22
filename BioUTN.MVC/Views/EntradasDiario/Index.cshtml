@@ -1,0 +1,74 @@
+@model IEnumerable<BioUTN.Modelos.EntradaDiario>
+
+@{
+    ViewData["Title"] = "Fichas de Seguimiento";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="bioutn-title mb-0">Fichas de Seguimiento</h2>
+        <p class="text-muted small mt-1">Observaciones y notas sobre los lotes y proyectos</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-controller="Cultivos" asp-action="Index" class="btn bioutn-btn bioutn-btn-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Volver a Cultivos
+        </a>
+        <a asp-action="Create" class="btn bioutn-btn bioutn-btn-primary">
+            <i class="bi bi-plus-lg me-1"></i> Nueva Ficha
+        </a>
+    </div>
+</div>
+
+<div class="bioutn-card">
+    <div class="bioutn-card-body p-0">
+        <div class="table-responsive">
+            <table class="table bioutn-table mb-0">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Título</th>
+                        <th>Contenido</th>
+                        <th>Lote (ID)</th>
+                        <th>Proyecto (ID)</th>
+                        <th class="text-end">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.FechaRegistro.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>@item.Titulo</td>
+                                <td><span class="text-truncate d-inline-block" style="max-width: 250px;">@item.Contenido</span></td>
+                                <td>@item.IdLoteCultivo</td>
+                                <td>@item.IdProyecto</td>
+                                <td class="text-end">
+                                    <div class="btn-group btn-group-sm">
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-primary" title="Editar">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline" onsubmit="return confirm('¿Está seguro de eliminar esta ficha?');">
+                                            <button type="submit" class="btn btn-outline-danger" title="Eliminar">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center py-4 text-muted">
+                                No se encontraron fichas de seguimiento.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
